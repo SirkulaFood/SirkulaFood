@@ -1,2 +1,1 @@
-# pangora
 # SirkulaFood
