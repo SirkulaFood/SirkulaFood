@@ -3,13 +3,16 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -20,6 +23,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'role',
+        'telegram_chat_id',
         'password',
     ];
 
@@ -44,5 +50,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /** @param Builder<User> $query */
+    public function scopeNotificationRecipients(Builder $query): Builder
+    {
+        return $query->whereIn('role', ['business_owner', 'manager', 'cashier']);
+    }
+
+    /** Get the donation partner profile owned by this account. */
+    public function donationPartner(): HasOne
+    {
+        return $this->hasOne(DonationPartner::class);
+    }
+
+    /** Resolve the post-authentication destination for this account role. */
+    public function landingRoute(): string
+    {
+        if ($this->role === 'SirkulaFood_admin') {
+            return 'admin.partners.index';
+        }
+
+        if (in_array($this->role, ['donation_partner', 'umkm_partner'], true)) {
+            return $this->donationPartner?->is_active
+                ? match ($this->role) {
+                    'umkm_partner' => 'umkm.offers',
+                    'donation_partner' => 'partner.scan',
+                    default => 'partner.pending',
+                }
+            : 'partner.pending';
+        }
+
+        return 'dashboard';
     }
 }

@@ -1,4 +1,5 @@
 {
+    "name": "sirkulafood",
     "private": true,
     "type": "module",
     "scripts": {

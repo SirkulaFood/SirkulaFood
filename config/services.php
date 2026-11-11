@@ -35,4 +35,33 @@ return [
         ],
     ],
 
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
+    ],
+
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.1-8b-instant'),
+    ],
+
+    'ninerouter' => [
+        'api_key' => env('NINEROUTER_API_KEY'),
+        'base_url' => env('NINEROUTER_BASE_URL', 'http://127.0.0.1:20128/v1'),
+        'model' => env('NINEROUTER_MODEL', 'openrouter/google/gemma-4-31b-it:free'),
+        'vision_model' => env('NINEROUTER_VISION_MODEL', 'openrouter/nvidia/nemotron-3.5-super-vl:free'),
+    ],
+
+    'n8n' => [
+        'webhook_url' => env('N8N_WEBHOOK_URL'),
+        'event_webhook_url' => env('N8N_EVENT_WEBHOOK_URL'),
+        'event_webhook_username' => env('N8N_EVENT_WEBHOOK_USERNAME'),
+        'event_webhook_password' => env('N8N_EVENT_WEBHOOK_PASSWORD'),
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
+    ],
+
 ];
