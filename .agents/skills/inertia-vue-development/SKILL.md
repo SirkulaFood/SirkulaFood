@@ -6,19 +6,19 @@ metadata:
   author: laravel
 ---
 
-# Inertia Vue development
+# Inertia Vue Development
 
 ## Documentation
 
 Use `search-docs` for detailed Inertia v2 Vue patterns and documentation.
 
-## Basic usage
+## Basic Usage
 
-### Page components location
+### Page Components Location
 
-Place Vue page components in the `resources/js/pages` directory.
+Vue page components should be placed in the `resources/js/pages` directory.
 
-### Page component structure
+### Page Component Structure
 
 Important: Vue components must have a single root element.
 
@@ -42,11 +42,11 @@ defineProps({
 </template>
 ```
 
-## Client-side navigation
+## Client-Side Navigation
 
-### Basic Link component
+### Basic Link Component
 
-Use `<Link>` for client-side navigation instead of `<a>` tags:
+Use `<Link>` for client-side navigation instead of traditional `<a>` tags:
 
 <!-- Inertia Vue Navigation -->
 ```vue
@@ -63,7 +63,7 @@ import { Link } from '@inertiajs/vue3'
 </template>
 ```
 
-### Link with method
+### Link with Method
 
 <!-- Link with POST Method -->
 ```vue
@@ -95,7 +95,7 @@ import { Link } from '@inertiajs/vue3'
 </template>
 ```
 
-### Programmatic navigation
+### Programmatic Navigation
 
 <!-- Router Visit -->
 ```vue
@@ -122,11 +122,11 @@ function createUser() {
 </template>
 ```
 
-## Form handling
+## Form Handling
 
-### `useForm` composable
+### `useForm` Composable
 
-In Inertia v2.0.x, build forms with the `useForm` composable. The `<Form>` component is not available until v2.1.0+.
+For Inertia v2.0.x: Build forms using the `useForm` composable as the `<Form>` component is not available until v2.1.0+.
 
 <!-- useForm Composable Example -->
 ```vue
@@ -164,11 +164,11 @@ function submit() {
 </template>
 ```
 
-## Inertia v2 features
+## Inertia v2 Features
 
-### Deferred props
+### Deferred Props
 
-Use deferred props to load data after the initial page render:
+Use deferred props to load data after initial page render:
 
 <!-- Deferred Props with Empty State -->
 ```vue
@@ -196,7 +196,7 @@ defineProps({
 
 ### Polling
 
-Use the `usePoll` composable to refresh data automatically at intervals. The composable cleans up on unmount and throttles polling when the browser tab is inactive.
+Use the `usePoll` composable to automatically refresh data at intervals. It handles cleanup on unmount and throttles polling when the tab is inactive.
 
 <!-- Basic Polling -->
 ```vue
@@ -251,12 +251,12 @@ const { start, stop } = usePoll(5000, {
 </template>
 ```
 
-- `autoStart` (default `true`): set to `false` to start polling manually with the returned `start()` function
-- `keepAlive` (default `false`): set to `true` to prevent throttling when the browser tab is inactive
+- `autoStart` (default `true`) — set to `false` to start polling manually via the returned `start()` function
+- `keepAlive` (default `false`) — set to `true` to prevent throttling when the browser tab is inactive
 
-### WhenVisible (infinite scroll)
+### WhenVisible (Infinite Scroll)
 
-Load more data when the user scrolls to a specific element:
+Load more data when user scrolls to a specific element:
 
 <!-- Infinite Scroll with WhenVisible -->
 ```vue
@@ -287,15 +287,15 @@ defineProps({
 </template>
 ```
 
-## Server-side patterns
+## Server-Side Patterns
 
-The inertia-laravel guidelines cover server-side patterns such as Inertia::render, props, and middleware.
+Server-side patterns (Inertia::render, props, middleware) are covered in inertia-laravel guidelines.
 
-## Common pitfalls
+## Common Pitfalls
 
 - Using traditional `<a>` links instead of Inertia's `<Link>` component (breaks SPA behavior)
 - Forgetting that Vue components must have a single root element
 - Forgetting to add loading states (skeleton screens) when using deferred props
 - Not handling the `undefined` state of deferred props before data loads
-- Using `<form>` without preventing default submission (use the `<Form>` component or `@submit.prevent`)
-- Forgetting to check whether the `<Form>` component is available in your Inertia version
+- Using `<form>` without preventing default submission (use `<Form>` component or `@submit.prevent`)
+- Forgetting to check if `<Form>` component is available in your Inertia version
