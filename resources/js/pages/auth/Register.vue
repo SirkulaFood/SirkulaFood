@@ -9,8 +9,13 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 const form = useForm({
+    partner_type: 'foundation',
+    organization_name: '',
     name: '',
     email: '',
+    phone: '',
+    telegram_chat_id: '',
+    address: '',
     password: '',
     password_confirmation: '',
 });
@@ -23,11 +28,27 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthBase title="Create an account" description="Enter your details below to create your account">
-        <Head title="Register" />
+    <AuthBase title="Daftar akun SirkulaFood" description="Daftarkan Yayasan penerima donasi, UMKM penerima diskon, atau supermarket/toko pemberi donasi dan diskon. Akun menunggu persetujuan Admin SirkulaFood.">
+        <Head title="Daftar Mitra SirkulaFood" />
 
-        <form @submit.prevent="submit" class="flex flex-col gap-6">
-            <div class="grid gap-6">
+        <form @submit.prevent="submit" class="flex w-full min-w-0 flex-col gap-6">
+            <div class="grid w-full min-w-0 gap-6">
+                <div class="grid gap-2">
+                    <Label for="partner_type">Jenis mitra</Label>
+                    <select id="partner_type" v-model="form.partner_type" class="h-10 w-full max-w-full truncate rounded-md border border-input bg-background px-3 text-sm">
+                        <option value="foundation">Yayasan / Badan Amal — menerima produk donasi</option>
+                        <option value="umkm">Mitra UMKM — menerima informasi produk diskon</option>
+                        <option value="business_owner">Supermarket / Toko — Pemberi Donasi & Diskon</option>
+                    </select>
+                    <InputError :message="form.errors.partner_type" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="organization_name">Nama organisasi / usaha</Label
+                    ><Input id="organization_name" required v-model="form.organization_name" :placeholder="form.partner_type === 'umkm' ? 'Contoh: Dapur Sejahtera' : form.partner_type === 'business_owner' ? 'Contoh: Supermarket Sejahtera' : 'Contoh: Yayasan Pangan Sejahtera'" /><InputError
+                        :message="form.errors.organization_name"
+                    />
+                </div>
+                <p class="-mt-3 text-xs leading-relaxed text-muted-foreground break-words">Yayasan menerima donasi, UMKM menerima informasi diskon, dan supermarket/toko mengelola dashboard operasional stok, batch, diskon, dan donasi setelah disetujui Admin SirkulaFood. Pemilik dapat memberikan akses operasional kepada staf melalui akun manager/kasir.</p>
                 <div class="grid gap-2">
                     <Label for="name">Name</Label>
                     <Input id="name" type="text" required autofocus tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
@@ -35,9 +56,35 @@ const submit = () => {
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="telegram_chat_id">Telegram Chat ID</Label
+                    ><Input id="telegram_chat_id" required v-model="form.telegram_chat_id" placeholder="Chat ID dari bot SirkulaFood" /><InputError
+                        :message="form.errors.telegram_chat_id"
+                    />
+                    <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan Chat ID, buka Telegram dan tekan tombol Start pada bot SirkulaFoodPartner_Bot terlebih dahulu. Chat ID dipakai untuk notifikasi sesuai jenis mitra.</p>
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="address">Alamat organisasi</Label
+                    ><textarea
+                        id="address"
+                        required
+                        v-model="form.address"
+                        rows="3"
+                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        placeholder="Alamat untuk pengambilan donasi"
+                    /><InputError :message="form.errors.address" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="email">Email address</Label>
                     <Input id="email" type="email" required tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="phone">Phone number</Label>
+                    <Input id="phone" type="tel" required autocomplete="tel" v-model="form.phone" placeholder="+62..." />
+                    <InputError :message="form.errors.phone" />
                 </div>
 
                 <div class="grid gap-2">
