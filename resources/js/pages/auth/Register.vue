@@ -55,13 +55,12 @@ const submit = () => {
                     <InputError :message="form.errors.name" />
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="telegram_chat_id">ID Obrolan Telegram</Label
+               <div class="grid gap-2">
+                    <Label for="telegram_chat_id">Telegram Chat ID</Label
                     ><Input id="telegram_chat_id" required v-model="form.telegram_chat_id" placeholder="Chat ID dari bot SirkulaFood" /><InputError
                         :message="form.errors.telegram_chat_id"
                     />
-                    <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan ID obrolan, buka bot Telegram SirkulaFood lalu tekan tombol Mulai. ID ini digunakan untuk mengirim notifikasi sesuai jenis mitra.</p>
-                    <a href="https://t.me/SirkulaFood_bot" target="_blank" rel="noopener noreferrer" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-emerald-700 underline underline-offset-4 dark:text-emerald-400">Buka bot SirkulaFood di Telegram</a>
+                    <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan Chat ID, buka Telegram dan tekan tombol Start pada bot Telegram SirkulaFood_bot atau klik tautan ini: <a href="https://t.me/sirkulafood_bot" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">https://t.me/sirkulafood_bot</a> agar terhubung terlebih dahulu. Chat ID dipakai untuk notifikasi sesuai jenis mitra.</p>
                 </div>
 
                 <div class="grid gap-2">
