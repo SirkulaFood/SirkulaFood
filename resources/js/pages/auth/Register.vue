@@ -55,8 +55,8 @@ const submit = () => {
                     <InputError :message="form.errors.name" />
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="telegram_chat_id">ID Obrolan Telegram</Label
+               <div class="grid gap-2">
+                    <Label for="telegram_chat_id">Telegram Chat ID</Label
                     ><Input id="telegram_chat_id" required v-model="form.telegram_chat_id" placeholder="Chat ID dari bot SirkulaFood" /><InputError
                         :message="form.errors.telegram_chat_id"
                     />

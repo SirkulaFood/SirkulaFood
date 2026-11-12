@@ -9,13 +9,6 @@
     <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> ·
     <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
   </p>
-     <p>
-    <img src="https://img.shields.io/badge/Laravel-12-0B3B2E?style=flat-square&logo=laravel&logoColor=F5F1E8" alt="Laravel 12">
-    <img src="https://img.shields.io/badge/Vue-3-526347?style=flat-square&logo=vuedotjs&logoColor=F5F1E8" alt="Vue 3">
-    <img src="https://img.shields.io/badge/Automation-n8n-C3A05B?style=flat-square&logo=n8n&logoColor=142C25" alt="n8n">
-    <img src="https://img.shields.io/badge/AI%20gateway-9Router-8E9C75?style=flat-square" alt="9Router">
-    <img src="https://img.shields.io/badge/Chat-Telegram-0B3B2E?style=flat-square&logo=telegram&logoColor=F5F1E8" alt="Telegram">
-  </p>
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
 </div>
