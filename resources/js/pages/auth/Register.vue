@@ -8,8 +8,6 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
-const telegramBotUrl = import.meta.env.VITE_TELEGRAM_BOT_URL ?? '';
-
 const form = useForm({
     partner_type: 'foundation',
     organization_name: '',
@@ -63,7 +61,7 @@ const submit = () => {
                         :message="form.errors.telegram_chat_id"
                     />
                     <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan ID obrolan, buka bot Telegram SirkulaFood lalu tekan tombol Mulai. ID ini digunakan untuk mengirim notifikasi sesuai jenis mitra.</p>
-                    <a v-if="telegramBotUrl" :href="telegramBotUrl" target="_blank" rel="noopener noreferrer" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-emerald-700 underline underline-offset-4 dark:text-emerald-400">Buka bot SirkulaFood di Telegram</a>
+                    <a href="https://t.me/SirkulaFood_bot" target="_blank" rel="noopener noreferrer" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-emerald-700 underline underline-offset-4 dark:text-emerald-400">Buka bot SirkulaFood di Telegram</a>
                 </div>
 
                 <div class="grid gap-2">
