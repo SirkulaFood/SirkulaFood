@@ -15,20 +15,20 @@ const page = usePage();
 const systemStatus = computed(() => {
     const flash = page.props.flash as Record<string, string> | undefined;
     if (flash?.error) {
-        return { label: 'Issue Detected', color: 'bg-red-500', pulse: true };
+        return { label: 'Gangguan terdeteksi', color: 'bg-red-500', pulse: true };
     }
-    return { label: 'All Systems Operational', color: 'bg-emerald-500', pulse: false };
+    return { label: 'Semua sistem beroperasi', color: 'bg-emerald-500', pulse: false };
 });
 </script>
 
 <template>
     <header
-        class="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-6 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:px-4"
+        class="flex h-14 min-w-0 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-3 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 sm:h-16 sm:px-6 md:px-4"
     >
-        <div class="flex items-center gap-2">
+        <div class="flex min-w-0 items-center gap-2">
             <SidebarTrigger class="-ml-1" />
             <template v-if="breadcrumbs.length > 0">
-                <Breadcrumb>
+                <Breadcrumb class="min-w-0 overflow-hidden">
                     <BreadcrumbList>
                         <template v-for="(item, index) in breadcrumbs" :key="index">
                             <BreadcrumbItem>
@@ -54,11 +54,11 @@ const systemStatus = computed(() => {
             <div class="flex items-center gap-3 text-xs text-muted-foreground">
                 <div class="flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2.5 py-1.5 text-emerald-700 dark:text-emerald-400">
                     <Leaf class="size-3.5" />
-                    <span class="font-medium">0 kg saved</span>
+                    <span class="font-medium">0 kg terselamatkan</span>
                 </div>
                 <div class="flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2.5 py-1.5 text-amber-700 dark:text-amber-400">
                     <Zap class="size-3.5" />
-                    <span class="font-medium">0 actions</span>
+                    <span class="font-medium">0 tindakan</span>
                 </div>
             </div>
 

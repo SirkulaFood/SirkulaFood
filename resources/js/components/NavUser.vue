@@ -35,8 +35,8 @@ const user = computed(() => page.props.auth?.user as User | null);
                         <LogIn class="size-4" />
                     </div>
                     <div class="grid flex-1 text-left text-sm leading-tight">
-                        <span class="truncate font-medium">Guest User</span>
-                        <span class="truncate text-xs text-muted-foreground">Click to Sign In</span>
+                        <span class="truncate font-medium">Pengguna Tamu</span>
+                        <span class="truncate text-xs text-muted-foreground">Pilih untuk masuk</span>
                     </div>
                 </Link>
             </SidebarMenuButton>
