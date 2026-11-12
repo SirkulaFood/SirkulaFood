@@ -4,20 +4,32 @@
     <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood transparan" width="356">
   </picture>
   <h1>Selamatkan pangan. Jaga nilainya.</h1>
-  <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
-  <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
-  <p>
-    <a href="https://sirkulafood.my.id/">Kunjungi website</a> ·
+    <p>
+    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> ·
     <a href="t.me/SirkulaFood_bot">Buka Telegram</a> ·
     <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
   </p>
+  <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
+  <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
 </div>
 
 ![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
+<br><sub>Tampilan Landing page SirkulaFood</sub> 
 
 ## Tentang SirkulaFood
 
 SirkulaFood adalah platform berbasis Laravel dan Vue untuk mengelola produk, batch inventaris, serta tanggal kedaluwarsa. Tim dapat meninjau produk berisiko, mempertimbangkan rekomendasi diskon, dan mengoordinasikan surplus pangan dengan mitra donasi. Setiap rekomendasi dan tindak lanjut dicatat agar dapat ditinjau kembali.
+
+## Kontribusi terhadap SDGs
+
+Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan penyaluran donasi, SirkulaFood mendukung upaya menuju konsumsi dan produksi yang lebih bertanggung jawab, pengurangan kelaparan, inovasi operasional, dan kemitraan untuk mencapai tujuan bersama.
+
+<p align="center">
+  <img src="docs/assets/SirkulaFood-poster.png" alt="Poster kontribusi SirkulaFood terhadap SDGs" width="595">
+  <br><sub>EcoLoop poster</sub>
+</p>
+
+Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; bukan klaim pencapaian target SDGs secara keseluruhan. Pengukuran dampak membutuhkan data operasional dan tolok ukur yang jelas.
 
 ## Jenis akun
 
@@ -39,16 +51,6 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 | **Pertahankan nilai** | Tinjau rekomendasi dan persetujuan diskon sebelum perubahan diterapkan. |
 | **Salurkan** | Siapkan produk yang memenuhi syarat untuk mitra donasi dan koordinasikan serah terima. |
 | **Catat** | Simpan aktivitas, keputusan, serta rekap untuk ditinjau. |
-
-## Kontribusi terhadap SDGs
-
-Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan penyaluran donasi, SirkulaFood mendukung upaya menuju konsumsi dan produksi yang lebih bertanggung jawab, pengurangan kelaparan, inovasi operasional, dan kemitraan untuk mencapai tujuan bersama.
-
-<p align="center">
-  <img src="docs/assets/SirkulaFood-poster.png" alt="Poster kontribusi SirkulaFood terhadap SDGs" width="595">
-</p>
-
-Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; bukan klaim pencapaian target SDGs secara keseluruhan. Pengukuran dampak membutuhkan data operasional dan tolok ukur yang jelas.
 
 ## Teknologi dan integrasi
 
