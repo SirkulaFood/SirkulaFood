@@ -1,65 +1,67 @@
 <div align="center">
-  <img src="public/images/SirkulaFood-logo-light.png" alt="SirkulaFood" width="210">
-  <h1>Selamatkan pangan, jaga nilainya.</h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/SirkulaFood-logo-dark.png">
+    <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood transparan" width="356">
+  </picture>
+  <h1>Selamatkan pangan. Jaga nilainya.</h1>
+    <p>
+    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> ·
+    <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> ·
+    <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
+  </p>
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
-  <p><a href="https://sirkulafood.my.id/">Kunjungi website</a> · <a href="https://t.me/SirkulaFood_bot">Buka bot SirkulaFood</a> · <a href="https://github.com/SirkulaFood/SirkulaFood">Lihat kode sumber</a></p>
 </div>
 
----
+![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
+<br><sub>Tampilan Landing page SirkulaFood</sub> 
 
-## About
+## Tentang SirkulaFood
 
-SirkulaFood is a Laravel and Vue web platform for managing products, inventory batches, and expiration dates. Teams can review at-risk products, consider markdowns, and coordinate eligible surplus with donation partners. Recommendations and follow-up actions are recorded so decisions can be reviewed.
+SirkulaFood adalah platform berbasis Laravel dan Vue untuk mengelola produk, batch inventaris, serta tanggal kedaluwarsa. Tim dapat meninjau produk berisiko, mempertimbangkan rekomendasi diskon, dan mengoordinasikan surplus pangan dengan mitra donasi. Setiap rekomendasi dan tindak lanjut dicatat agar dapat ditinjau kembali.
 
-## Account types
+## Kontribusi terhadap SDGs
 
-| Account type | Purpose | Registration |
+Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan penyaluran donasi, SirkulaFood mendukung upaya menuju konsumsi dan produksi yang lebih bertanggung jawab, pengurangan kelaparan, inovasi operasional, dan kemitraan untuk mencapai tujuan bersama.
+
+<p align="center">
+  <img src="docs/assets/SirkulaFood-poster.png" alt="Poster kontribusi SirkulaFood terhadap SDGs" width="595">
+  <br><sub>EcoLoop poster</sub>
+</p>
+
+Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; bukan klaim pencapaian target SDGs secara keseluruhan. Pengukuran dampak membutuhkan data operasional dan tolok ukur yang jelas.
+
+## Jenis akun
+
+| Jenis akun | Kegunaan | Pendaftaran |
 |:--|:--|:--|
-| **Foundation / charity** | Receives donated products. | Available on the registration page. |
-| **MSME partner (UMKM)** | Receives information about discounted products. | Available on the registration page. |
-| **Supermarket / store** | Manages inventory and offers products for donation or discount. | Available on the registration page. |
-| **System admin** | Administers the platform and partner accounts. | Provisioned internally. |
+| **Mitra sosial / yayasan** | Menerima produk yang didonasikan. | Tersedia pada halaman pendaftaran. |
+| **Mitra UMKM** | Menerima informasi produk diskon. | Tersedia pada halaman pendaftaran. |
+| **Supermarket / toko** | Mengelola inventaris serta menawarkan produk untuk diskon atau donasi. | Tersedia pada halaman pendaftaran. |
+| **Admin sistem** | Mengelola platform dan akun mitra. | Dibuat oleh administrator. |
 
-Store owners can grant operational access to staff through manager or cashier accounts.
+Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelola atau kasir.
 
-## Product workflow
+## Alur pengelolaan pangan
 
-| Stage | What SirkulaFood supports |
+| Tahap | Dukungan SirkulaFood |
 |:--|:--|
-| **Monitor** | Review products, batches, quantities, prices, and remaining shelf life. |
-| **Assess** | Use image review as an initial aid. It is not a food-safety certification. |
-| **Recover value** | Review discount recommendations and approval workflows before applying changes. |
-| **Redirect** | Reserve eligible products for donation partners and coordinate handoffs. |
-| **Record** | Keep activity, decisions, and summaries for review. |
+| **Pantau** | Tinjau produk, batch, jumlah stok, harga, dan sisa masa simpan. |
+| **Periksa** | Gunakan analisis gambar sebagai bantuan awal untuk menilai kondisi produk. |
+| **Pertahankan nilai** | Tinjau rekomendasi dan persetujuan diskon sebelum perubahan diterapkan. |
+| **Salurkan** | Siapkan produk yang memenuhi syarat untuk mitra donasi dan koordinasikan serah terima. |
+| **Catat** | Simpan aktivitas, keputusan, serta rekap untuk ditinjau. |
 
 ## Teknologi dan integrasi
 
-| Technology | Role |
+| Teknologi | Peran |
 |:--|:--|
-| **Laravel 12** | Backend, inventory, business rules, approvals, audit trail, and APIs. |
-| **Vue 3 + Inertia** | Dashboard, partner portal, simulation, and user workflows. |
-| **9Router** | OpenAI-compatible gateway for configured language and vision models. Configure credentials and model settings per environment. |
-| **Telegram** | Bot untuk mengambil ID obrolan, percakapan chatbot berbasis AI, notifikasi inventaris, serta persetujuan tindakan oleh staf berwenang. |
-| **n8n** | Workflow exports are included as inactive drafts. Configure endpoints and credentials in the deployment environment before importing or activating them. |
-| **MySQL / SQLite** | Application storage, depending on local configuration. |
-
-### Alur chatbot dan ID Telegram
-
-Bot SirkulaFood dapat memberikan ID obrolan yang dipakai untuk menghubungkan akun aplikasi, mengirim pemberitahuan, dan membuka percakapan chatbot sesuai peran akun.
-
-1. Buka [@SirkulaFood_bot](https://t.me/SirkulaFood_bot) lalu tekan **Mulai** atau kirim `/start` (perintah `/id` juga menampilkan ID).
-2. Bot membalas dengan ID obrolan Telegram Anda. Salin ID tersebut ke kolom **ID Obrolan Telegram** saat mendaftar. Jika akun sudah terdaftar, pemilik bisnis, manager, atau kasir dapat mengaturnya di **Pengaturan → Profil**.
-3. Setelah ID tersimpan di akun, kirim pertanyaan langsung ke bot. Chatbot hanya dapat membaca data dan menawarkan tindakan sesuai peran serta akun yang terhubung. Gunakan `/help` untuk panduan dan `/reset` untuk memulai ulang konteks percakapan.
-4. Permintaan seperti diskon, donasi, atau perubahan otomatisasi perlu dikonfirmasi oleh pengguna berwenang melalui tombol Telegram sebelum diproses. Bot juga dapat mengirim notifikasi dan meminta persetujuan operasional.
-
-Untuk mengaktifkan bot pada server, isi `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET` di `.env`. Atur `NINEROUTER_API_KEY` beserta URL dan model yang sesuai untuk fitur chatbot AI. Pastikan aplikasi dapat diakses melalui HTTPS publik, lalu daftarkan webhook:
-
-```bash
-php artisan telegram:set-webhook --url=https://domain-anda.example
-```
-
-Webhook menerima pembaruan di `/api/v1/telegram/webhook`. Tanpa token bot, webhook HTTPS yang aktif, dan kunci AI, alur chat serta balasan AI tidak dapat berjalan penuh. Untuk mengambil ID obrolan melalui bot, webhook Telegram harus sudah aktif.
+| **Laravel 12** | Backend, inventaris, aturan bisnis, persetujuan, audit, dan API. |
+| **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
+| **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
+| **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
+| **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
+| **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
 
 ### Alur keputusan AI
 
@@ -75,72 +77,68 @@ Staf meninjau / menyetujui melalui aplikasi atau Telegram
 Diskon atau donasi yang disetujui → dicatat oleh Laravel
 ```
 
-AI dapat membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
+Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
 
-## Run locally
+## Menjalankan secara lokal
 
-### Prerequisites
+### Persyaratan
 
-- PHP 8.2 or newer and Composer
-- Node.js and npm
-- MySQL or SQLite
-- PHP extensions required by Laravel 12
+- PHP 8.2 atau lebih baru dan Composer
+- Node.js dan npm
+- MySQL atau SQLite
+- Ekstensi PHP yang dibutuhkan Laravel 12
 
-### Installation
+### Instalasi
 
-```bash
+```powershell
 git clone https://github.com/SirkulaFood/SirkulaFood.git
-cd SirkulaFood
+Set-Location SirkulaFood
 composer install
 npm install
-cp .env.example .env
+Copy-Item .env.example .env
 php artisan key:generate
 ```
 
-Set up the database connection in `.env`, then run migrations and build the frontend assets:
+Atur koneksi database di `.env`, lalu jalankan migrasi dan build aset frontend:
 
-```bash
+```powershell
 php artisan migrate
 npm run build
 ```
 
-For local development, run the required services in separate terminals:
+Untuk pengembangan lokal, jalankan layanan yang diperlukan pada terminal terpisah:
 
-```bash
+```powershell
 php artisan serve
 php artisan queue:listen --tries=1 --timeout=0
 npm run dev
 ```
 
-Or use the available Composer script:
+Atau gunakan skrip Composer yang tersedia:
 
-```bash
+```powershell
 composer run dev
 ```
 
-### Optional integrations
+### Integrasi opsional
 
-- **9Router:** Set `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, and `NINEROUTER_VISION_MODEL`. The example base URL is `http://127.0.0.1:20128/v1`; it must be reachable from the Laravel process.
-- **Telegram:** Atur `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, dan konfigurasi 9Router untuk chatbot. Bot memerlukan webhook HTTPS publik; lihat [Alur chatbot dan ID Telegram](#alur-chatbot-dan-id-telegram) untuk langkah pendaftaran webhook dan penggunaan.
-- **n8n:** Set the webhook variables in `.env.example` as needed. The workflow exports in this repository are inactive until configured and enabled in your n8n environment.
-- **Queue and scheduler:** Configure a queue worker and Laravel scheduler in the deployment environment for notifications and scheduled jobs.
+- **9Router:** Atur `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, dan `NINEROUTER_VISION_MODEL`. Contoh URL dasar adalah `http://127.0.0.1:20128/v1`; proses Laravel harus dapat menjangkaunya.
+- **Telegram:** Atur `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET`, lalu daftarkan webhook HTTPS publik dengan `php artisan telegram:set-webhook --url=https://domain-anda.example`.
+- **n8n:** Atur variabel webhook di `.env` sesuai kebutuhan. Alur kerja yang disertakan tidak aktif sebelum dikonfigurasi dan diaktifkan di lingkungan n8n.
+- **Antrean dan penjadwal:** Konfigurasikan pekerja antrean serta penjadwal Laravel untuk notifikasi dan tugas terjadwal.
 
-## Project structure
+## Struktur proyek
 
 ```text
-app/                   Laravel backend, controllers, models, services, and jobs
-resources/js/           Vue pages and interface components
-resources/css/          Application styles
-routes/                 Web routes, API routes, and scheduled tasks
-SirkulaFood-agent-*.json n8n workflow exports
+app/                    Backend Laravel, controller, model, layanan, dan job
+resources/js/            Halaman Vue dan komponen antarmuka
+resources/css/           Gaya aplikasi
+routes/                  Rute web, API, dan tugas terjadwal
+SirkulaFood-agent-*.json Ekspor alur kerja n8n
 ```
-
-## Impact
-
-SirkulaFood aims to help reduce avoidable food waste and recover value from inventory. Any claims about waste or emissions reductions require a baseline and measured operational data.
 
 ---
 
 <div align="center">
-  <sub>Built with a circular mindset: review the stock, coordinate the next step, and keep people in control.</sub>
+  <sub>Kelola stok, tentukan langkah berikutnya, dan jaga keputusan tetap berada di tangan manusia.</sub>
 </div>
