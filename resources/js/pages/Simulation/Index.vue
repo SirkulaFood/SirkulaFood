@@ -104,8 +104,8 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() =>
     isPartnerPortal.value
         ? [{ title: 'Portal Mitra', href: '/partner/scan' }]
         : [
-              { title: 'Dashboard', href: '/dashboard' },
-              { title: 'AI Simulation', href: '/simulation' },
+              { title: 'Dasbor', href: '/dashboard' },
+              { title: 'Simulasi AI', href: '/simulation' },
           ],
 );
 
@@ -162,27 +162,35 @@ function formatCurrency(value: number): string {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 }
 
+function categoryLabel(name: string): string {
+    return ({
+        'Fresh Produce': 'Buah dan Sayur', Bakery: 'Roti dan Kue', 'Dairy & Eggs': 'Susu dan Telur',
+        'Packaged Goods': 'Bahan Pangan Kemasan', 'Meat & Seafood': 'Daging dan Hasil Laut', General: 'Umum',
+        manual: 'Input manual', central_sync: 'Sinkronisasi pusat',
+    } as Record<string, string>)[name] ?? name;
+}
+
 function activityLabel(actionType: string): string {
     const labels: Record<string, string> = {
-        stock_received: 'Stock received',
-        stock_sold: 'Stock sold',
-        donation_requested: 'Donation',
-        donation_approval: 'Donation review',
-        donation_prealert: 'Donation forecast',
-        discount_recommendation: 'Discount recommendation',
-        discount_applied: 'Discount applied',
-        discount_rejected: 'Discount rejected',
-        alert_sent: 'Notification sent',
-        manual_override: 'Manual change',
+        stock_received: 'Stok diterima',
+        stock_sold: 'Stok terjual',
+        donation_requested: 'Donasi',
+        donation_approval: 'Peninjauan donasi',
+        donation_prealert: 'Prakiraan donasi',
+        discount_recommendation: 'Rekomendasi diskon',
+        discount_applied: 'Diskon diterapkan',
+        discount_rejected: 'Diskon ditolak',
+        alert_sent: 'Notifikasi dikirim',
+        manual_override: 'Perubahan manual',
     };
 
     return labels[actionType] ?? actionType.replaceAll('_', ' ');
 }
 
 function expiryLabel(days: number): string {
-    if (days < 0) return `Expired ${Math.abs(days)}d ago`;
-    if (days === 0) return 'Expires today';
-    return `${days}d remaining`;
+    if (days < 0) return `Kedaluwarsa ${Math.abs(days)} hari lalu`;
+    if (days === 0) return 'Kedaluwarsa hari ini';
+    return `${days} hari tersisa`;
 }
 
 function statusClass(status: string): string {
@@ -317,89 +325,89 @@ function claimReviewedPhoto(): void {
 </script>
 
 <template>
-    <Head :title="isPartnerPortal ? 'Scan Produk Donasi' : 'AI Simulation - Latest Inventory'" />
+    <Head :title="isPartnerPortal ? 'Pindai Produk Donasi' : 'Simulasi AI - Stok Terkini'" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <main class="space-y-6 p-4 sm:p-6 lg:p-8">
-            <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <main class="min-w-0 space-y-5 p-3 sm:space-y-6 sm:p-6 lg:p-8">
+            <header class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-                        {{ isPartnerPortal ? 'Scan Produk Donasi' : 'AI Simulation' }}
+                    <h1 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                        {{ isPartnerPortal ? 'Pindai Produk Donasi' : 'Simulasi AI' }}
                     </h1>
                     <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                         {{
                             isPartnerPortal
                                 ? 'Pindai batch yang disiapkan supermarket. Donasi hanya dapat dilakukan jika AI menilai produk masih layak dikonsumsi.'
-                                : 'Latest stock lots, autonomous agent activity, and discount recommendations awaiting approval.'
+                                : 'Pantau batch stok terbaru, aktivitas agen AI, dan rekomendasi diskon yang menunggu persetujuan.'
                         }}
                     </p>
-                    <p class="mt-1 text-xs text-neutral-400">Updated {{ lastUpdatedLabel }}</p>
+                    <p class="mt-1 text-xs text-neutral-400">Diperbarui {{ lastUpdatedLabel }}</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
                     <button
                         type="button"
                         :disabled="isRefreshing"
-                        aria-label="Refresh latest inventory data"
-                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+                        aria-label="Muat ulang data stok terkini"
+                        class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60 sm:col-span-1 sm:px-4 sm:text-sm"
                         @click="refreshData"
                     >
                         <RefreshCw class="size-4" :class="{ 'animate-spin': isRefreshing }" />
-                        <span>{{ isRefreshing ? 'Refreshing…' : 'Refresh data' }}</span>
+                        <span>{{ isRefreshing ? 'Memuat ulang…' : 'Muat ulang data' }}</span>
                     </button>
                     <Link
                         v-if="!isPartnerPortal"
                         href="/inventory"
-                        class="inline-flex items-center gap-2 rounded-lg border border-sidebar-border bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-accent"
+                        class="inline-flex min-w-0 items-center justify-center gap-2 rounded-lg border border-sidebar-border bg-card px-3 py-2.5 text-xs font-medium text-foreground shadow-sm transition hover:bg-accent sm:px-4 sm:text-sm"
                     >
                         <Package class="size-4" />
-                        <span>Open inventory</span>
+                        <span>Buka stok produk</span>
                     </Link>
                 </div>
             </header>
 
-            <section v-if="!isPartnerPortal" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Inventory summary">
-                <article class="rounded-xl border border-sidebar-border bg-card p-5 shadow-sm">
+            <section v-if="!isPartnerPortal" class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4" aria-label="Ringkasan stok">
+                <article class="min-w-0 rounded-xl border border-sidebar-border bg-card p-3.5 shadow-sm sm:p-5">
                     <div class="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Tracked lots</span><Package class="size-4" />
+                        <span>Batch dipantau</span><Package class="size-4" />
                     </div>
-                    <p class="mt-2 text-3xl font-bold text-foreground">{{ batches.length }}</p>
+                    <p class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{{ batches.length }}</p>
                 </article>
-                <article class="rounded-xl border border-sidebar-border bg-card p-5 shadow-sm">
+                <article class="min-w-0 rounded-xl border border-sidebar-border bg-card p-3.5 shadow-sm sm:p-5">
                     <div class="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Available stock</span><CalendarClock class="size-4" />
+                        <span>Stok tersedia</span><CalendarClock class="size-4" />
                     </div>
-                    <p class="mt-2 text-3xl font-bold text-foreground">{{ availableUnits }}</p>
-                    <p class="text-xs text-muted-foreground">units across displayed lots</p>
+                    <p class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{{ availableUnits }}</p>
+                    <p class="text-xs text-muted-foreground">unit dari batch yang ditampilkan</p>
                 </article>
-                <article class="rounded-xl border border-sidebar-border bg-card p-5 shadow-sm">
+                <article class="min-w-0 rounded-xl border border-sidebar-border bg-card p-3.5 shadow-sm sm:p-5">
                     <div class="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Donated stock</span><HeartHandshake class="size-4" />
+                        <span>Stok didonasikan</span><HeartHandshake class="size-4" />
                     </div>
-                    <p class="mt-2 text-3xl font-bold text-foreground">{{ donatedUnits }}</p>
-                    <p class="text-xs text-muted-foreground">units across displayed lots</p>
+                    <p class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{{ donatedUnits }}</p>
+                    <p class="text-xs text-muted-foreground">unit dari batch yang ditampilkan</p>
                 </article>
-                <article class="rounded-xl border border-sidebar-border bg-card p-5 shadow-sm">
+                <article class="min-w-0 rounded-xl border border-sidebar-border bg-card p-3.5 shadow-sm sm:p-5">
                     <div class="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Discount approvals</span><Percent class="size-4" />
+                        <span>Persetujuan diskon</span><Percent class="size-4" />
                     </div>
-                    <p class="mt-2 text-3xl font-bold text-foreground">{{ pendingApprovals.length }}</p>
-                    <p class="text-xs text-muted-foreground">waiting for a manager or cashier</p>
+                    <p class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{{ pendingApprovals.length }}</p>
+                    <p class="text-xs text-muted-foreground">menunggu persetujuan pengelola atau kasir</p>
                 </article>
             </section>
 
-            <section class="rounded-xl border border-emerald-200 bg-card shadow-sm dark:border-emerald-900">
-                <div class="flex items-center gap-3 border-b border-sidebar-border px-5 py-4">
+            <section class="min-w-0 rounded-xl border border-emerald-200 bg-card shadow-sm dark:border-emerald-900">
+                <div class="flex items-start gap-3 border-b border-sidebar-border px-4 py-4 sm:px-5">
                     <div class="rounded-lg bg-emerald-500/10 p-2 text-emerald-700 dark:text-emerald-300"><Camera class="size-5" /></div>
                     <div>
                         <h2 class="font-semibold text-foreground">
-                            {{ isPartnerPortal ? 'Pemeriksaan kelayakan konsumsi' : 'AI food condition check' }}
+                            {{ isPartnerPortal ? 'Pemeriksaan kelayakan konsumsi' : 'Pemeriksaan kondisi pangan dengan AI' }}
                         </h2>
                         <p class="text-xs text-muted-foreground">
-                            Use a phone camera, webcam, or uploaded image to check sale and donation suitability.
+                            Gunakan kamera ponsel, kamera komputer, atau unggah gambar untuk memeriksa kelayakan jual dan donasi.
                         </p>
                     </div>
                 </div>
-                <div class="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.8fr)]">
+                <div class="grid min-w-0 gap-4 p-3.5 sm:gap-5 sm:p-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.8fr)]">
                     <div class="space-y-4">
                         <p class="text-sm text-muted-foreground">
                             Ambil atau unggah foto produk. AI akan mencocokkannya dengan stok yang tersedia dan memilih batch yang paling dekat tanggal kedaluwarsanya.
@@ -419,7 +427,7 @@ function claimReviewedPhoto(): void {
                                 :disabled="analysisForm.processing || cameraActive"
                                 @click="startCamera"
                             >
-                                <Camera class="size-4" />Open camera
+                                <Camera class="size-4" />Buka kamera
                             </button>
                             <button
                                 type="button"
@@ -427,7 +435,7 @@ function claimReviewedPhoto(): void {
                                 :disabled="analysisForm.processing"
                                 @click="photoInput?.click()"
                             >
-                                <ImagePlus class="size-4" />{{ selectedPhoto ? 'Choose another photo' : 'Use phone camera / upload' }}
+                                <ImagePlus class="size-4" />{{ selectedPhoto ? 'Pilih foto lain' : 'Gunakan kamera / unggah foto' }}
                             </button>
                             <button
                                 type="button"
@@ -436,7 +444,7 @@ function claimReviewedPhoto(): void {
                                 @click="analyzePhoto"
                             >
                                 <RefreshCw class="size-4" :class="{ 'animate-spin': analysisForm.processing }" />{{
-                                    analysisForm.processing ? 'Checking photo…' : 'Analyze photo'
+                                    analysisForm.processing ? 'Memeriksa foto…' : 'Analisis foto'
                                 }}
                             </button>
                         </div>
@@ -448,34 +456,34 @@ function claimReviewedPhoto(): void {
                                     class="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
                                     @click="captureCameraPhoto"
                                 >
-                                    Take photo
+                                    Ambil foto
                                 </button>
                                 <button
                                     type="button"
                                     class="rounded-lg border border-white/30 px-4 py-2 text-sm font-medium text-white"
                                     @click="stopCamera"
                                 >
-                                    Close camera
+                                    Tutup kamera
                                 </button>
                             </div>
                         </div>
                         <p v-if="cameraError" role="status" class="text-xs text-amber-700">{{ cameraError }}</p>
                         <p v-if="analysisForm.errors.photo" class="text-xs text-red-600">{{ analysisForm.errors.photo }}</p>
                         <p class="text-xs leading-relaxed text-muted-foreground">
-                            This is a visual screening aid only. It cannot verify smell, storage temperature, contamination, or microbial safety.
-                            Stock stays unchanged during analysis; unclear results require a manual check or a retake.
+                            Pemeriksaan ini hanya menilai tampilan visual. AI tidak dapat memastikan bau, suhu penyimpanan, kontaminasi, atau keamanan mikrobiologis.
+                            Stok tidak berubah selama analisis; hasil yang belum jelas perlu diperiksa manual atau difoto ulang.
                         </p>
                     </div>
 
                     <div class="space-y-3">
                         <div v-if="photoPreviewUrl" class="overflow-hidden rounded-lg border border-sidebar-border bg-muted/30">
-                            <img :src="photoPreviewUrl" alt="Selected food photo preview" class="max-h-64 w-full object-contain" />
+                            <img :src="photoPreviewUrl" alt="Pratinjau foto pangan terpilih" class="max-h-64 w-full object-contain" />
                         </div>
                         <div
                             v-else
                             class="flex min-h-32 items-center justify-center rounded-lg border border-dashed border-sidebar-border bg-muted/20 px-4 text-center text-sm text-muted-foreground"
                         >
-                            A selected photo preview will appear here.
+                            Pratinjau foto yang dipilih akan muncul di sini.
                         </div>
 
                         <article
@@ -505,21 +513,21 @@ function claimReviewedPhoto(): void {
                                                 : visionResult.donation_eligible && isPartnerPortal
                                                   ? 'Layak konsumsi — dapat diambil sebagai donasi, meski masih layak jual'
                                                   : visionResult.donation_eligible
-                                                ? 'Not suitable for sale; potentially suitable for donation'
+                                                ? 'Tidak layak dijual; mungkin layak didonasikan'
                                                 : visionResult.condition === 'good'
                                                   ? isPartnerPortal
                                                       ? 'Masih layak konsumsi — donasi dapat dilanjutkan'
-                                                      : 'Still suitable for sale — donation is disabled'
+                                                      : 'Masih layak dijual — donasi tidak tersedia'
                                                   : visionResult.condition === 'poor'
-                                                    ? 'Possible spoilage or unsafe condition — do not donate'
-                                                    : 'Unclear — inspect manually or take another photo'
+                                                    ? 'Kemungkinan pangan rusak atau tidak aman — jangan didonasikan'
+                                                    : 'Hasil belum jelas — periksa manual atau ambil foto lain'
                                         }}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
                                         <template v-if="visionResult.product_name">
                                             {{ visionResult.product_name }} · {{ visionResult.batch_code || 'Batch' }} ·
                                         </template>
-                                        {{ Math.round(visionResult.confidence * 100) }}% visual confidence
+                                        {{ Math.round(visionResult.confidence * 100) }}% tingkat keyakinan visual
                                     </p>
                                 </div>
                             </div>
@@ -544,20 +552,20 @@ function claimReviewedPhoto(): void {
                                     </label>
                                     <p class="text-xs text-muted-foreground">
                                         Stok tersedia untuk pengambilan: {{ visionResult.quantity_available }} {{ visionResult.unit }}. Setelah Anda mengambilnya,
-                                        manager/kasir akan menerima konfirmasi untuk mencatat apakah stok supermarket ikut dikurangi.
+                                        pengelola/kasir akan menerima konfirmasi untuk mencatat apakah stok supermarket ikut dikurangi.
                                     </p>
                                     <p v-if="partnerClaimForm.errors.quantity" class="text-xs text-destructive">{{ partnerClaimForm.errors.quantity }}</p>
                                 </template>
                                 <label v-if="!isPartnerPortal" class="block space-y-1.5 text-sm font-medium text-foreground"
-                                    ><span>Donation partner</span>
+                                    ><span>Mitra donasi</span>
                                     <select
                                         v-model.number="selectedPartnerId"
                                         class="w-full rounded-lg border-input bg-background text-sm"
                                         :disabled="donationForm.processing || donationPartners.length === 0"
                                     >
-                                        <option :value="null" disabled>Select active partner</option>
+                                        <option :value="null" disabled>Pilih mitra aktif</option>
                                         <option v-for="partner in donationPartners" :key="partner.id" :value="partner.id">
-                                            {{ partner.name }}{{ partner.telegram_ready ? '' : ' · Telegram not set up' }}
+                                            {{ partner.name }}{{ partner.telegram_ready ? '' : ' · Telegram belum diatur' }}
                                         </option>
                                     </select>
                                 </label>
@@ -565,8 +573,7 @@ function claimReviewedPhoto(): void {
                                     v-if="!isPartnerPortal && selectedDonationPartner && !selectedDonationPartner.telegram_ready"
                                     class="text-xs text-amber-700"
                                 >
-                                    Set the partner Telegram chat ID in Donation Partners to enable donation and ensure both email and Telegram alerts
-                                    can be queued.
+                                    Atur ID obrolan Telegram mitra pada menu Mitra Donasi agar donasi dapat diproses dan notifikasi email serta Telegram terkirim.
                                 </p>
                                 <button
                                     type="button"
@@ -582,12 +589,12 @@ function claimReviewedPhoto(): void {
                                                 ? 'Mencatat pengambilan…'
                                                 : `Ambil donasi ${partnerClaimForm.quantity || 0} ${visionResult.unit ?? ''}`
                                             : donationForm.processing
-                                              ? 'Processing donation…'
-                                              : `Donate ${visionResult.quantity_available ?? 0} ${visionResult.unit ?? ''}`
+                                                ? 'Memproses donasi…'
+                                              : `Donasikan ${visionResult.quantity_available ?? 0} ${visionResult.unit ?? ''}`
                                     }}
                                 </button>
                                 <p v-if="!isPartnerPortal && donationPartners.length === 0" class="text-xs text-amber-700">
-                                    Add an active donation partner before donating this batch.
+                                    Tambahkan mitra donasi aktif sebelum mendonasikan batch ini.
                                 </p>
                             </div>
                         </article>
@@ -602,26 +609,26 @@ function claimReviewedPhoto(): void {
             <section v-if="!isPartnerPortal" class="overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm">
                 <div class="flex items-center justify-between border-b border-sidebar-border px-5 py-4">
                     <div>
-                        <h2 class="font-semibold text-foreground">Inventory lots</h2>
-                        <p class="text-xs text-muted-foreground">One row per receiving batch, including remaining and diverted quantities.</p>
+                        <h2 class="font-semibold text-foreground">Batch stok</h2>
+                        <p class="text-xs text-muted-foreground">Satu baris untuk setiap penerimaan batch, termasuk sisa dan jumlah yang disalurkan.</p>
                     </div>
                     <Link
                         href="/inventory"
                         class="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400"
                     >
-                        Manage inventory <ArrowRight class="size-4" />
+                        Kelola stok <ArrowRight class="size-4" />
                     </Link>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-[920px] text-left text-sm">
                         <thead class="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
                             <tr>
-                                <th class="px-5 py-3">Product</th>
+                                <th class="px-5 py-3">Produk</th>
                                 <th class="px-4 py-3">Batch</th>
-                                <th class="px-4 py-3">Received</th>
-                                <th class="px-4 py-3">Available</th>
-                                <th class="px-4 py-3">Donated / sold</th>
-                                <th class="px-4 py-3">Expiration</th>
+                                <th class="px-4 py-3">Diterima</th>
+                                <th class="px-4 py-3">Tersedia</th>
+                                <th class="px-4 py-3">Didonasikan / terjual</th>
+                                <th class="px-4 py-3">Kedaluwarsa</th>
                                 <th class="px-4 py-3">Status</th>
                             </tr>
                         </thead>
@@ -629,12 +636,12 @@ function claimReviewedPhoto(): void {
                             <tr v-for="batch in batches" :key="batch.id" class="hover:bg-muted/20">
                                 <td class="px-5 py-3">
                                     <p class="font-medium text-foreground">{{ batch.name }}</p>
-                                    <p class="font-mono text-xs text-muted-foreground">{{ batch.sku }} · {{ batch.category }}</p>
+                                    <p class="font-mono text-xs text-muted-foreground">{{ batch.sku }} · {{ categoryLabel(batch.category) }}</p>
                                 </td>
                                 <td class="px-4 py-3 font-mono text-xs text-foreground">
                                     {{ batch.batch_code || '—' }}
                                     <p class="font-sans text-[11px] text-muted-foreground">
-                                        {{ batch.source === 'central_sync' ? 'Supermarket POS · ' + batch.store_code : batch.source }}
+                                        {{ batch.source === 'central_sync' ? 'POS supermarket · ' + batch.store_code : categoryLabel(batch.source) }}
                                     </p>
                                 </td>
                                 <td class="px-4 py-3 text-foreground">{{ batch.quantity_received }} {{ batch.unit }}</td>
@@ -652,7 +659,7 @@ function claimReviewedPhoto(): void {
                             </tr>
                             <tr v-if="batches.length === 0">
                                 <td colspan="7" class="px-5 py-12 text-center text-sm text-muted-foreground">
-                                    No inventory batches yet. Add a product in Inventory to begin tracking.
+                                    Belum ada batch stok. Tambahkan produk untuk mulai memantau stok.
                                 </td>
                             </tr>
                         </tbody>
@@ -665,8 +672,8 @@ function claimReviewedPhoto(): void {
                     <div class="flex items-center gap-2 border-b border-sidebar-border px-5 py-4">
                         <Percent class="size-4 text-amber-600 dark:text-amber-400" />
                         <div>
-                            <h2 class="font-semibold text-foreground">Discount recommendations</h2>
-                            <p class="text-xs text-muted-foreground">Products expiring in 4–6 days are added automatically; prices stay unchanged until approval.</p>
+                            <h2 class="font-semibold text-foreground">Rekomendasi diskon</h2>
+                        <p class="text-xs text-muted-foreground">Produk yang kedaluwarsa dalam 4–6 hari ditambahkan otomatis; harga tidak berubah sebelum disetujui.</p>
                         </div>
                     </div>
                     <div v-if="pendingApprovals.length" class="divide-y divide-sidebar-border/60">
@@ -677,25 +684,25 @@ function claimReviewedPhoto(): void {
                                     <p class="font-mono text-xs text-muted-foreground">{{ approval.sku }} · {{ approval.batch_code || 'Batch' }}</p>
                                 </div>
                                 <span class="rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300"
-                                    >Pending approval</span
+                                    >Menunggu persetujuan</span
                                 >
                             </div>
-                            <p class="text-sm text-foreground">{{ approval.quantity }} units · expires {{ approval.expiration_date }}</p>
+                            <p class="text-sm text-foreground">{{ approval.quantity }} unit · kedaluwarsa {{ approval.expiration_date }}</p>
                             <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                                Recommended discount: {{ approval.recommended_percentage }}% · {{ formatCurrency(approval.recommended_price) }}
+                                Rekomendasi diskon: {{ approval.recommended_percentage }}% · {{ formatCurrency(approval.recommended_price) }}
                             </p>
                             <p class="text-xs text-muted-foreground">{{ approval.reasoning }}</p>
                         </article>
                     </div>
-                    <p v-else class="px-5 py-10 text-center text-sm text-muted-foreground">No discount recommendations are waiting for approval.</p>
+                    <p v-else class="px-5 py-10 text-center text-sm text-muted-foreground">Tidak ada rekomendasi diskon yang menunggu persetujuan.</p>
                 </section>
 
                 <section class="rounded-xl border border-sidebar-border bg-card shadow-sm">
                     <div class="flex items-center gap-2 border-b border-sidebar-border px-5 py-4">
                         <Bot class="size-4 text-emerald-700 dark:text-emerald-400" />
                         <div>
-                            <h2 class="font-semibold text-foreground">Recent agent activity</h2>
-                            <p class="text-xs text-muted-foreground">Latest AI actions, stock movements, sync decisions, and pending reviews.</p>
+                            <h2 class="font-semibold text-foreground">Aktivitas agen terkini</h2>
+                            <p class="text-xs text-muted-foreground">Tindakan AI terbaru, perubahan stok, keputusan sinkronisasi, dan peninjauan tertunda.</p>
                         </div>
                     </div>
                     <div v-if="recentLogs.length" class="divide-y divide-sidebar-border/60">
@@ -707,21 +714,21 @@ function claimReviewedPhoto(): void {
                                 <span class="text-xs text-muted-foreground">{{ log.created_at_human }}</span>
                             </div>
                             <p class="mt-1 text-sm text-foreground">
-                                {{ log.product?.name || 'Inventory event' }}<span v-if="log.batch_code"> · {{ log.batch_code }}</span><span v-if="log.partner?.name"> · {{ log.partner.name }}</span>
+                                {{ log.product?.name || 'Aktivitas stok' }}<span v-if="log.batch_code"> · {{ log.batch_code }}</span><span v-if="log.partner?.name"> · {{ log.partner.name }}</span>
                             </p>
                             <p v-if="log.quantity !== null && log.quantity !== undefined" class="mt-1 text-xs font-medium text-foreground">
-                                {{ log.quantity }} {{ log.unit || 'units' }}<span v-if="log.status"> · {{ log.status }}</span>
+                                {{ log.quantity }} {{ log.unit || 'unit' }}<span v-if="log.status"> · {{ log.status }}</span>
                             </p>
                             <p class="mt-1 line-clamp-2 text-xs text-muted-foreground">{{ log.reasoning }}</p>
                         </article>
                     </div>
                     <div v-else class="flex flex-col items-center gap-2 px-5 py-10 text-center text-sm text-muted-foreground">
                         <Bot class="size-6" />
-                        <p>No activity yet. This list records AI decisions, inventory changes, and reviews created by Sync Now or automatic sync.</p>
+                        <p>Belum ada aktivitas. Daftar ini mencatat keputusan AI, perubahan stok, dan peninjauan dari sinkronisasi manual maupun otomatis.</p>
                     </div>
                     <div class="border-t border-sidebar-border px-5 py-3 text-right">
                         <Link href="/agent-logs" class="text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400"
-                            >Open audit trail <ArrowRight class="inline size-4"
+                            >Buka riwayat audit <ArrowRight class="inline size-4"
                         /></Link>
                     </div>
                 </section>

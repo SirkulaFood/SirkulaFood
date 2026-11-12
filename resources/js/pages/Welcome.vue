@@ -24,7 +24,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 const page = usePage();
 const isSignedIn = computed(() => Boolean((page.props as unknown as { auth?: { user?: unknown } }).auth?.user));
 const primaryHref = computed(() => (isSignedIn.value ? route('dashboard') : route('login')));
-const primaryLabel = computed(() => (isSignedIn.value ? 'Open dashboard' : 'Sign in to SirkulaFood'));
+const primaryLabel = computed(() => (isSignedIn.value ? 'Buka dasbor' : 'Masuk ke SirkulaFood'));
 const carousel = ref<HTMLElement | null>(null);
 const proofSection = ref<HTMLElement | null>(null);
 const counts = ref([0, 0, 0]);
@@ -38,55 +38,85 @@ let counted = false;
 
 const features = [
     {
-        eyebrow: '01 · VISIBILITY',
-        title: 'Know your stock before it is too late.',
-        description: 'Track products and batches by shelf life, quantity, and source in one actionable view.',
+        eyebrow: '01 · PEMANTAUAN',
+        title: 'Kenali stok sebelum terlambat.',
+        description: 'Pantau produk dan batch berdasarkan masa simpan, jumlah, dan sumber dalam satu tampilan.',
         image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=85',
-        alt: 'Fresh produce at a market',
+        alt: 'Hasil bumi segar di pasar',
         icon: Package,
     },
     {
-        eyebrow: '02 · VALUE RECOVERY',
-        title: 'Discount at the right moment.',
-        description: 'Markdown recommendations help products retain value for customers and reduce the chance of inventory becoming waste.',
+        eyebrow: '02 · PEMULIHAN NILAI',
+        title: 'Berikan diskon pada saat yang tepat.',
+        description: 'Rekomendasi diskon membantu produk tetap bernilai bagi pelanggan dan mengurangi risiko terbuang.',
         image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=85',
-        alt: 'Freshly baked bread',
+        alt: 'Roti yang baru dipanggang',
         icon: Tag,
     },
     {
-        eyebrow: '03 · TARGETED DONATIONS',
-        title: 'Connect surplus food with partners.',
-        description: 'Allocate safe-to-eat products, coordinate reviews, and keep donation handoffs transparent.',
+        eyebrow: '03 · DONASI TEPAT SASARAN',
+        title: 'Hubungkan pangan berlebih dengan mitra.',
+        description: 'Salurkan produk yang layak konsumsi, koordinasikan peninjauan, dan catat serah terima donasi dengan jelas.',
         image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1200&q=85',
-        alt: 'Fresh vegetable harvest',
+        alt: 'Panen sayuran segar',
         icon: Handshake,
     },
 ];
 const faqs = [
     {
-        question: 'What is SirkulaFood?',
-        answer: 'SirkulaFood helps retailers manage food inventory nearing its expiration date. It tracks shelf life, recommends discounts, and connects safe-to-eat products with donation partners.',
+        question: 'Apa itu SirkulaFood?',
+        answer: 'SirkulaFood membantu peritel mengelola stok pangan yang mendekati kedaluwarsa. Sistem ini memantau masa simpan, merekomendasikan diskon, dan menghubungkan produk layak konsumsi dengan mitra donasi.',
     },
     {
-        question: 'Does SirkulaFood change prices automatically?',
-        answer: 'SirkulaFood can recommend markdowns based on stock conditions and remaining shelf life. Your operations team can review and approve actions before any changes are applied.',
+        question: 'Apakah SirkulaFood mengubah harga secara otomatis?',
+        answer: 'SirkulaFood dapat merekomendasikan diskon berdasarkan kondisi stok dan sisa masa simpan. Tim operasional dapat meninjau dan menyetujui tindakan sebelum perubahan diterapkan.',
     },
     {
-        question: 'How do partners receive donations?',
-        answer: 'Products allocated for donation are routed through partner workflows. SirkulaFood supports notifications and reviews so every handoff is clear and recorded.',
+        question: 'Bagaimana mitra menerima donasi?',
+        answer: 'Produk donasi disalurkan melalui alur kerja mitra. SirkulaFood mendukung notifikasi dan peninjauan agar setiap serah terima tercatat dengan jelas.',
     },
     {
-        question: 'Can SirkulaFood connect to store inventory?',
-        answer: 'SirkulaFood syncs product, quantity, price, and expiration data with your store operations.',
+        question: 'Bisakah SirkulaFood terhubung ke stok toko?',
+        answer: 'SirkulaFood menyinkronkan data produk, jumlah, harga, dan tanggal kedaluwarsa dengan operasional toko Anda.',
+    },
+];
+const sdgContributions = [
+    {
+        number: '02',
+        title: 'Tanpa Kelaparan',
+        description: 'Pangan layak konsumsi yang berlebih dapat diarahkan kepada mitra sosial untuk membantu memperluas akses pangan.',
+        icon: Leaf,
+        color: '#C99A2E',
+    },
+    {
+        number: '09',
+        title: 'Industri, Inovasi, dan Infrastruktur',
+        description: 'Pemantauan stok dan rekomendasi berbasis data mendukung proses operasional pangan yang lebih tanggap.',
+        icon: Bot,
+        color: '#D66A45',
+    },
+    {
+        number: '12',
+        title: 'Konsumsi dan Produksi yang Bertanggung Jawab',
+        description: 'Pemantauan masa simpan, diskon tepat waktu, dan penyaluran surplus membantu menekan pangan terbuang.',
+        icon: Package,
+        color: '#9B7B35',
+    },
+    {
+        number: '17',
+        title: 'Kemitraan untuk Mencapai Tujuan',
+        description: 'SirkulaFood menghubungkan toko, UMKM, dan mitra sosial dalam alur penyelamatan pangan yang tercatat.',
+        icon: Handshake,
+        color: '#2F9182',
     },
 ];
 const nodes = [
-    { label: 'POS', icon: Store, pos: 'node-top' },
+    { label: 'Kasir (POS)', icon: Store, pos: 'node-top' },
     { label: 'AI', icon: Bot, pos: 'node-right-top' },
-    { label: 'Vision', icon: ScanEye, pos: 'node-right-bottom' },
-    { label: 'Partners', icon: Handshake, pos: 'node-bottom' },
-    { label: 'Inventory', icon: Package, pos: 'node-left-bottom' },
-    { label: 'Discount', icon: Tag, pos: 'node-left-top' },
+    { label: 'Visi komputer', icon: ScanEye, pos: 'node-right-bottom' },
+    { label: 'Mitra', icon: Handshake, pos: 'node-bottom' },
+    { label: 'Stok', icon: Package, pos: 'node-left-bottom' },
+    { label: 'Diskon', icon: Tag, pos: 'node-left-top' },
 ];
 function scrollFeatures(direction: -1 | 1): void {
     carousel.value?.scrollBy({ left: direction * 440, behavior: 'smooth' });
@@ -176,10 +206,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-    <Head title="SirkulaFood — Save food, keep its value">
+    <Head title="SirkulaFood — Selamatkan pangan, jaga nilainya">
         <meta
             name="description"
-            content="Track shelf life, preserve product value with markdowns, and route safe-to-eat food through donation partners."
+            content="Pantau masa simpan, jaga nilai produk melalui diskon, dan salurkan pangan layak konsumsi kepada mitra donasi."
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" /><link
             rel="preconnect"
@@ -194,18 +224,18 @@ onBeforeUnmount(() => {
     <div class="SirkulaFood min-h-screen overflow-hidden bg-[#F2EEE5] text-[#171512] antialiased">
         <header class="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-8 lg:px-12">
             <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-2 rounded-full border border-white/65 bg-[#F2EEE5]/85 px-3 py-2.5 shadow-lg backdrop-blur-2xl sm:px-7 sm:py-3">
-                <a href="#home" class="inline-flex items-center" aria-label="SirkulaFood — back to home"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[92px] sm:h-9 sm:max-w-[150px]" /></a>
-                <nav class="hidden items-center gap-8 text-[12px] font-medium text-[#6d6a5f] lg:flex" aria-label="Main navigation">
-                    <a href="#solusi">Solutions</a><a href="#alur">How it works</a><a href="#dampak">Impact</a><a href="#integrasi">Integrations</a><a href="#faq">FAQ</a>
+                <a href="#home" class="inline-flex items-center rounded-lg px-1" aria-label="SirkulaFood — kembali ke beranda"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[92px] sm:h-9 sm:max-w-[150px]" /></a>
+                <nav class="hidden items-center gap-8 text-[12px] font-medium text-[#6d6a5f] lg:flex" aria-label="Navigasi utama">
+                    <a href="#solusi">Solusi</a><a href="#alur">Cara kerja</a><a href="#dampak">Dampak</a><a href="#integrasi">Integrasi</a><a href="#faq">FAQ</a>
                 </nav>
-                <div class="flex items-center gap-2"><Link :href="primaryHref" class="btn-lift inline-flex items-center gap-2 rounded-full bg-[#171512] px-3 py-2.5 text-[10px] font-semibold text-[#F2EEE5] sm:px-5 sm:text-[12px]"><span class="hidden sm:inline">{{ primaryLabel }}</span><span class="sm:hidden">{{ isSignedIn ? 'Dashboard' : 'Sign in' }}</span> <ArrowUpRight class="size-3.5" /></Link><button type="button" class="grid size-10 place-items-center rounded-full border border-[#d8d2c5] text-[#3B4B34] transition active:scale-95 lg:hidden" :aria-expanded="mobileMenuOpen" aria-controls="mobile-site-menu" aria-label="Open navigation" @click="mobileMenuOpen = !mobileMenuOpen"><X v-if="mobileMenuOpen" class="size-4" /><Menu v-else class="size-4" /></button></div>
+                <div class="flex items-center gap-2"><Link :href="primaryHref" class="btn-lift inline-flex items-center gap-2 rounded-full bg-[#171512] px-3 py-2.5 text-[10px] font-semibold text-[#F2EEE5] sm:px-5 sm:text-[12px]"><span class="hidden sm:inline">{{ primaryLabel }}</span><span class="sm:hidden">{{ isSignedIn ? 'Dasbor' : 'Masuk' }}</span> <ArrowUpRight class="size-3.5" /></Link><button type="button" class="grid size-10 place-items-center rounded-full border border-[#d8d2c5] text-[#3B4B34] transition active:scale-95 lg:hidden" :aria-expanded="mobileMenuOpen" aria-controls="mobile-site-menu" aria-label="Buka navigasi" @click="mobileMenuOpen = !mobileMenuOpen"><X v-if="mobileMenuOpen" class="size-4" /><Menu v-else class="size-4" /></button></div>
             </div>
             <nav v-if="mobileMenuOpen" id="mobile-site-menu" class="mx-auto mt-2 grid max-w-[1440px] gap-1 rounded-3xl border border-white/70 bg-[#F2EEE5]/95 p-3 text-sm text-[#3b4b34] shadow-xl backdrop-blur-2xl lg:hidden">
-                <a v-for="item in [{ label: 'Solutions', href: '#solusi' }, { label: 'How it works', href: '#alur' }, { label: 'Impact', href: '#dampak' }, { label: 'Integrations', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
+                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Dampak', href: '#dampak' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
             </nav>        </header>
         <main id="home">
             <section class="hero relative isolate flex min-h-[760px] items-center px-5 pb-20 pt-36 sm:px-8 lg:min-h-[900px] lg:px-12 lg:pt-40">
-                <div class="hero-photo parallax absolute inset-0 -z-20" role="img" aria-label="Fresh vegetable harvest" />
+                <div class="hero-photo parallax absolute inset-0 -z-20" role="img" aria-label="Panen sayuran segar" />
                 <div class="hero-shade absolute inset-0 -z-10" />
                 <div class="hero-glow absolute -left-36 top-32 -z-10 size-[460px] rounded-full" />
                 <div class="mx-auto grid w-full max-w-[1320px] items-center gap-14 lg:grid-cols-[.88fr_1.12fr] lg:gap-8">
@@ -213,30 +243,25 @@ onBeforeUnmount(() => {
                         <div
                             class="reveal mb-7 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.16em] backdrop-blur-xl"
                         >
-                            <span class="size-2 rounded-full bg-[#b4c29a]"></span>A circular system for retail food
+                            <span class="size-2 rounded-full bg-[#b4c29a]"></span>Sistem sirkular untuk pangan ritel
                         </div>
                         <h1 class="w-anim reveal font-serif text-[clamp(3.6rem,8vw,7.3rem)] leading-[.9] tracking-[-.055em] text-[#F7F4ED]">
-                            <span class="block">Save</span><span class="block">food<span class="text-[#bdcaa6]">.</span></span
-                            ><span class="block italic text-[#d8dfc8]">Keep its value.</span>
+                            <span class="block">Selamatkan</span><span class="block">pangan<span class="text-[#bdcaa6]">.</span></span
+                            ><span class="block italic text-[#d8dfc8]">Jaga nilainya.</span>
                         </h1>
                         <p class="reveal mt-7 max-w-[450px] text-[14px] leading-7 text-white/75 sm:text-[15px]">
-                            SirkulaFood helps retailers spot risk early, make informed decisions, and redirect food that still has value
-                            to the people who need it.
+                            SirkulaFood membantu peritel mengenali risiko lebih awal, mengambil keputusan tepat, dan menyalurkan pangan yang masih bernilai kepada mereka yang membutuhkan.
                         </p>
                         <div class="reveal mt-8 flex flex-wrap gap-3">
-                            <Link
-                                :href="primaryHref"
-                                class="btn-lift inline-flex items-center gap-3 rounded-full bg-[#F2EEE5] px-6 py-3.5 text-[12px] font-semibold text-[#171512]"
-                                >{{ primaryLabel }} <ArrowRight class="size-4" /></Link
-                            ><a
+                            <a
                                 href="#solusi"
                                 class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/5 px-5 py-3.5 text-[12px] backdrop-blur-lg"
-                                >Explore how it works <ArrowDownRight class="size-4"
+                                >Jelajahi solusi <ArrowDownRight class="size-4"
                             /></a>
                         </div>
                         <div class="reveal mt-12 flex flex-wrap gap-5 text-[10px] text-white/65">
-                            <span class="inline-flex items-center gap-2"><Check class="size-3.5 text-[#bdcaa6]" /> Recommendations stay reviewable</span
-                            ><span class="inline-flex items-center gap-2"><Check class="size-3.5 text-[#bdcaa6]" /> Every step is recorded</span>
+                            <span class="inline-flex items-center gap-2"><Check class="size-3.5 text-[#bdcaa6]" /> Rekomendasi dapat ditinjau</span
+                            ><span class="inline-flex items-center gap-2"><Check class="size-3.5 text-[#bdcaa6]" /> Setiap langkah tercatat</span>
                         </div>
                     </div>
                     <div class="reveal relative mx-auto w-full max-w-[710px] lg:ml-auto">
@@ -250,24 +275,24 @@ onBeforeUnmount(() => {
                                     <div class="flex items-center gap-2.5">
                                         <div class="grid size-8 place-items-center rounded-xl bg-[#3B4B34] text-white"><Leaf class="size-4" /></div>
                                         <div>
-                                            <p class="text-[11px] font-semibold">SirkulaFood Control</p>
-                                            <p class="text-[9px] text-[#8a877d]">Concept preview</p>
+                                            <p class="text-[11px] font-semibold">Dasbor SirkulaFood</p>
+                                            <p class="text-[9px] text-[#8a877d]">Pratinjau konsep</p>
                                         </div>
                                     </div>
-                                    <span class="rounded-full bg-[#edf1e7] px-2.5 py-1 text-[9px] text-[#3B4B34]">● System connected</span>
+                                    <span class="rounded-full bg-[#edf1e7] px-2.5 py-1 text-[9px] text-[#3B4B34]">● Sistem terhubung</span>
                                 </div>
                                 <div class="grid min-h-[370px] sm:grid-cols-[140px_1fr]">
                                     <aside class="hidden border-r border-[#e9e5dc] bg-[#f6f3eb] p-4 sm:flex sm:flex-col">
-                                        <p class="mb-3 px-2 text-[8px] font-semibold uppercase tracking-[.15em] text-[#a29e93]">Workspace</p>
+                                        <p class="mb-3 px-2 text-[8px] font-semibold uppercase tracking-[.15em] text-[#a29e93]">Ruang kerja</p>
                                         <div class="flex flex-col gap-1 text-[10px]">
                                             <div class="flex items-center gap-2 rounded-xl bg-[#e7ebde] px-2.5 py-2.5 text-[#3B4B34]">
-                                                <Package class="size-3.5" /> Dashboard
+                                                <Package class="size-3.5" /> Dasbor
                                             </div>
                                             <div class="flex items-center gap-2 px-2.5 py-2.5 text-[#817e74]">
-                                                <Bot class="size-3.5" /> Inventory
+                                                <Bot class="size-3.5" /> Stok
                                             </div>
                                             <div class="flex items-center gap-2 px-2.5 py-2.5 text-[#817e74]">
-                                                <Handshake class="size-3.5" /> AI Simulation
+                                                <Handshake class="size-3.5" /> Simulasi AI
                                             </div>
                                         </div>
                                     </aside>
@@ -275,25 +300,25 @@ onBeforeUnmount(() => {
                                         <div class="flex items-center justify-between">
                                             <div>
                                                 <p class="text-[8px] font-semibold uppercase tracking-[.15em] text-[#929084]">
-                                                    Operational overview
+                                                    Ringkasan operasional
                                                 </p>
                                                 <h2 class="mt-1 font-serif text-[25px] sm:text-[30px]">
-                                                    Food under control<span class="text-[#8E9C75]">.</span>
+                                                    Stok terkendali<span class="text-[#8E9C75]">.</span>
                                                 </h2>
                                             </div>
                                         </div>
                                         <div class="mt-4 grid grid-cols-2 gap-2 xl:grid-cols-4">
-                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Expiring soon</p><p class="mt-1 font-serif text-[20px]">7</p><p class="text-[8px] text-[#bb7a54]">Critical window</p></div>
-                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Food waste diverted</p><p class="mt-1 font-serif text-[20px]">88 <span class="text-[10px]">kg</span></p><p class="text-[8px] text-[#71845f]">Rescued food</p></div>
-                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Loss prevented</p><p class="mt-1 font-serif text-[18px]">Rp 5.7jt</p><p class="text-[8px] text-[#71845f]">Markdown & rescue</p></div>
-                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">CO₂e reduced</p><p class="mt-1 font-serif text-[20px]">220 <span class="text-[10px]">kg</span></p><p class="text-[8px] text-[#71845f]">Impact tracked</p></div>
+                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Segera kedaluwarsa</p><p class="mt-1 font-serif text-[20px]">7</p><p class="text-[8px] text-[#bb7a54]">Perlu ditangani segera</p></div>
+                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Pangan terselamatkan</p><p class="mt-1 font-serif text-[20px]">88 <span class="text-[10px]">kg</span></p><p class="text-[8px] text-[#71845f]">Pangan terselamatkan</p></div>
+                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Kerugian dicegah</p><p class="mt-1 font-serif text-[18px]">Rp 5.7jt</p><p class="text-[8px] text-[#71845f]">Diskon dan penyelamatan</p></div>
+                                            <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-2.5"><p class="text-[8px] text-[#8d8a7e]">Emisi CO₂e berkurang</p><p class="mt-1 font-serif text-[20px]">220 <span class="text-[10px]">kg</span></p><p class="text-[8px] text-[#71845f]">Dampak tercatat</p></div>
                                         </div>
                                         <div class="mt-3 grid gap-3 lg:grid-cols-[1.2fr_.8fr]">
                                             <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-3.5">
                                                 <div class="flex justify-between">
                                                     <div>
-                                                        <p class="text-[9px] font-semibold">Urgent Clearance Items</p>
-                                                        <p class="text-[8px] text-[#949084]">Products approaching expiration</p>
+                                                        <p class="text-[9px] font-semibold">Produk prioritas</p>
+                                                        <p class="text-[8px] text-[#949084]">Produk mendekati kedaluwarsa</p>
                                                     </div>
                                                 </div>
                                                 <div class="mt-3 flex flex-col gap-2.5">
@@ -301,22 +326,22 @@ onBeforeUnmount(() => {
                                                         v-for="item in [
                                                             {
                                                                 emoji: '🥑',
-                                                                name: 'Local avocados',
-                                                                status: 'Review',
+                                                                name: 'Alpukat lokal',
+                                                                status: 'Tinjau',
                                                                 color: 'bg-[#bb7a54]',
                                                                 width: '72%',
                                                             },
                                                             {
                                                                 emoji: '🥬',
-                                                                name: 'Leafy greens',
-                                                                status: 'Monitor',
+                                                                name: 'Sayuran daun',
+                                                                status: 'Pantau',
                                                                 color: 'bg-[#8e9c75]',
                                                                 width: '40%',
                                                             },
                                                             {
                                                                 emoji: '🥖',
-                                                                name: 'Whole-grain bread',
-                                                                status: 'Discount',
+                                                                name: 'Roti gandum',
+                                                                status: 'Diskon',
                                                                 color: 'bg-[#d2a16e]',
                                                                 width: '55%',
                                                             },
@@ -344,17 +369,17 @@ onBeforeUnmount(() => {
                                                 </div>
                                             </div>
                                             <div class="rounded-2xl border border-[#ebe7de] bg-white/75 p-3.5">
-                                                <div class="mb-3 flex items-center justify-between"><span class="text-[9px] font-semibold">Agent Activity Feed</span><span class="size-2 rounded-full bg-[#7a9c6b]"></span></div>
+                                                <div class="mb-3 flex items-center justify-between"><span class="text-[9px] font-semibold">Aktivitas Agen</span><span class="size-2 rounded-full bg-[#7a9c6b]"></span></div>
                                                 <div class="space-y-2">
-                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#8b6949]">Alert sent · Organic Whole Milk</p><p class="mt-1 text-[7px] text-[#858277]">19 items monitored · markdown active</p></div>
-                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#596d48]">Donation requested · Sourdough</p><p class="mt-1 text-[7px] text-[#858277]">Dispatched to community partner</p></div>
-                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#8b6949]">Review needed · Baby Spinach</p><p class="mt-1 text-[7px] text-[#858277]">Shelf life remaining: 48 hours</p></div>
+                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#8b6949]">Peringatan dikirim · Susu segar organik</p><p class="mt-1 text-[7px] text-[#858277]">19 produk dipantau · diskon aktif</p></div>
+                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#596d48]">Donasi diminta · Roti sourdough</p><p class="mt-1 text-[7px] text-[#858277]">Disalurkan kepada mitra komunitas</p></div>
+                                                    <div class="rounded-xl border border-[#ebe7de] bg-[#faf8f2] p-2"><p class="text-[8px] font-semibold text-[#8b6949]">Perlu ditinjau · Bayam muda</p><p class="mt-1 text-[7px] text-[#858277]">Sisa masa simpan: 48 jam</p></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="mt-3 flex items-center gap-2 rounded-xl border border-[#eae6dd] bg-white/65 px-3 py-2.5">
                                             <Check class="size-3 text-[#3B4B34]" />
-                                            <p class="text-[8px] text-[#77746b]">Every action is reviewable and recorded.</p>
+                                            <p class="text-[8px] text-[#77746b]">Setiap tindakan dapat ditinjau dan tercatat.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -374,9 +399,9 @@ onBeforeUnmount(() => {
                 <div class="relative mx-auto grid max-w-[1160px] gap-8 sm:grid-cols-3 sm:gap-6">
                     <div
                         v-for="(item, index) in [
-                            { suffix: ' steps', label: 'from monitoring to action', icon: ScanEye },
-                            { suffix: ' paths', label: 'markdowns or targeted donations', icon: ArrowRight },
-                            { suffix: ' workflows', label: 'connected for operations teams', icon: Sparkles },
+                            { suffix: ' langkah', label: 'dari pemantauan hingga tindakan', icon: ScanEye },
+                            { suffix: ' pilihan', label: 'diskon atau donasi tepat sasaran', icon: ArrowRight },
+                            { suffix: ' alur', label: 'terhubung untuk tim operasional', icon: Sparkles },
                         ]"
                         :key="item.label"
                         class="reveal flex items-center gap-4 border-b border-white/10 pb-7 last:border-0 sm:border-0"
@@ -398,26 +423,26 @@ onBeforeUnmount(() => {
                 <div class="mx-auto max-w-[1320px]">
                     <div class="reveal mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">One ecosystem, three decisions</p>
+                            <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">Satu ekosistem, tiga keputusan</p>
                             <h2 class="w-anim font-serif text-[clamp(2.8rem,6vw,5.3rem)] leading-[.92]">
-                                Food moves<br /><span class="italic text-[#3B4B34]">further.</span>
+                                Pangan bergerak<br /><span class="italic text-[#3B4B34]">lebih jauh.</span>
                             </h2>
                         </div>
                         <p class="max-w-[360px] text-[12px] leading-6 text-[#77746a]">
-                            Turn unpredictable inventory into clearer, measurable decisions with a path forward.
+                            Ubah stok yang sulit diprediksi menjadi keputusan terukur dengan langkah tindak lanjut yang jelas.
                         </p>
                     </div>
                     <div class="reveal mb-5 flex justify-between">
-                        <p class="text-[10px] text-[#79766d]">Tools for every stage of food recovery</p>
+                        <p class="text-[10px] text-[#79766d]">Solusi untuk setiap tahap penyelamatan pangan</p>
                         <div class="flex gap-2">
                             <button
-                                aria-label="Scroll features left"
+                                aria-label="Geser fitur ke kiri"
                                 @click="scrollFeatures(-1)"
                                 class="grid size-10 place-items-center rounded-full border border-[#dcd7cb] bg-white/40"
                             >
                                 <ChevronLeft class="size-4" /></button
                             ><button
-                                aria-label="Scroll features right"
+                                aria-label="Geser fitur ke kanan"
                                 @click="scrollFeatures(1)"
                                 class="grid size-10 place-items-center rounded-full border border-[#dcd7cb] bg-white/40"
                             >
@@ -464,18 +489,14 @@ onBeforeUnmount(() => {
             <section id="alur" class="bg-[#e9e5da] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
                 <div class="mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-[.9fr_1.1fr]">
                     <div class="reveal">
-                        <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">A workflow that makes sense</p>
+                        <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">Alur kerja yang mudah dipahami</p>
                         <h2 class="w-anim font-serif text-[clamp(2.8rem,6vw,5.1rem)] leading-[.94]">
-                            From shelf,<br />toward <span class="italic text-[#3B4B34]">impact.</span>
+                            Dari rak,<br />menuju <span class="italic text-[#3B4B34]">dampak.</span>
                         </h2>
                         <p class="mt-6 max-w-[410px] text-[12px] leading-6 text-[#77746a]">
-                            Bring inventory visibility, reviewable recommendations, and partner coordination together in one workflow.
+                            Satukan pemantauan stok, rekomendasi yang dapat ditinjau, dan koordinasi mitra dalam satu alur kerja.
                         </p>
-                        <Link
-                            :href="primaryHref"
-                            class="btn-lift mt-8 inline-flex items-center gap-3 rounded-full bg-[#3B4B34] px-6 py-3.5 text-[11px] font-semibold text-white"
-                            >{{ primaryLabel }} <ArrowRight class="size-4"
-                        /></Link>
+                        <a href="#integrasi" class="mt-8 inline-flex items-center gap-2 text-[11px] font-semibold text-[#3B4B34]">Lihat pilihan integrasi <ArrowRight class="size-4" /></a>
                     </div>
                     <div class="reveal relative mx-auto w-full max-w-[560px]">
                         <div class="absolute inset-[15%] rounded-full bg-[#b5bf9f]/30 blur-3xl"></div>
@@ -510,16 +531,16 @@ onBeforeUnmount(() => {
                         </div>
                         <div class="relative mx-auto grid max-w-[450px] gap-2 sm:grid-cols-3">
                             <div class="rounded-2xl border border-white/65 bg-white/35 p-3">
-                                <p class="text-[9px] font-semibold">01 · Monitor</p>
-                                <p class="text-[8px] text-[#817e73]">Inventory and shelf life</p>
+                                <p class="text-[9px] font-semibold">01 · Pantau</p>
+                                <p class="text-[8px] text-[#817e73]">Stok dan masa simpan</p>
                             </div>
                             <div class="rounded-2xl border border-white/65 bg-white/35 p-3">
-                                <p class="text-[9px] font-semibold">02 · Decide</p>
-                                <p class="text-[8px] text-[#817e73]">Discount or donation</p>
+                                <p class="text-[9px] font-semibold">02 · Tentukan</p>
+                                <p class="text-[8px] text-[#817e73]">Diskon atau donasi</p>
                             </div>
                             <div class="rounded-2xl border border-white/65 bg-white/35 p-3">
-                                <p class="text-[9px] font-semibold">03 · Route</p>
-                                <p class="text-[8px] text-[#817e73]">Partner follow-up</p>
+                                <p class="text-[9px] font-semibold">03 · Salurkan</p>
+                                <p class="text-[8px] text-[#817e73]">Tindak lanjut mitra</p>
                             </div>
                         </div>
                     </div>
@@ -529,29 +550,29 @@ onBeforeUnmount(() => {
             <section id="integrasi" class="relative px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
                 <div class="mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-2">
                     <div class="reveal">
-                        <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">Works with your ecosystem</p>
+                        <p class="mb-4 text-[10px] font-semibold uppercase tracking-[.18em] text-[#71805f]">Terhubung dengan ekosistem Anda</p>
                         <h2 class="w-anim font-serif text-[clamp(2.8rem,6vw,5rem)] leading-[.94]">
-                            One cycle.<br /><span class="italic text-[#3B4B34]">Many connections.</span>
+                            Satu siklus.<br /><span class="italic text-[#3B4B34]">Banyak koneksi.</span>
                         </h2>
                         <p class="mt-6 max-w-[420px] text-[12px] leading-6 text-[#77746a]">
-                            Connect inventory sources, smart monitoring, and donation partners so each decision starts with the operational context
+                            Hubungkan sumber stok, pemantauan cerdas, dan mitra donasi agar setiap keputusan didukung konteks operasional
                             it needs.
                         </p>
                         <div class="mt-7 flex flex-wrap gap-2">
-                            <span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">POS sync</span
-                            ><span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">Partner notifications</span
-                            ><span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">AI & computer vision</span>
+                            <span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">Sinkronisasi Kasir (POS)</span
+                            ><span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">Notifikasi mitra</span
+                            ><span class="rounded-full border border-[#d9d6ca] bg-white/35 px-3 py-1.5 text-[9px]">AI dan visi komputer</span>
                         </div>
                     </div>
                     <div class="reveal rounded-[30px] border border-white/75 bg-white/30 p-5 shadow-xl backdrop-blur-2xl sm:p-8">
-                        <p class="text-[9px] font-semibold uppercase tracking-[.16em] text-[#8b887d]">SirkulaFood network</p>
-                        <p class="mt-1 font-serif text-[28px]">Connected workflows</p>
+                        <p class="text-[9px] font-semibold uppercase tracking-[.16em] text-[#8b887d]">Jaringan SirkulaFood</p>
+                        <p class="mt-1 font-serif text-[28px]">Alur kerja terhubung</p>
                         <div class="mt-6 flex flex-col gap-2.5">
                             <div
                                 v-for="(item, index) in [
-                                    { title: 'Store dashboard', desc: 'Products · batches · shelf life', icon: Store },
-                                    { title: 'SirkulaFood intelligence', desc: 'Forecasts · recommendations · audit', icon: Bot },
-                                    { title: 'Donation partners', desc: 'Discounts · donations · notifications', icon: Handshake },
+                                    { title: 'Dasbor toko', desc: 'Produk · batch · masa simpan', icon: Store },
+                                    { title: 'Sistem cerdas SirkulaFood', desc: 'Prediksi · rekomendasi · audit', icon: Bot },
+                                    { title: 'Mitra donasi', desc: 'Diskon · donasi · notifikasi', icon: Handshake },
                                 ]"
                                 :key="item.title"
                                 class="flex items-center gap-3 rounded-2xl border border-[#e4e0d6] bg-white/70 p-3.5"
@@ -567,7 +588,7 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                         <div class="mt-4 flex items-center justify-between rounded-2xl bg-[#3B4B34] px-4 py-3.5 text-white">
-                            <span class="text-[9px]">Data flows in one cycle</span><ArrowRight class="size-4" />
+                            <span class="text-[9px]">Data mengalir dalam satu siklus</span><ArrowRight class="size-4" />
                         </div>
                     </div>
                 </div>
@@ -584,28 +605,24 @@ onBeforeUnmount(() => {
                             <p
                                 class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[.07] px-3 py-1.5 text-[9px] uppercase tracking-[.14em] text-white/75"
                             >
-                                <Sparkles class="size-3" /> SirkulaFood pilot program
+                                <Sparkles class="size-3" /> Program percontohan SirkulaFood
                             </p>
                             <h2 class="font-serif text-[clamp(2.8rem,6vw,5.5rem)] leading-[.92]">
-                                Start with one<br /><span class="italic text-[#c9d2b6]">meaningful step.</span>
+                                Mulai dari satu<br /><span class="italic text-[#c9d2b6]">langkah bermakna.</span>
                             </h2>
                             <p class="mt-5 max-w-[470px] text-[11px] leading-6 text-white/65">
-                                Shape the SirkulaFood workflow around how your store operates. We tailor the implementation plan to your
-                                operational needs.
+                                Sesuaikan alur kerja SirkulaFood dengan operasional toko Anda. Kami menyesuaikan rencana penerapan dengan
+                                kebutuhan operasional.
                             </p>
                         </div>
                         <div class="reveal w-full max-w-[290px] rounded-[22px] border border-white/15 bg-white/[.08] p-5 backdrop-blur-xl">
                             <div class="flex justify-between text-[9px] uppercase tracking-[.14em] text-white/60">
-                                <span>A phased rollout</span><Leaf class="size-4" />
+                                <span>Penerapan bertahap</span><Leaf class="size-4" />
                             </div>
-                            <p class="mt-3 font-serif text-[28px]">Designed together.</p>
-                            <p class="mt-2 text-[9px] leading-4 text-white/55">Scope, integrations, and success metrics are agreed together.</p>
-                            <Link
-                                :href="primaryHref"
-                                class="mt-5 flex justify-between rounded-full bg-[#F2EEE5] px-4 py-3 text-[10px] font-semibold text-[#171512]"
-                                >{{ primaryLabel }} <ArrowUpRight class="size-4"
-                            /></Link>
-                            <p class="mt-3 text-[8px] text-white/40">Pilot pricing is discussed together and tailored to your needs</p>
+                            <p class="mt-3 font-serif text-[28px]">Dirancang bersama.</p>
+                            <p class="mt-2 text-[9px] leading-4 text-white/55">Lingkup, integrasi, dan indikator keberhasilan disepakati bersama.</p>
+                            <a href="mailto:hello@SirkulaFood.id" class="mt-5 flex justify-between rounded-full bg-[#F2EEE5] px-4 py-3 text-[10px] font-semibold text-[#171512]">Jadwalkan konsultasi <ArrowUpRight class="size-4" /></a>
+                            <p class="mt-3 text-[8px] text-white/40">Biaya uji coba dibahas bersama dan disesuaikan dengan kebutuhan Anda</p>
                         </div>
                     </div>
                 </div>
@@ -614,13 +631,13 @@ onBeforeUnmount(() => {
             <section id="faq" class="px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
                 <div class="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[.72fr_1.28fr]">
                     <div class="reveal">
-                        <p class="mb-4 text-[10px] uppercase tracking-[.18em] text-[#71805f]">Frequently asked questions</p>
+                        <p class="mb-4 text-[10px] uppercase tracking-[.18em] text-[#71805f]">FAQ</p>
                         <h2 class="w-anim font-serif text-[clamp(2.8rem,5vw,4.6rem)] leading-[.95]">
-                            Here to<br /><span class="italic text-[#3B4B34]">help.</span>
+                            Kami siap<br /><span class="italic text-[#3B4B34]">membantu.</span>
                         </h2>
-                        <p class="mt-5 max-w-[310px] text-[11px] leading-6 text-[#77746a]">Our team can help map a workflow that fits your needs.</p>
+                        <p class="mt-5 max-w-[310px] text-[11px] leading-6 text-[#77746a]">Tim kami siap membantu merancang alur kerja yang sesuai dengan kebutuhan Anda.</p>
                         <a href="mailto:hello@SirkulaFood.id" class="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-[#3B4B34]"
-                            >Contact the SirkulaFood team <ArrowUpRight class="size-3.5"
+                            >Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5"
                         /></a>
                     </div>
                     <div class="reveal divide-y divide-[#dcd7cb] border-y border-[#dcd7cb]">
@@ -646,17 +663,94 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
             </section>
+
+            <section id="sdgs" class="overflow-hidden bg-[#e9e5da] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+                <div class="mx-auto max-w-[1320px]">
+                    <div class="grid items-center gap-12 lg:grid-cols-[.85fr_1.15fr] lg:gap-20">
+                        <div class="reveal">
+                            <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c7c1b3] bg-[#F2EEE5] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.18em] text-[#667352]">
+                                <Leaf class="size-3.5" /> Dampak yang saling terhubung
+                            </p>
+                            <h2 class="w-anim max-w-[580px] font-serif text-[clamp(2.8rem,5.5vw,5rem)] leading-[.94] tracking-[-.035em] text-[#20271d]">
+                                Pangan terselamatkan,<br /><span class="italic text-[#667352]">dampak berlanjut.</span>
+                            </h2>
+                            <p class="mt-6 max-w-[480px] text-[12px] leading-6 text-[#77746a]">
+                                Melalui pemantauan stok, keputusan yang lebih tepat, dan kerja sama lintas mitra, SirkulaFood mendukung beberapa Tujuan Pembangunan Berkelanjutan (SDGs).
+                            </p>
+                            <p class="mt-4 text-[9px] leading-5 text-[#8c887c]">Kontribusi ini menggambarkan dukungan melalui alur kerja dan kemitraan, bukan klaim pencapaian target SDGs secara keseluruhan.</p>
+                        </div>
+
+                        <div class="reveal relative mx-auto aspect-[1.15] w-full max-w-[560px] overflow-hidden rounded-[32px] bg-[#193b32] p-5 text-[#F2EEE5] shadow-[0_28px_70px_rgba(28,44,34,.18)] sm:p-8">
+                            <div class="absolute -right-20 -top-24 size-72 rounded-full border border-[#c5aa66]/25"></div>
+                            <div class="absolute -bottom-36 -left-20 size-80 rounded-full border border-[#c5aa66]/20"></div>
+                            <svg class="absolute inset-0 h-full w-full opacity-70" viewBox="0 0 560 480" fill="none" aria-hidden="true">
+                                <path d="M280 242 C220 188 135 155 88 124 M280 242 C360 182 423 154 477 124 M280 242 C210 312 147 341 92 369 M280 242 C354 313 418 345 468 369" stroke="#C5AA66" stroke-width="1.5" stroke-dasharray="5 8" />
+                                <circle cx="280" cy="242" r="142" stroke="#F2EEE5" stroke-opacity=".16" />
+                                <circle cx="280" cy="242" r="184" stroke="#C5AA66" stroke-opacity=".28" />
+                            </svg>
+                            <div class="relative flex h-full items-center justify-center">
+                                <div class="absolute left-0 top-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:left-3 sm:top-5">
+                                    <Store class="size-4 text-[#d7c28d]" /><span class="text-[9px] font-medium">Toko</span>
+                                </div>
+                                <div class="absolute right-0 top-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:right-3 sm:top-5">
+                                    <Tag class="size-4 text-[#d7c28d]" /><span class="text-[9px] font-medium">Diskon tepat waktu</span>
+                                </div>
+                                <div class="absolute bottom-2 left-0 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:bottom-5 sm:left-3">
+                                    <Leaf class="size-4 text-[#bdcaa6]" /><span class="text-[9px] font-medium">Pangan terselamatkan</span>
+                                </div>
+                                <div class="absolute bottom-2 right-0 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:bottom-5 sm:right-3">
+                                    <Handshake class="size-4 text-[#bdcaa6]" /><span class="text-[9px] font-medium">Mitra sosial</span>
+                                </div>
+                                <div class="relative z-10 grid size-28 place-items-center rounded-full border border-[#d3bd7d]/60 bg-[#F2EEE5] text-[#193b32] shadow-[0_0_0_14px_rgba(242,238,229,.06)] sm:size-36">
+                                    <div class="text-center"><Package class="mx-auto size-8" /><span class="mt-1 block text-[9px] font-bold tracking-wide">SIKLUS PANGAN</span></div>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 top-1/2 z-20 grid size-7 -translate-x-1/2 -translate-y-[5.7rem] place-items-center rounded-full bg-[#c5aa66] text-[#193b32] sm:-translate-y-[7.2rem]"><ArrowRight class="size-3.5" /></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <article v-for="goal in sdgContributions" :key="goal.number" class="group rounded-[22px] border border-[#dcd7cb] bg-[#F7F4ED] p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="font-serif text-[42px] leading-none" :style="{ color: goal.color }">{{ goal.number }}</span>
+                                <span class="grid size-10 place-items-center rounded-full bg-[#e9e5da] text-[#3B4B34] transition group-hover:bg-[#193b32] group-hover:text-[#F2EEE5]"><component :is="goal.icon" class="size-4" /></span>
+                            </div>
+                            <h3 class="mt-5 min-h-[42px] text-[12px] font-semibold leading-5 text-[#283326]">{{ goal.title }}</h3>
+                            <p class="mt-2 text-[10px] leading-5 text-[#77746a]">{{ goal.description }}</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
         </main>
         <footer class="footer-gradient px-5 pb-8 pt-12 text-[#F2EEE5] sm:px-8 lg:px-12 lg:pt-16">
             <div class="mx-auto max-w-[1320px]">
-                <div class="grid gap-10 border-b border-white/15 pb-10 md:grid-cols-[1fr_auto] md:items-end">
+                <div class="grid gap-10 border-b border-white/15 pb-9 sm:grid-cols-2 lg:grid-cols-[1.4fr_.8fr_1fr] lg:gap-16">
                     <div>
-                        <a href="#home" class="inline-flex items-center rounded-xl bg-[#F2EEE5] px-3 py-2" aria-label="SirkulaFood — back to top"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-8 w-auto max-w-[140px]" /></a>
-                        <p class="mt-4 max-w-sm text-[10px] leading-5 text-white/55">A circular system that keeps food valuable.</p>
+                        <a href="#home" class="inline-flex items-center rounded-2xl bg-[#F2EEE5] px-4 py-2.5 shadow-lg shadow-black/10" aria-label="SirkulaFood — kembali ke atas">
+                            <img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-11 w-auto max-w-[190px]" />
+                        </a>
+                        <p class="mt-4 max-w-sm text-[10px] leading-5 text-white/65">Sistem sirkular yang menjaga nilai pangan. Dari stok toko, menuju pangan yang lebih bermanfaat.</p>
+                    </div>
+                    <div>
+                        <h2 class="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d4c28f]">Jelajahi</h2>
+                        <nav class="mt-4 flex flex-col items-start gap-3 text-[10px] text-white/65" aria-label="Navigasi footer">
+                            <a href="#solusi" class="transition hover:text-white">Solusi</a>
+                            <a href="#alur" class="transition hover:text-white">Cara kerja</a>
+                            <a href="#sdgs" class="transition hover:text-white">Kontribusi SDGs</a>
+                            <a href="#faq" class="transition hover:text-white">FAQ</a>
+                        </nav>
+                    </div>
+                    <div>
+                        <h2 class="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d4c28f]">Mari berkolaborasi</h2>
+                        <p class="mt-4 max-w-xs text-[10px] leading-5 text-white/65">Punya pertanyaan atau ingin menjajaki penerapan di tempat Anda?</p>
+                        <a href="mailto:hello@SirkulaFood.id" class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[.07] px-4 py-2.5 text-[10px] font-semibold transition hover:bg-white/[.14]">
+                            Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5" />
+                        </a>
                     </div>
                 </div>
-                <div class="flex justify-between pt-5 text-[8px] text-white/35">
-                    <span>© {{ new Date().getFullYear() }} SirkulaFood</span><span>Designed to preserve value at every step.</span>
+                <div class="flex flex-col gap-3 pt-5 text-[8px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+                    <span>© {{ new Date().getFullYear() }} SirkulaFood · Selamatkan pangan, jaga nilainya.</span>
+                    <span class="inline-flex items-center gap-2"><span class="text-[#d4c28f]">02 · 09 · 12 · 17</span> Berkontribusi melalui aksi dan kemitraan pangan.</span>
                 </div>
             </div>
         </footer>

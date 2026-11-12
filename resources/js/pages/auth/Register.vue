@@ -50,17 +50,17 @@ const submit = () => {
                 </div>
                 <p class="-mt-3 text-xs leading-relaxed text-muted-foreground break-words">Yayasan menerima donasi, UMKM menerima informasi diskon, dan supermarket/toko mengelola dashboard operasional stok, batch, diskon, dan donasi setelah disetujui Admin SirkulaFood. Pemilik dapat memberikan akses operasional kepada staf melalui akun manager/kasir.</p>
                 <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <Input id="name" type="text" required autofocus tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                    <Label for="name">Nama lengkap</Label>
+                    <Input id="name" type="text" required autofocus tabindex="1" autocomplete="name" v-model="form.name" placeholder="Nama lengkap" />
                     <InputError :message="form.errors.name" />
                 </div>
 
-                <div class="grid gap-2">
+               <div class="grid gap-2">
                     <Label for="telegram_chat_id">Telegram Chat ID</Label
                     ><Input id="telegram_chat_id" required v-model="form.telegram_chat_id" placeholder="Chat ID dari bot SirkulaFood" /><InputError
                         :message="form.errors.telegram_chat_id"
                     />
-                    <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan Chat ID, buka Telegram dan tekan tombol Start pada bot SirkulaFoodPartner_Bot terlebih dahulu. Chat ID dipakai untuk notifikasi sesuai jenis mitra.</p>
+                    <p class="text-xs text-muted-foreground break-words">Untuk mendapatkan ID obrolan, buka bot Telegram SirkulaFood lalu tekan tombol Mulai. ID ini digunakan untuk mengirim notifikasi sesuai jenis mitra.</p>
                     <a href="https://t.me/SirkulaFood_bot" target="_blank" rel="noopener noreferrer" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-emerald-700 underline underline-offset-4 dark:text-emerald-400">Buka bot SirkulaFood di Telegram</a>
                 </div>
 
@@ -77,19 +77,19 @@ const submit = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email">Alamat email</Label>
                     <Input id="email" type="email" required tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="phone">Phone number</Label>
+                    <Label for="phone">Nomor telepon</Label>
                     <Input id="phone" type="tel" required autocomplete="tel" v-model="form.phone" placeholder="+62..." />
                     <InputError :message="form.errors.phone" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">Password</Label>
+                    <Label for="password">Kata sandi</Label>
                     <Input
                         id="password"
                         type="password"
@@ -97,13 +97,13 @@ const submit = () => {
                         tabindex="3"
                         autocomplete="new-password"
                         v-model="form.password"
-                        placeholder="Password"
+                        placeholder="Kata sandi"
                     />
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">Confirm password</Label>
+                    <Label for="password_confirmation">Konfirmasi kata sandi</Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -111,20 +111,20 @@ const submit = () => {
                         tabindex="4"
                         autocomplete="new-password"
                         v-model="form.password_confirmation"
-                        placeholder="Confirm password"
+                        placeholder="Ulangi kata sandi"
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
 
                 <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                    Create account
+                    Buat akun
                 </Button>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
-                Already have an account?
-                <TextLink :href="route('login')" class="underline underline-offset-4" tabindex="6">Log in</TextLink>
+                Sudah punya akun?
+                <TextLink :href="route('login')" class="underline underline-offset-4" tabindex="6">Masuk</TextLink>
             </div>
         </form>
     </AuthBase>

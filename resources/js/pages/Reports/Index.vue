@@ -34,7 +34,7 @@ const reportType = ref(props.type);
 const reportPeriod = ref(props.period);
 const periodValue = ref(props.periodValue);
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Dasbor', href: '/dashboard' },
     { title: 'Rekap PDF', href: '/reports' },
 ];
 
@@ -74,7 +74,7 @@ function formatCurrency(value: number | null): string {
 <template>
     <Head :title="`${title} - SirkulaFood`" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <main class="space-y-6 p-4 sm:p-6 lg:p-8">
+        <main class="min-w-0 space-y-5 p-3 sm:space-y-6 sm:p-6 lg:p-8">
             <header class="no-print flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight text-foreground">Rekap Donasi & Diskon</h1>
@@ -110,7 +110,7 @@ function formatCurrency(value: number | null): string {
                 </button>
             </section>
 
-            <section id="print-report" class="space-y-5 rounded-xl border border-sidebar-border bg-card p-5 shadow-sm sm:p-7">
+            <section id="print-report" class="min-w-0 space-y-5 rounded-xl border border-sidebar-border bg-card p-4 shadow-sm sm:p-7">
                 <header class="flex flex-col gap-3 border-b border-sidebar-border pb-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
@@ -124,7 +124,7 @@ function formatCurrency(value: number | null): string {
                     <p class="text-xs text-muted-foreground">Dibuat {{ new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) }}</p>
                 </header>
 
-                <div class="grid gap-3 sm:grid-cols-3">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     <article class="rounded-lg bg-muted/40 p-4"><p class="text-xs text-muted-foreground">{{ props.type === 'donation' ? 'Transaksi donasi selesai' : 'Diskon diterapkan' }}</p><p class="mt-1 text-2xl font-bold text-foreground">{{ props.totals.transactions }}</p></article>
                     <article v-if="props.type === 'donation'" class="rounded-lg bg-muted/40 p-4"><p class="text-xs text-muted-foreground">Total unit didonasikan</p><p class="mt-1 text-2xl font-bold text-foreground">{{ props.totals.quantity_donated }}</p></article>
                     <article v-else class="rounded-lg bg-muted/40 p-4"><p class="text-xs text-muted-foreground">Rata-rata diskon</p><p class="mt-1 text-2xl font-bold text-foreground">{{ props.totals.average_discount_percentage }}%</p></article>
@@ -133,6 +133,12 @@ function formatCurrency(value: number | null): string {
 
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-[720px] border-collapse text-left text-sm">
+                        <colgroup v-if="props.type === 'donation'">
+                            <col style="width: 15%" /><col style="width: 22%" /><col style="width: 12%" /><col style="width: 12%" /><col style="width: 17%" /><col style="width: 22%" />
+                        </colgroup>
+                        <colgroup v-else>
+                            <col style="width: 13%" /><col style="width: 19%" /><col style="width: 10%" /><col style="width: 8%" /><col style="width: 12%" /><col style="width: 12%" /><col style="width: 26%" />
+                        </colgroup>
                         <thead>
                             <tr class="border-b-2 border-sidebar-border text-xs uppercase tracking-wide text-muted-foreground">
                                 <th class="px-3 py-3">Waktu</th><th class="px-3 py-3">Produk / SKU</th><th class="px-3 py-3">Batch</th>
@@ -168,10 +174,44 @@ function formatCurrency(value: number | null): string {
 
 <style>
 @media print {
-    @page { size: landscape; margin: 12mm; }
+    @page { size: A4 landscape; margin: 12mm; }
+    html,
+    body {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        background: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
     body * { visibility: hidden !important; }
     #print-report, #print-report * { visibility: visible !important; }
-    #print-report { position: absolute; inset: 0 auto auto 0; width: 100%; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+    #print-report {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        color: #171512 !important;
+        background: #fff !important;
+        font-size: 9pt !important;
+    }
     .no-print { display: none !important; }
+    #print-report .overflow-x-auto { overflow: visible !important; }
+    #print-report table { width: 100% !important; min-width: 0 !important; table-layout: fixed !important; border-collapse: collapse !important; font-size: 8pt !important; }
+    #print-report thead { display: table-header-group; }
+    #print-report tfoot { display: table-footer-group; }
+    #print-report tr, #print-report article, #print-report footer { break-inside: avoid; page-break-inside: avoid; }
+    #print-report th, #print-report td { padding: 5pt 4pt !important; border-bottom: 0.5pt solid #d8d5cc !important; color: #25251f !important; vertical-align: top !important; overflow-wrap: anywhere !important; }
+    #print-report th { color: #4b5941 !important; font-size: 7pt !important; }
+    #print-report p, #print-report h2, #print-report span { color: #25251f !important; }
+    #print-report header { border-color: #b8b4a8 !important; }
+    #print-report > footer { margin-top: 10pt !important; padding-top: 6pt !important; }
 }
 </style>
