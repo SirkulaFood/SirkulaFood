@@ -136,7 +136,7 @@ class SimulationController extends Controller
                             'reasoning' => $reasoning,
                             'status' => $status,
                             'created_at' => ($run->completed_at ?? $run->started_at)?->toIso8601String(),
-                            'created_at_human' => ($run->completed_at ?? $run->started_at)?->diffForHumans() ?? 'Recently',
+                            'created_at_human' => ($run->completed_at ?? $run->started_at)?->locale('id')->diffForHumans() ?? 'Baru-baru ini',
                             'quantity' => $quantity !== null ? (int) $quantity : null,
                             'unit' => $event['unit'] ?? null,
                             'batch_code' => $event['batch_code'] ?? null,
