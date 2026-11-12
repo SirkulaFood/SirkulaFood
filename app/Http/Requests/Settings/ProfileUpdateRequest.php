@@ -16,6 +16,9 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        $partnerId = $user->donationPartner?->id;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -27,7 +30,14 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'phone' => ['required', 'string', 'max:50'],
-            'telegram_chat_id' => ['nullable', 'string', 'max:64', 'regex:/^-?\d+$/', Rule::unique(User::class)->ignore($this->user()->id)],
+            'telegram_chat_id' => [
+                'nullable',
+                'string',
+                'max:64',
+                'regex:/^-?\d+$/',
+                Rule::unique(User::class)->ignore($user->id),
+                Rule::unique('donation_partners', 'telegram_chat_id')->ignore($partnerId),
+            ],
         ];
     }
 }

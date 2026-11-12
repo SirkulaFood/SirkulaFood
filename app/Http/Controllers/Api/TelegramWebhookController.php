@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DiscountApproval;
+use App\Models\DonationPartner;
 use App\Models\User;
 use App\Services\DiscountApprovalService;
 use App\Services\PartnerDonationClaimService;
@@ -12,6 +13,7 @@ use App\Services\TelegramAiChatService;
 use App\Services\TelegramBotService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -37,6 +39,40 @@ class TelegramWebhookController extends Controller
         try {
             if (isset($update['callback_query'])) {
                 $callback = $update['callback_query'];
+                if (preg_match('/^eco:chatid:(confirm|cancel)$/i', $callback['data'], $chatIdResetMatch) === 1) {
+                    $callbackChatId = (string) $callback['message']['chat']['id'];
+                    $telegramUserId = (string) $callback['from']['id'];
+                    if (! hash_equals($callbackChatId, $telegramUserId)) {
+                        $telegram->answerCallback((string) $callback['id'], 'Reset Chat ID hanya tersedia di chat pribadi dengan bot.');
+
+                        return response()->json(['ok' => true]);
+                    }
+
+                    if (strtolower($chatIdResetMatch[1]) === 'cancel') {
+                        $telegram->answerCallback((string) $callback['id'], 'Reset dibatalkan.');
+                        $telegram->sendMessage($callbackChatId, 'Chat ID tetap terhubung ke akun sebelumnya.');
+
+                        return response()->json(['ok' => true]);
+                    }
+
+                    $unlinked = DB::transaction(function () use ($callbackChatId): int {
+                        $users = User::query()->where('telegram_chat_id', $callbackChatId)->update(['telegram_chat_id' => null]);
+                        $partners = DonationPartner::query()->where('telegram_chat_id', $callbackChatId)->update(['telegram_chat_id' => null]);
+
+                        return $users + $partners;
+                    });
+                    $aiChat->reset($callbackChatId);
+                    $telegram->answerCallback((string) $callback['id'], $unlinked > 0 ? 'Chat ID berhasil dilepas.' : 'Chat ID sudah tidak tertaut.');
+                    $telegram->sendMessage(
+                        $callbackChatId,
+                        $unlinked > 0
+                            ? 'Koneksi Chat ID ke akun lama sudah dilepas. ID Telegram Anda tidak berubah; sekarang masukkan ID yang sama ke akun SirkulaFood yang benar. Akun lama tidak lagi menerima notifikasi melalui bot ini.'
+                            : 'Chat ID ini sudah tidak tertaut ke akun SirkulaFood. Masukkan ID yang sama ke akun yang ingin Anda hubungkan.'
+                    );
+
+                    return response()->json(['ok' => true, 'unlinked' => $unlinked]);
+                }
+
                 // Telegram identifies the user separately from the chat. In private chats
                 // they usually match; in groups the chat ID must not be used for authorization.
                 $user = $this->authorizedUser((string) $callback['from']['id']);
@@ -122,10 +158,29 @@ class TelegramWebhookController extends Controller
                 if (preg_match('/^\/(?:start|id)(?:@[A-Za-z0-9_]+)?(?:\s|$)/i', $text) === 1) {
                     $telegram->sendMessage(
                         $chatId,
-                        "Halo! Saya SirkulaFood AI, asisten generatif SirkulaFood. Chat ID Anda: {$chatId}. Hubungkan ID ini ke akun SirkulaFood: pemilik bisnis/manager/kasir melalui Settings → Profile, atau mitra melalui pendaftaran/data mitra. Setelah terhubung, kirim pertanyaan langsung di sini. Gunakan /help untuk panduan role dan /reset untuk memulai ulang percakapan."
+                        "Halo! Saya SirkulaFood AI, asisten generatif SirkulaFood. Chat ID Anda: {$chatId}. Hubungkan ID ini ke akun SirkulaFood: pemilik bisnis/manager/kasir melalui Settings → Profile, atau mitra melalui pendaftaran/data mitra. Jika ID tertaut ke akun lama, jalankan /resetid untuk melepasnya lalu hubungkan ID yang sama ke akun yang benar. Gunakan /help untuk panduan role dan /reset untuk memulai ulang percakapan."
                     );
 
                     return response()->json(['ok' => true]);
+                }
+
+                if (preg_match('/^\/resetid(?:@[A-Za-z0-9_]+)?(?:\s|$)/i', $text) === 1) {
+                    $linkedUser = User::query()->where('telegram_chat_id', $chatId)->exists();
+                    $linkedPartner = DonationPartner::query()->where('telegram_chat_id', $chatId)->exists();
+                    if (! $linkedUser && ! $linkedPartner) {
+                        $telegram->sendMessage($chatId, 'Chat ID ini tidak sedang tertaut ke akun mana pun. ID Telegram tidak berubah; Anda dapat memasukkan ID yang sama ke akun SirkulaFood yang benar.');
+
+                        return response()->json(['ok' => true]);
+                    }
+
+                    $telegram->sendMessage($chatId, 'Reset akan melepas Chat ID ini dari akun lama dan menghentikan notifikasi bot ke akun tersebut. ID Telegram Anda tidak berubah dan dapat ditautkan ke akun yang benar setelah reset. Lanjutkan?', [
+                        'inline_keyboard' => [[
+                            ['text' => 'Lepas tautan Chat ID', 'callback_data' => 'eco:chatid:confirm'],
+                            ['text' => 'Batal', 'callback_data' => 'eco:chatid:cancel'],
+                        ]],
+                    ]);
+
+                    return response()->json(['ok' => true, 'confirmation_required' => true]);
                 }
 
                 if (preg_match('/^\/help(?:@[A-Za-z0-9_]+)?(?:\s|$)/i', $text) === 1) {
