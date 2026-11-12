@@ -1,9 +1,9 @@
 <div align="center">
   <img src="public/images/SirkulaFood-logo-light.png" alt="SirkulaFood" width="210">
-  <h1>Save food. Keep its value.</h1>
-  <p><strong>Smart inventory management to reduce food waste.</strong></p>
-  <p>SirkulaFood helps retail teams review food nearing its expiration date and coordinate discounts or donations for eligible surplus.</p>
-  <p><a href="https://github.com/SirkulaFood/SirkulaFood">Source code</a></p>
+  <h1>Selamatkan pangan, jaga nilainya.</h1>
+  <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
+  <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
+  <p><a href="https://sirkulafood.my.id/">Kunjungi website</a> · <a href="https://t.me/SirkulaFood_bot">Buka bot SirkulaFood</a> · <a href="https://github.com/SirkulaFood/SirkulaFood">Lihat kode sumber</a></p>
 </div>
 
 ---
@@ -33,32 +33,49 @@ Store owners can grant operational access to staff through manager or cashier ac
 | **Redirect** | Reserve eligible products for donation partners and coordinate handoffs. |
 | **Record** | Keep activity, decisions, and summaries for review. |
 
-## Technology and integrations
+## Teknologi dan integrasi
 
 | Technology | Role |
 |:--|:--|
 | **Laravel 12** | Backend, inventory, business rules, approvals, audit trail, and APIs. |
 | **Vue 3 + Inertia** | Dashboard, partner portal, simulation, and user workflows. |
 | **9Router** | OpenAI-compatible gateway for configured language and vision models. Configure credentials and model settings per environment. |
-| **Telegram** | Webhook-based conversations and inventory follow-up. Requests that require approval remain subject to authorized staff review. |
+| **Telegram** | Bot untuk mengambil ID obrolan, percakapan chatbot berbasis AI, notifikasi inventaris, serta persetujuan tindakan oleh staf berwenang. |
 | **n8n** | Workflow exports are included as inactive drafts. Configure endpoints and credentials in the deployment environment before importing or activating them. |
 | **MySQL / SQLite** | Application storage, depending on local configuration. |
 
-### AI decision flow
+### Alur chatbot dan ID Telegram
 
-```text
-Inventory data / product photo
-              ↓
-Laravel validates context and request
-              ↓
-9Router → configured AI model → structured result
-              ↓
-Staff review / approval through the application or Telegram
-              ↓
-Approved discount or donation → Laravel audit record
+Bot SirkulaFood dapat memberikan ID obrolan yang dipakai untuk menghubungkan akun aplikasi, mengirim pemberitahuan, dan membuka percakapan chatbot sesuai peran akun.
+
+1. Buka [@SirkulaFood_bot](https://t.me/SirkulaFood_bot) lalu tekan **Mulai** atau kirim `/start` (perintah `/id` juga menampilkan ID).
+2. Bot membalas dengan ID obrolan Telegram Anda. Salin ID tersebut ke kolom **ID Obrolan Telegram** saat mendaftar. Jika akun sudah terdaftar, pemilik bisnis, manager, atau kasir dapat mengaturnya di **Pengaturan → Profil**.
+3. Setelah ID tersimpan di akun, kirim pertanyaan langsung ke bot. Chatbot hanya dapat membaca data dan menawarkan tindakan sesuai peran serta akun yang terhubung. Gunakan `/help` untuk panduan dan `/reset` untuk memulai ulang konteks percakapan.
+4. Permintaan seperti diskon, donasi, atau perubahan otomatisasi perlu dikonfirmasi oleh pengguna berwenang melalui tombol Telegram sebelum diproses. Bot juga dapat mengirim notifikasi dan meminta persetujuan operasional.
+
+Untuk mengaktifkan bot pada server, isi `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET` di `.env`. Atur `NINEROUTER_API_KEY` beserta URL dan model yang sesuai untuk fitur chatbot AI. Pastikan aplikasi dapat diakses melalui HTTPS publik, lalu daftarkan webhook:
+
+```bash
+php artisan telegram:set-webhook --url=https://domain-anda.example
 ```
 
-AI can provide context, but a photo alone cannot confirm freshness, contamination, smell, or food safety. Staff retain authority over eligibility and operational decisions.
+Webhook menerima pembaruan di `/api/v1/telegram/webhook`. Tanpa token bot, webhook HTTPS yang aktif, dan kunci AI, alur chat serta balasan AI tidak dapat berjalan penuh. Untuk mengambil ID obrolan melalui bot, webhook Telegram harus sudah aktif.
+
+### Alur keputusan AI
+
+```text
+Data inventaris / foto produk
+              ↓
+Laravel memvalidasi konteks dan permintaan
+              ↓
+9Router → model AI yang dikonfigurasi → hasil terstruktur
+              ↓
+Staf meninjau / menyetujui melalui aplikasi atau Telegram
+              ↓
+Diskon atau donasi yang disetujui → dicatat oleh Laravel
+```
+
+AI dapat membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
 
 ## Run locally
 
@@ -104,7 +121,7 @@ composer run dev
 ### Optional integrations
 
 - **9Router:** Set `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, and `NINEROUTER_VISION_MODEL`. The example base URL is `http://127.0.0.1:20128/v1`; it must be reachable from the Laravel process.
-- **Telegram:** Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET`. Register a public HTTPS webhook with `php artisan telegram:set-webhook --url=https://your-domain.example`.
+- **Telegram:** Atur `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, dan konfigurasi 9Router untuk chatbot. Bot memerlukan webhook HTTPS publik; lihat [Alur chatbot dan ID Telegram](#alur-chatbot-dan-id-telegram) untuk langkah pendaftaran webhook dan penggunaan.
 - **n8n:** Set the webhook variables in `.env.example` as needed. The workflow exports in this repository are inactive until configured and enabled in your n8n environment.
 - **Queue and scheduler:** Configure a queue worker and Laravel scheduler in the deployment environment for notifications and scheduled jobs.
 
