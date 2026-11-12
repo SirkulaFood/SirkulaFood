@@ -89,3 +89,41 @@ html {
         @apply bg-background text-foreground;
     }
 }
+
+/* Keep signed-in pages within phone viewports while allowing tables to scroll. */
+html,
+body,
+#app {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    .group\/sidebar-wrapper,
+    .group\/sidebar-wrapper > main,
+    .group\/sidebar-wrapper > main > *,
+    main {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    main .overflow-x-auto {
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    main :is(h1, h2, h3, p, a, button, label) {
+        overflow-wrap: anywhere;
+    }
+
+    main :is(input, select, textarea) {
+        min-width: 0;
+        max-width: 100%;
+    }
+}

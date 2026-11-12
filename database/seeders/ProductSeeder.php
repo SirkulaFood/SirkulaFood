@@ -38,7 +38,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'dairy-eggs',
                 'sku' => 'ECL-DRY-1001',
-                'name' => 'Organic Whole Milk 1L',
+                'name' => 'Susu Organik Utuh 1 L',
                 'description' => 'Fresh pasteurized organic milk from local dairy farms.',
                 'quantity' => 18,
                 'unit' => 'pcs',
@@ -56,7 +56,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'bakery',
                 'sku' => 'ECL-BAK-2001',
-                'name' => 'Artisan Sourdough Loaf',
+                'name' => 'Roti Ragi Alami Artisan',
                 'description' => 'Naturally fermented sourdough baked fresh yesterday morning.',
                 'quantity' => 12,
                 'unit' => 'pcs',
@@ -74,7 +74,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'fresh-produce',
                 'sku' => 'ECL-PRD-3001',
-                'name' => 'Ripe Hass Avocados',
+                'name' => 'Alpukat Hass Matang',
                 'description' => 'Ready-to-eat Hass avocados, rich and creamy texture.',
                 'quantity' => 25,
                 'unit' => 'kg',
@@ -92,7 +92,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'meat-seafood',
                 'sku' => 'ECL-MEA-4001',
-                'name' => 'Fresh Atlantic Salmon Fillet',
+                'name' => 'Fillet Salmon Atlantik Segar',
                 'description' => 'Responsibly farmed Norwegian salmon portioned fillets.',
                 'quantity' => 8,
                 'unit' => 'kg',
@@ -110,7 +110,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'bakery',
                 'sku' => 'ECL-BAK-2002',
-                'name' => 'French Baguette Traditiion',
+                'name' => 'Roti Baget Prancis Tradisional',
                 'description' => 'Crisp crust traditional French baguette.',
                 'quantity' => 15,
                 'unit' => 'pcs',
@@ -123,7 +123,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'fresh-produce',
                 'sku' => 'ECL-PRD-3002',
-                'name' => 'Baby Spinach Clamshell 200g',
+                'name' => 'Bayam Muda 200 g',
                 'description' => 'Triple-washed organic tender baby spinach leaves.',
                 'quantity' => 14,
                 'unit' => 'packs',
@@ -143,7 +143,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'dairy-eggs',
                 'sku' => 'ECL-DRY-1002',
-                'name' => 'Greek Plain Yogurt 500g',
+                'name' => 'Yogurt Yunani Tawar 500 g',
                 'description' => 'Authentic strained thick Greek yogurt, 10% milk fat.',
                 'quantity' => 22,
                 'unit' => 'pcs',
@@ -156,7 +156,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'fresh-produce',
                 'sku' => 'ECL-PRD-3003',
-                'name' => 'Sweet Strawberries 250g',
+                'name' => 'Stroberi Manis 250 g',
                 'description' => 'Local greenhouse sweet red strawberries.',
                 'quantity' => 30,
                 'unit' => 'packs',
@@ -169,7 +169,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'bakery',
                 'sku' => 'ECL-BAK-2003',
-                'name' => 'Sliced Multigrain Bread 600g',
+                'name' => 'Roti Iris Gandum dengan Beragam Biji 600 g',
                 'description' => 'Hearty 7-grain sliced sandwich loaf with flax and chia seeds.',
                 'quantity' => 20,
                 'unit' => 'pcs',
@@ -182,7 +182,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'meat-seafood',
                 'sku' => 'ECL-MEA-4002',
-                'name' => 'Grass-Fed Minced Beef 500g',
+                'name' => 'Daging Sapi Giling dari Sapi yang Diberi Pakan Rumput 500 g',
                 'description' => 'Lean 85/15 ground beef from pasture-raised cattle.',
                 'quantity' => 15,
                 'unit' => 'packs',
@@ -195,7 +195,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'dairy-eggs',
                 'sku' => 'ECL-DRY-1003',
-                'name' => 'Free-Range Brown Eggs (12pk)',
+                'name' => 'Telur Cokelat dari Ayam Bebas Kandang (12 butir)',
                 'description' => 'Grade A large free-range fresh farm eggs.',
                 'quantity' => 40,
                 'unit' => 'packs',
@@ -208,7 +208,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'fresh-produce',
                 'sku' => 'ECL-PRD-3004',
-                'name' => 'Sweet Cherry Tomatoes 500g',
+                'name' => 'Tomat Ceri Manis 500 g',
                 'description' => 'Vine-ripened sweet bite-sized cherry tomatoes.',
                 'quantity' => 28,
                 'unit' => 'packs',
@@ -223,7 +223,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'dairy-eggs',
                 'sku' => 'ECL-DRY-1004',
-                'name' => 'Aged Cheddar Cheese Block 250g',
+                'name' => 'Keju Cheddar Tua 250 g',
                 'description' => 'Sharp vintage cheddar aged for 12 months.',
                 'quantity' => 24,
                 'unit' => 'pcs',
@@ -236,7 +236,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'fresh-produce',
                 'sku' => 'ECL-PRD-3005',
-                'name' => 'Crisp Honeycrisp Apples 1kg',
+                'name' => 'Apel Honeycrisp Renyah 1 kg',
                 'description' => 'Premium orchard crisp and juicy sweet apples.',
                 'quantity' => 45,
                 'unit' => 'kg',
@@ -249,7 +249,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'packaged-goods',
                 'sku' => 'ECL-PKG-5001',
-                'name' => 'Extra Virgin Olive Oil 750ml',
+                'name' => 'Minyak Zaitun Murni Ekstra 750 ml',
                 'description' => 'First cold pressed Mediterranean extra virgin olive oil.',
                 'quantity' => 35,
                 'unit' => 'pcs',
@@ -262,7 +262,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'packaged-goods',
                 'sku' => 'ECL-PKG-5002',
-                'name' => 'Organic Rolled Oats 1kg',
+                'name' => 'Oat Gulung Organik 1 kg',
                 'description' => 'Whole grain non-GMO gluten-free rolled breakfast oats.',
                 'quantity' => 50,
                 'unit' => 'packs',
@@ -275,7 +275,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'packaged-goods',
                 'sku' => 'ECL-PKG-5003',
-                'name' => 'Canned San Marzano Tomatoes 400g',
+                'name' => 'Tomat San Marzano Kalengan 400 g',
                 'description' => 'D.O.P. certified whole peeled Italian plum tomatoes.',
                 'quantity' => 120,
                 'unit' => 'pcs',
@@ -288,7 +288,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'packaged-goods',
                 'sku' => 'ECL-PKG-5004',
-                'name' => 'Organic Brown Rice 2kg',
+                'name' => 'Beras Cokelat Organik 2 kg',
                 'description' => 'Long grain organic jasmine brown rice.',
                 'quantity' => 40,
                 'unit' => 'packs',
@@ -302,7 +302,7 @@ class ProductSeeder extends Seeder
             [
                 'category_slug' => 'bakery',
                 'sku' => 'ECL-BAK-2004',
-                'name' => 'All-Butter Croissants (6pk)',
+                'name' => 'Croissant Mentega (6 buah)',
                 'description' => 'Flaky French butter croissants packaged in tray.',
                 'quantity' => 10,
                 'unit' => 'packs',
@@ -318,6 +318,21 @@ class ProductSeeder extends Seeder
                 ],
             ],
         ];
+
+        // The starter catalog is authored in USD-like values; persist and log all prices in IDR.
+        $toRupiah = static fn (float $amount): int => (int) round($amount * 16, -3);
+        foreach ($productsData as &$productData) {
+            foreach (['original_price', 'discount_price'] as $priceField) {
+                if (isset($productData[$priceField])) {
+                    $productData[$priceField] = $toRupiah((float) $productData[$priceField]);
+                }
+
+                if (isset($productData['agent_action']['payload'][$priceField])) {
+                    $productData['agent_action']['payload'][$priceField] = $toRupiah((float) $productData['agent_action']['payload'][$priceField]);
+                }
+            }
+        }
+        unset($productData);
 
         foreach ($productsData as $data) {
             $category = $categories[$data['category_slug']];
