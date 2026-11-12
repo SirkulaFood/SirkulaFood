@@ -20,6 +20,12 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    telegramBotConfigured?: boolean;
+    flash?: {
+        success?: string;
+        error?: string;
+        info?: string;
+    };
     ziggy: {
         location: string;
         url: string;
@@ -33,6 +39,9 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
+    role: string;
+    telegram_chat_id: string | null;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;
