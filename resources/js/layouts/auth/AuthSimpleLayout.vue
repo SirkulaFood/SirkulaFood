@@ -20,11 +20,11 @@ defineProps<{ title?: string; description?: string }>();
                     <p class="mt-6 max-w-md text-sm leading-7 text-white/70">Kelola produk mendekati kedaluwarsa, ambil keputusan lebih awal, dan hubungkan pangan layak dengan mitra donasi.</p>
                     <div class="mt-9 grid gap-3 text-sm text-white/85">
                         <div class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded-full bg-white/10 text-[#d7c28d]">01</span> Pantau masa simpan dan stok</div>
-                        <div class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded-full bg-white/10 text-[#d7c28d]">02</span> Susun markdown secara terarah</div>
+                        <div class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded-full bg-white/10 text-[#d7c28d]">02</span> Atur diskon secara terarah</div>
                         <div class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded-full bg-white/10 text-[#d7c28d]">03</span> Salurkan pangan lewat mitra</div>
                     </div>
                 </div>
-                <p class="relative z-10 text-xs text-white/45">SirkulaFood · Smart inventory management</p>
+                <p class="relative z-10 text-xs text-white/45">SirkulaFood · Pengelolaan stok pangan cerdas</p>
             </section>
             <section class="flex w-full min-w-0 items-center justify-center px-2 py-6 sm:px-8 sm:py-8 lg:px-12 xl:px-16">
                 <div class="auth-form-panel w-full min-w-0 max-w-xl">

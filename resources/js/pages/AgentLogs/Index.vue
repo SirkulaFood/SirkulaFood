@@ -106,8 +106,8 @@ const props = defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Audit Trail', href: '/agent-logs' },
+    { title: 'Dasbor', href: '/dashboard' },
+    { title: 'Riwayat Audit', href: '/agent-logs' },
 ];
 
 const page = usePage();
@@ -224,7 +224,7 @@ const copyJsonToClipboard = async () => {
             hasCopiedJson.value = false;
         }, 2200);
     } catch (e) {
-        console.error('Failed to copy to clipboard', e);
+        console.error('Gagal menyalin ke papan klip', e);
     }
 };
 
@@ -254,10 +254,30 @@ const getModelBadge = (payload: Record<string, any>) => {
     if (payload.model) return payload.model;
     if (payload.gemini || payload.gemini_version) return 'Gemini 2.5 Flash';
     if (payload.groq || payload.groq_model) return 'Groq LLaMA 3.3';
-    if (payload.n8n || payload.webhook) return 'n8n Autonomous Workflow';
-    if (payload.rule) return 'SirkulaFood Heuristic Engine';
-    return 'Autonomous Daemon';
+    if (payload.n8n || payload.webhook) return 'Alur Kerja Otomatis n8n';
+    if (payload.rule) return 'Mesin Heuristik SirkulaFood';
+    return 'Layanan Otomatis';
 };
+
+const actionTypeLabel = (actionType: string) => ({
+    discount_applied: 'Diskon diterapkan',
+    donation_requested: 'Permintaan donasi',
+    alert_sent: 'Peringatan dikirim',
+    manual_override: 'Penyesuaian manual',
+}[actionType] ?? actionType.replaceAll('_', ' '));
+
+const statusLabel = (status: string) => ({
+    success: 'Berhasil',
+    failed: 'Gagal',
+    pending: 'Menunggu',
+}[status] ?? status);
+const paginationLabel = (label: string) => label.includes('Previous') ? 'Sebelumnya' : label.includes('Next') ? 'Berikutnya' : label.replace(/<[^>]*>/g, '');
+
+const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
+const categoryLabel = (name?: string) => ({
+    'Fresh Produce': 'Buah dan Sayur', Bakery: 'Roti dan Kue', 'Dairy & Eggs': 'Susu dan Telur',
+    'Packaged Goods': 'Bahan Pangan Kemasan', 'Meat & Seafood': 'Daging dan Hasil Laut', General: 'Umum',
+}[name ?? ''] ?? name ?? 'Umum');
 
 // ─── Manual Override Modal ──────────────────────────────────────────────────
 const selectedLogForOverride = ref<AgentLogItem | null>(null);
@@ -295,12 +315,12 @@ const submitManualOverride = () => {
     if (!selectedLogForOverride.value) return;
 
     if (!overrideReason.value.trim() || overrideReason.value.trim().length < 5) {
-        overrideErrorMessage.value = 'Please provide an override justification with at least 5 characters.';
+        overrideErrorMessage.value = 'Masukkan alasan penyesuaian minimal 5 karakter.';
         return;
     }
 
     if (overrideAction.value === 'reassign_partner' && !overridePartnerId.value) {
-        overrideErrorMessage.value = 'Please choose a donation partner to reassign.';
+        overrideErrorMessage.value = 'Pilih mitra donasi tujuan.';
         return;
     }
 
@@ -321,7 +341,7 @@ const submitManualOverride = () => {
             },
             onError: (errors) => {
                 const firstErr = Object.values(errors)[0];
-                overrideErrorMessage.value = typeof firstErr === 'string' ? firstErr : 'Failed to apply manual override.';
+                overrideErrorMessage.value = typeof firstErr === 'string' ? firstErr : 'Gagal menerapkan penyesuaian manual.';
             },
             onFinish: () => {
                 isSubmittingOverride.value = false;
@@ -332,48 +352,47 @@ const submitManualOverride = () => {
 </script>
 
 <template>
-    <Head title="Autonomous AI Audit Trail - SirkulaFood" />
+    <Head title="Riwayat Audit Agen AI - SirkulaFood" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+        <div class="flex min-w-0 h-full flex-1 flex-col gap-4 p-3 sm:gap-6 sm:p-6 lg:p-8">
             <!-- Header Section with Live Status Badge and Actions -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex min-w-0 items-start gap-3">
                         <div
                             class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-md shadow-emerald-500/20"
                         >
                             <Cpu class="size-5" />
                         </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">AI Agent Audit Trail</h1>
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h1 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">Riwayat Audit Agen AI</h1>
                                 <span
                                     class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400"
                                 >
                                     <span class="size-1.5 animate-pulse rounded-full bg-emerald-500"></span>
-                                    Autonomous Ledger
+                                    Catatan Otomatis
                                 </span>
                             </div>
                             <p class="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-                                Transparent decision verification for competition evaluation, inspection of LLM payloads, and manual operator
-                                overrides.
+                                Verifikasi keputusan yang transparan, pemeriksaan data AI, dan penyesuaian manual oleh operator.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5 self-start sm:self-auto">
+                <div class="grid w-full grid-cols-[1fr_auto] items-center gap-2 sm:flex sm:w-auto sm:self-auto">
                     <button
                         type="button"
                         :disabled="isSimulating"
                         @click="runSimulation"
                         class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-600/30 transition-all hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-600/40 active:translate-y-0.5 disabled:opacity-60"
-                        title="Simulate autonomous AI evaluation for expiring inventory"
+                        title="Simulasikan evaluasi AI otomatis untuk stok yang mendekati kedaluwarsa"
                     >
                         <Sparkles v-if="!isSimulating" class="size-4" />
                         <RefreshCw v-else class="size-4 animate-spin" />
-                        <span>{{ isSimulating ? 'Evaluating Inventory...' : 'Simulate AI Scan' }}</span>
+                        <span>{{ isSimulating ? 'Mengevaluasi stok…' : 'Simulasikan Pemindaian AI' }}</span>
                     </button>
 
                     <button
@@ -381,10 +400,10 @@ const submitManualOverride = () => {
                         :disabled="isRefreshing"
                         @click="refreshLogs"
                         class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                        title="Refresh agent log stream"
+                        title="Muat ulang riwayat aktivitas agen"
                     >
                         <RefreshCw class="size-4" :class="{ 'animate-spin': isRefreshing }" />
-                        <span class="hidden sm:inline">Refresh</span>
+                        <span class="hidden sm:inline">Muat ulang</span>
                     </button>
                 </div>
             </div>
@@ -422,26 +441,26 @@ const submitManualOverride = () => {
                     class="relative overflow-hidden rounded-2xl border border-neutral-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-neutral-500 dark:text-neutral-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Total Actions</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Total Tindakan</span>
                         <Cpu class="size-4 text-neutral-600 dark:text-neutral-300" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">{{ stats.total_logs }}</span>
-                        <span class="text-xs text-muted-foreground">recorded</span>
+                        <span class="text-xs text-muted-foreground">tercatat</span>
                     </div>
                 </div>
 
-                <!-- Card 2: Markdowns Applied -->
+                <!-- Card 2: Diskons Applied -->
                 <div
                     class="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-50/50 to-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-emerald-500/30 dark:from-emerald-950/20 dark:to-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Markdowns</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Diskon</span>
                         <TrendingDown class="size-4" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">{{ stats.discounts_count }}</span>
-                        <span class="text-xs text-emerald-600/70 dark:text-emerald-400/70">auto sales</span>
+                        <span class="text-xs text-emerald-600/70 dark:text-emerald-400/70">penjualan otomatis</span>
                     </div>
                 </div>
 
@@ -450,40 +469,40 @@ const submitManualOverride = () => {
                     class="relative overflow-hidden rounded-2xl border border-sky-500/20 bg-gradient-to-br from-sky-50/50 to-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-sky-500/30 dark:from-sky-950/20 dark:to-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-sky-600 dark:text-sky-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Donations</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Donasi</span>
                         <HeartHandshake class="size-4" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-sky-700 dark:text-sky-300">{{ stats.donations_count }}</span>
-                        <span class="text-xs text-sky-600/70 dark:text-sky-400/70">partner feeds</span>
+                        <span class="text-xs text-sky-600/70 dark:text-sky-400/70">mitra penerima</span>
                     </div>
                 </div>
 
-                <!-- Card 4: Alerts Dispatched -->
+                <!-- Card 4: Peringatan dikirim -->
                 <div
                     class="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-50/50 to-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-amber-500/30 dark:from-amber-950/20 dark:to-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-amber-600 dark:text-amber-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Alerts</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Peringatan</span>
                         <AlertTriangle class="size-4" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-amber-700 dark:text-amber-300">{{ stats.alerts_count }}</span>
-                        <span class="text-xs text-amber-600/70 dark:text-amber-400/70">broadcasted</span>
+                        <span class="text-xs text-amber-600/70 dark:text-amber-400/70">dikirim</span>
                     </div>
                 </div>
 
-                <!-- Card 5: Manual Overrides -->
+                <!-- Card 5: Penyesuaian manual -->
                 <div
                     class="relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-50/50 to-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-violet-500/30 dark:from-violet-950/20 dark:to-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-violet-600 dark:text-violet-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Overrides</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Penyesuaian</span>
                         <ShieldAlert class="size-4" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-violet-700 dark:text-violet-300">{{ stats.overrides_count }}</span>
-                        <span class="text-xs text-violet-600/70 dark:text-violet-400/70">human in loop</span>
+                        <span class="text-xs text-violet-600/70 dark:text-violet-400/70">ditinjau petugas</span>
                     </div>
                 </div>
 
@@ -492,12 +511,12 @@ const submitManualOverride = () => {
                     class="relative overflow-hidden rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-50/50 to-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-teal-500/30 dark:from-teal-950/20 dark:to-neutral-900/70"
                 >
                     <div class="flex items-center justify-between text-teal-600 dark:text-teal-400">
-                        <span class="text-xs font-medium uppercase tracking-wider">Reliability</span>
+                        <span class="text-xs font-medium uppercase tracking-wider">Keandalan</span>
                         <CheckCircle2 class="size-4" />
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-bold tracking-tight text-teal-700 dark:text-teal-300">{{ stats.success_rate }}%</span>
-                        <span class="text-xs text-teal-600/70 dark:text-teal-400/70">success rate</span>
+                        <span class="text-xs text-teal-600/70 dark:text-teal-400/70">tingkat keberhasilan</span>
                     </div>
                 </div>
             </div>
@@ -512,7 +531,7 @@ const submitManualOverride = () => {
                             v-model="search"
                             @input="handleSearchInput"
                             type="text"
-                            placeholder="Search by SKU, product name, partner, or reasoning keywords..."
+                            placeholder="Cari SKU, nama produk, mitra, atau kata kunci alasan..."
                             class="w-full rounded-xl border border-neutral-200 bg-neutral-50 py-2 pl-10 pr-9 text-sm text-neutral-900 transition placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100"
                         />
                         <button
@@ -527,7 +546,7 @@ const submitManualOverride = () => {
 
                     <!-- Dropdown Filters Group -->
                     <div class="flex flex-wrap items-center gap-2.5">
-                        <!-- Action Type Filter -->
+                        <!-- Jenis Tindakan Filter -->
                         <div class="flex items-center gap-1.5">
                             <Tag class="size-3.5 text-muted-foreground" />
                             <select
@@ -535,11 +554,11 @@ const submitManualOverride = () => {
                                 @change="applyFilters"
                                 class="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-medium text-neutral-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200 sm:text-sm"
                             >
-                                <option value="all">All Action Types</option>
-                                <option value="discount_applied">Discounts Applied</option>
-                                <option value="donation_requested">Donation Requests</option>
-                                <option value="alert_sent">Alerts Dispatched</option>
-                                <option value="manual_override">Manual Overrides</option>
+                                <option value="all">Semua jenis tindakan</option>
+                                <option value="discount_applied">Diskon diterapkan</option>
+                                <option value="donation_requested">Permintaan donasi</option>
+                                <option value="alert_sent">Peringatan dikirim</option>
+                                <option value="manual_override">Penyesuaian manual</option>
                             </select>
                         </div>
 
@@ -551,10 +570,10 @@ const submitManualOverride = () => {
                                 @change="applyFilters"
                                 class="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-medium text-neutral-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200 sm:text-sm"
                             >
-                                <option value="all">All Statuses</option>
-                                <option value="success">Success</option>
-                                <option value="failed">Failed</option>
-                                <option value="pending">Pending</option>
+                                <option value="all">Semua status</option>
+                                <option value="success">Berhasil</option>
+                                <option value="failed">Gagal</option>
+                                <option value="pending">Menunggu</option>
                             </select>
                         </div>
 
@@ -566,10 +585,10 @@ const submitManualOverride = () => {
                                 @change="applyFilters"
                                 class="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-medium text-neutral-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200 sm:text-sm"
                             >
-                                <option value="all">All Time</option>
-                                <option value="today">Today Only</option>
-                                <option value="7days">Past 7 Days</option>
-                                <option value="30days">Past 30 Days</option>
+                                <option value="all">Semua waktu</option>
+                                <option value="today">Hari ini saja</option>
+                                <option value="7days">7 hari terakhir</option>
+                                <option value="30days">30 hari terakhir</option>
                             </select>
                         </div>
 
@@ -581,7 +600,7 @@ const submitManualOverride = () => {
                             class="inline-flex items-center gap-1 rounded-xl border border-neutral-200 bg-white px-2.5 py-2 text-xs font-medium text-rose-600 transition hover:bg-rose-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-rose-400 dark:hover:bg-rose-950/30"
                         >
                             <X class="size-3.5" />
-                            <span>Reset Filters</span>
+                            <span>Atur ulang filter</span>
                         </button>
                     </div>
                 </div>
@@ -590,17 +609,17 @@ const submitManualOverride = () => {
             <!-- Main Audit Log Table -->
             <div class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full min-w-[1080px] text-left text-sm">
                         <thead
                             class="border-b border-neutral-200 bg-neutral-50/80 text-xs font-semibold uppercase tracking-wider text-neutral-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400"
                         >
                             <tr>
-                                <th scope="col" class="px-4 py-3.5 sm:px-6">Timestamp & Model</th>
-                                <th scope="col" class="px-4 py-3.5">Product SKU / Name</th>
-                                <th scope="col" class="px-4 py-3.5">Action Type</th>
-                                <th scope="col" class="min-w-[280px] px-4 py-3.5">Autonomous Reasoning</th>
+                                <th scope="col" class="px-4 py-3.5 sm:px-6">Waktu & Model</th>
+                                <th scope="col" class="px-4 py-3.5">SKU / Nama Produk</th>
+                                <th scope="col" class="px-4 py-3.5">Jenis Tindakan</th>
+                                <th scope="col" class="min-w-[280px] px-4 py-3.5">Alasan Otomatis</th>
                                 <th scope="col" class="px-4 py-3.5 text-center">Status</th>
-                                <th scope="col" class="px-4 py-3.5 text-right sm:px-6">Actions</th>
+                                <th scope="col" class="px-4 py-3.5 text-right sm:px-6">Tindakan</th>
                             </tr>
                         </thead>
 
@@ -614,10 +633,10 @@ const submitManualOverride = () => {
                                         <Bot class="size-7" />
                                     </div>
                                     <h3 class="mt-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                                        No AI agent logs match your filters
+                                        Tidak ada catatan aktivitas AI yang sesuai dengan filter
                                     </h3>
                                     <p class="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-                                        Try broadening your search criteria or trigger a live simulation scan to populate autonomous entries.
+                                        Ubah kriteria pencarian atau jalankan simulasi pemindaian untuk membuat catatan baru.
                                     </p>
                                     <div class="mt-5 flex items-center justify-center gap-3">
                                         <button
@@ -627,7 +646,7 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-3.5 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                                         >
                                             <RotateCcw class="size-3.5" />
-                                            <span>Clear Filters</span>
+                                            <span>Hapus filter</span>
                                         </button>
                                         <button
                                             @click="runSimulation"
@@ -635,7 +654,7 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-500"
                                         >
                                             <Sparkles class="size-3.5" />
-                                            <span>Simulate AI Scan</span>
+                                            <span>Simulasikan Pemindaian AI</span>
                                         </button>
                                     </div>
                                 </td>
@@ -651,7 +670,7 @@ const submitManualOverride = () => {
                                             <span>{{ log.created_at_human }}</span>
                                         </div>
                                         <span class="mt-0.5 font-mono text-[11px] text-muted-foreground" :title="log.created_at">
-                                            {{ log.created_at ? new Date(log.created_at).toLocaleString() : 'Just now' }}
+                                            {{ log.created_at ? new Date(log.created_at).toLocaleString('id-ID') : 'Baru saja' }}
                                         </span>
                                         <div class="mt-1.5 flex items-center gap-1">
                                             <span
@@ -662,9 +681,9 @@ const submitManualOverride = () => {
                                             <span
                                                 v-if="log.payload.is_overridden"
                                                 class="inline-flex items-center rounded-md bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700 dark:bg-violet-950/60 dark:text-violet-300"
-                                                title="This autonomous action was manually adjusted"
+                                                title="Tindakan otomatis ini telah disesuaikan secara manual"
                                             >
-                                                Overridden
+                                                Disesuaikan manual
                                             </span>
                                         </div>
                                     </div>
@@ -681,7 +700,7 @@ const submitManualOverride = () => {
                                                 v-if="log.product.category"
                                                 class="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
                                             >
-                                                {{ log.product.category }}
+                                                {{ categoryLabel(log.product.category) }}
                                             </span>
                                         </div>
                                         <span
@@ -693,15 +712,15 @@ const submitManualOverride = () => {
                                         <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                                             <span v-if="log.product.discount_price">
                                                 <span class="text-muted-foreground/70 line-through"
-                                                    >${{ Number(log.product.original_price).toFixed(2) }}</span
+                                                    >{{ formatCurrency(Number(log.product.original_price)) }}</span
                                                 >
                                                 <span class="ml-1 font-semibold text-emerald-600 dark:text-emerald-400"
-                                                    >${{ Number(log.product.discount_price).toFixed(2) }}</span
+                                                    >{{ formatCurrency(Number(log.product.discount_price)) }}</span
                                                 >
                                             </span>
-                                            <span v-else-if="log.product.original_price"> ${{ Number(log.product.original_price).toFixed(2) }} </span>
+                                            <span v-else-if="log.product.original_price">{{ formatCurrency(Number(log.product.original_price)) }}</span>
                                             <span v-if="log.product.expiration_date" class="text-[11px]">
-                                                • Exp: {{ log.product.expiration_date }}
+                                                • Kedaluwarsa: {{ log.product.expiration_date }}
                                             </span>
                                         </div>
                                     </div>
@@ -710,13 +729,13 @@ const submitManualOverride = () => {
                                             <Cpu class="size-3.5 text-neutral-500" />
                                         </div>
                                         <div>
-                                            <span class="font-semibold text-neutral-700 dark:text-neutral-300">System Daemon</span>
-                                            <p class="text-[10px] text-muted-foreground">Inventory cycle monitor</p>
+                                            <span class="font-semibold text-neutral-700 dark:text-neutral-300">Layanan Sistem</span>
+                                            <p class="text-[10px] text-muted-foreground">Pemantau siklus stok</p>
                                         </div>
                                     </div>
                                 </td>
 
-                                <!-- Action Type Badge -->
+                                <!-- Jenis Tindakan Badge -->
                                 <td class="whitespace-nowrap px-4 py-4 align-top">
                                     <!-- Discount Applied -->
                                     <div v-if="log.action_type === 'discount_applied'" class="flex flex-col items-start gap-1">
@@ -724,13 +743,13 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300"
                                         >
                                             <Percent class="size-3.5" />
-                                            <span>Discount Applied</span>
+                                            <span>Diskon diterapkan</span>
                                         </span>
                                         <span
                                             v-if="log.payload.discount_percentage"
                                             class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"
                                         >
-                                            -{{ log.payload.discount_percentage }}% Markdown
+                                            -{{ log.payload.discount_percentage }}% Diskon
                                         </span>
                                     </div>
 
@@ -740,7 +759,7 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300"
                                         >
                                             <HeartHandshake class="size-3.5" />
-                                            <span>Donation Reserved</span>
+                                            <span>Donasi disiapkan</span>
                                         </span>
                                         <span
                                             v-if="log.partner?.name || log.payload.partner_name || log.payload.recipient"
@@ -756,9 +775,9 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300"
                                         >
                                             <AlertTriangle class="size-3.5" />
-                                            <span>Alert Broadcasted</span>
+                                            <span>Peringatan dikirim</span>
                                         </span>
-                                        <span class="text-[11px] text-amber-600/90 dark:text-amber-400/90"> Inventory alert </span>
+                                        <span class="text-[11px] text-amber-600/90 dark:text-amber-400/90"> Peringatan stok </span>
                                     </div>
 
                                     <!-- Manual Override -->
@@ -767,10 +786,10 @@ const submitManualOverride = () => {
                                             class="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300"
                                         >
                                             <ShieldAlert class="size-3.5" />
-                                            <span>Manual Override</span>
+                                            <span>Penyesuaian manual</span>
                                         </span>
                                         <span v-if="log.payload.performed_by" class="text-[11px] font-medium text-violet-600 dark:text-violet-400">
-                                            By {{ log.payload.performed_by }}
+                                            Oleh {{ log.payload.performed_by }}
                                         </span>
                                     </div>
                                 </td>
@@ -788,19 +807,19 @@ const submitManualOverride = () => {
                                                 v-if="log.payload.rule"
                                                 class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] dark:bg-neutral-800"
                                             >
-                                                rule: {{ log.payload.rule }}
+                                                aturan: {{ log.payload.rule }}
                                             </span>
                                             <span
                                                 v-if="log.payload.confidence"
                                                 class="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400"
                                             >
-                                                {{ Math.round(Number(log.payload.confidence) * 100) }}% confidence
+                                                {{ Math.round(Number(log.payload.confidence) * 100) }}% keyakinan
                                             </span>
                                             <span
                                                 v-if="log.payload.override_reason"
                                                 class="rounded bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300"
                                             >
-                                                Overridden: "{{ log.payload.override_reason }}"
+                                                Alasan penyesuaian: "{{ log.payload.override_reason }}"
                                             </span>
                                         </div>
                                     </div>
@@ -813,21 +832,21 @@ const submitManualOverride = () => {
                                         class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400"
                                     >
                                         <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                                        Success
+                                        Berhasil
                                     </span>
                                     <span
                                         v-else-if="log.status === 'failed'"
                                         class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-700 dark:text-rose-400"
                                     >
                                         <span class="size-1.5 rounded-full bg-rose-500"></span>
-                                        Failed
+                                        Gagal
                                     </span>
                                     <span
                                         v-else
                                         class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400"
                                     >
                                         <span class="size-1.5 rounded-full bg-amber-500"></span>
-                                        Pending
+                                        Menunggu
                                     </span>
                                 </td>
 
@@ -839,10 +858,10 @@ const submitManualOverride = () => {
                                             @click="openJsonModal(log)"
                                             type="button"
                                             class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-neutral-700 shadow-sm transition hover:bg-neutral-50 active:translate-y-0.5 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700/80"
-                                            title="Inspect raw JSON payload from AI engine"
+                                            title="Periksa data JSON mentah dari mesin AI"
                                         >
                                             <Code2 class="size-3.5 text-sky-600 dark:text-sky-400" />
-                                            <span>Inspect JSON</span>
+                                            <span>Periksa JSON</span>
                                         </button>
 
                                         <!-- Manual Override Button -->
@@ -851,10 +870,10 @@ const submitManualOverride = () => {
                                             @click="openOverrideModal(log)"
                                             type="button"
                                             class="inline-flex items-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50/50 px-2.5 py-1.5 text-xs font-semibold text-violet-700 shadow-sm transition hover:bg-violet-100 active:translate-y-0.5 dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-300 dark:hover:bg-violet-900/50"
-                                            title="Manually revert or adjust this automated decision"
+                                            title="Batalkan atau sesuaikan tindakan otomatis ini"
                                         >
                                             <RotateCcw class="size-3.5 text-violet-600 dark:text-violet-400" />
-                                            <span>Override</span>
+                                            <span>Sesuaikan</span>
                                         </button>
                                     </div>
                                 </td>
@@ -869,13 +888,13 @@ const submitManualOverride = () => {
                     class="flex flex-col gap-3 border-t border-neutral-200 px-4 py-4 dark:border-neutral-800 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                 >
                     <div class="text-xs text-muted-foreground">
-                        Showing
+                        Menampilkan
                         <span class="font-semibold text-foreground">{{ logs.from || 0 }}</span>
-                        to
+                        sampai
                         <span class="font-semibold text-foreground">{{ logs.to || 0 }}</span>
-                        of
+                        dari
                         <span class="font-semibold text-foreground">{{ logs.total }}</span>
-                        audit entries
+                        catatan audit
                     </div>
 
                     <div class="flex items-center gap-1">
@@ -891,12 +910,12 @@ const submitManualOverride = () => {
                                 ]"
                                 preserve-scroll
                             >
-                                <span v-html="link.label" />
+                                <span>{{ paginationLabel(link.label) }}</span>
                             </Link>
                             <span
                                 v-else
                                 class="inline-flex items-center justify-center px-2 py-1.5 text-xs text-muted-foreground/60"
-                                v-html="link.label"
+                                {{ paginationLabel(link.label) }}
                             />
                         </template>
                     </div>
@@ -909,7 +928,7 @@ const submitManualOverride = () => {
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <div
             v-if="isJsonModalOpen && selectedLogForJson"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-all"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm transition-all sm:p-4"
         >
             <div
                 class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
@@ -917,7 +936,7 @@ const submitManualOverride = () => {
             >
                 <!-- Modal Header -->
                 <div
-                    class="flex items-center justify-between border-b border-neutral-200 bg-neutral-50/70 px-6 py-4 dark:border-neutral-800 dark:bg-neutral-950/40"
+                    class="flex items-center justify-between gap-2 border-b border-neutral-200 bg-neutral-50/70 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-950/40 sm:px-6 sm:py-4"
                 >
                     <div class="flex items-center gap-3">
                         <div class="flex size-9 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
@@ -925,14 +944,14 @@ const submitManualOverride = () => {
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Raw AI Decision Payload</h3>
+                                <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Data Mentah Keputusan AI</h3>
                                 <span
                                     class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
                                 >
                                     #LOG-{{ selectedLogForJson.id }}
                                 </span>
                             </div>
-                            <p class="text-xs text-muted-foreground">Verified payload from {{ getModelBadge(selectedLogForJson.payload) }}</p>
+                            <p class="text-xs text-muted-foreground">Data terverifikasi dari {{ getModelBadge(selectedLogForJson.payload) }}</p>
                         </div>
                     </div>
 
@@ -944,7 +963,7 @@ const submitManualOverride = () => {
                         >
                             <Check v-if="hasCopiedJson" class="size-3.5 text-emerald-500" />
                             <Copy v-else class="size-3.5" />
-                            <span>{{ hasCopiedJson ? 'Copied!' : 'Copy JSON' }}</span>
+                            <span>{{ hasCopiedJson ? 'Tersalin!' : 'Salin JSON' }}</span>
                         </button>
 
                         <button
@@ -959,31 +978,31 @@ const submitManualOverride = () => {
 
                 <!-- Modal Sub-Header: Payload Metadata Chips -->
                 <div
-                    class="grid grid-cols-2 gap-3 border-b border-neutral-200 bg-neutral-50/40 px-6 py-3 dark:border-neutral-800 dark:bg-neutral-950/20 sm:grid-cols-4"
+                    class="grid grid-cols-2 gap-3 border-b border-neutral-200 bg-neutral-50/40 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-950/20 sm:grid-cols-4 sm:px-6"
                 >
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Action Type</span>
+                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Jenis Tindakan</span>
                         <p class="mt-0.5 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                            {{ selectedLogForJson.action_type }}
+                                            {{ actionTypeLabel(selectedLogForJson.action_type) }}
                         </p>
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Target Product</span>
+                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Produk Sasaran</span>
                         <p class="mt-0.5 truncate text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                            {{ selectedLogForJson.product ? selectedLogForJson.product.sku : 'System Routine' }}
+                            {{ selectedLogForJson.product ? selectedLogForJson.product.sku : 'Proses Sistem' }}
                         </p>
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Decision Rule</span>
+                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Aturan Keputusan</span>
                         <p class="mt-0.5 truncate font-mono text-xs font-semibold text-neutral-800 dark:text-neutral-200">
                             {{ selectedLogForJson.payload.rule || 'expiring_threshold' }}
                         </p>
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Execution Status</span>
+                        <span class="text-[10px] font-bold uppercase text-muted-foreground">Status Pelaksanaan</span>
                         <p class="mt-0.5 flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                             <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                            {{ selectedLogForJson.status }}
+                            {{ statusLabel(selectedLogForJson.status) }}
                         </p>
                     </div>
                 </div>
@@ -997,13 +1016,13 @@ const submitManualOverride = () => {
                 <div
                     class="flex items-center justify-between border-t border-neutral-200 bg-neutral-50/70 px-6 py-3.5 dark:border-neutral-800 dark:bg-neutral-950/40"
                 >
-                    <span class="text-xs text-muted-foreground"> Payload size: {{ formattedJsonString.length }} bytes </span>
+                    <span class="text-xs text-muted-foreground"> Ukuran data: {{ formattedJsonString.length }} bytes </span>
                     <button
                         @click="closeJsonModal"
                         type="button"
                         class="rounded-xl bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90 dark:bg-neutral-100 dark:text-neutral-900"
                     >
-                        Close Viewer
+                        Tutup Pratinjau
                     </button>
                 </div>
             </div>
@@ -1014,7 +1033,7 @@ const submitManualOverride = () => {
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <div
             v-if="isOverrideModalOpen && selectedLogForOverride"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-all"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-4"
         >
             <div
                 class="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
@@ -1022,7 +1041,7 @@ const submitManualOverride = () => {
             >
                 <!-- Modal Header -->
                 <div
-                    class="flex items-center justify-between border-b border-neutral-200 bg-violet-50/40 px-6 py-4 dark:border-neutral-800 dark:bg-violet-950/20"
+                    class="flex items-center justify-between gap-2 border-b border-neutral-200 bg-violet-50/40 px-3 py-3 dark:border-neutral-800 dark:bg-violet-950/20 sm:px-6 sm:py-4"
                 >
                     <div class="flex items-center gap-3">
                         <div class="flex size-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
@@ -1030,9 +1049,9 @@ const submitManualOverride = () => {
                         </div>
                         <div>
                             <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">
-                                Manual Override: Log #{{ selectedLogForOverride.id }}
+                                Penyesuaian Manual: Log #{{ selectedLogForOverride.id }}
                             </h3>
-                            <p class="text-xs text-muted-foreground">Adjust or revert automated decisions with competition audit accountability.</p>
+                            <p class="text-xs text-muted-foreground">Sesuaikan atau batalkan keputusan otomatis dengan tetap menjaga jejak audit.</p>
                         </div>
                     </div>
                     <button
@@ -1045,7 +1064,7 @@ const submitManualOverride = () => {
                 </div>
 
                 <!-- Modal Body -->
-                <div class="flex-1 space-y-5 overflow-y-auto p-6">
+                <div class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
                     <!-- Context Summary Card -->
                     <div class="rounded-xl border border-neutral-200 bg-neutral-50/70 p-3.5 text-xs dark:border-neutral-800 dark:bg-neutral-950/50">
                         <div class="flex items-start justify-between">
@@ -1058,7 +1077,7 @@ const submitManualOverride = () => {
                                 </p>
                             </div>
                             <span class="rounded bg-neutral-200 px-2 py-0.5 text-[10px] font-semibold dark:bg-neutral-800">
-                                Current: {{ selectedLogForOverride.action_type }}
+                                Saat ini: {{ actionTypeLabel(selectedLogForOverride.action_type) }}
                             </span>
                         </div>
                         <p class="mt-2 line-clamp-2 text-[11px] italic text-muted-foreground">"{{ selectedLogForOverride.reasoning }}"</p>
@@ -1075,7 +1094,7 @@ const submitManualOverride = () => {
 
                     <!-- Override Action Selector -->
                     <div>
-                        <label class="mb-2 block text-xs font-semibold text-neutral-700 dark:text-neutral-300"> Select Override Strategy </label>
+                        <label class="mb-2 block text-xs font-semibold text-neutral-700 dark:text-neutral-300"> Pilih Tindakan Penyesuaian </label>
                         <div class="space-y-2">
                             <!-- Revert Option -->
                             <label
@@ -1094,9 +1113,9 @@ const submitManualOverride = () => {
                                     class="mt-0.5 text-emerald-600 focus:ring-emerald-500"
                                 />
                                 <div>
-                                    <span class="text-xs font-bold text-neutral-900 dark:text-neutral-100"> Revert Decision to Normal Stock </span>
+                                    <span class="text-xs font-bold text-neutral-900 dark:text-neutral-100"> Kembalikan ke Stok Normal </span>
                                     <p class="mt-0.5 text-[11px] text-muted-foreground">
-                                        Cancels discount or donation reservation, restoring product to active inventory.
+                                        Batalkan diskon atau donasi dan kembalikan produk ke stok aktif.
                                     </p>
                                 </div>
                             </label>
@@ -1119,9 +1138,9 @@ const submitManualOverride = () => {
                                     class="mt-0.5 text-sky-600 focus:ring-sky-500"
                                 />
                                 <div>
-                                    <span class="text-xs font-bold text-neutral-900 dark:text-neutral-100"> Reassign Donation Partner </span>
+                                    <span class="text-xs font-bold text-neutral-900 dark:text-neutral-100"> Alihkan Mitra Donasi </span>
                                     <p class="mt-0.5 text-[11px] text-muted-foreground">
-                                        Route the surplus batch to an alternate verified non-profit charity.
+                                        Salurkan batch pangan berlebih kepada yayasan terverifikasi lainnya.
                                     </p>
                                 </div>
                             </label>
@@ -1130,12 +1149,12 @@ const submitManualOverride = () => {
 
                     <!-- Dynamic field: Reassign Partner Dropdown -->
                     <div v-if="overrideAction === 'reassign_partner'" class="space-y-1.5">
-                        <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"> Select New Donation Partner </label>
+                        <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"> Pilih Mitra Donasi Baru </label>
                         <select
                             v-model="overridePartnerId"
                             class="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs text-neutral-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 sm:text-sm"
                         >
-                            <option value="" disabled>Choose verified recipient...</option>
+                            <option value="" disabled>Pilih penerima terverifikasi...</option>
                             <option v-for="partner in partners" :key="partner.id" :value="partner.id">
                                 {{ partner.name }}
                             </option>
@@ -1145,12 +1164,12 @@ const submitManualOverride = () => {
                     <!-- Justification / Reason Textarea -->
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                            Override Rationale / Justification <span class="text-rose-500">*</span>
+                            Alasan Penyesuaian <span class="text-rose-500">*</span>
                         </label>
                         <textarea
                             v-model="overrideReason"
                             rows="3"
-                            placeholder="State the regulatory or operational reason for modifying this autonomous decision..."
+                            placeholder="Jelaskan alasan operasional atau kebijakan untuk mengubah keputusan otomatis ini..."
                             class="w-full rounded-xl border border-neutral-200 bg-white p-3 text-xs text-neutral-900 transition placeholder:text-muted-foreground focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 sm:text-sm"
                         ></textarea>
                     </div>
@@ -1158,14 +1177,14 @@ const submitManualOverride = () => {
 
                 <!-- Modal Footer -->
                 <div
-                    class="flex items-center justify-end gap-2.5 border-t border-neutral-200 bg-neutral-50/70 px-6 py-4 dark:border-neutral-800 dark:bg-neutral-950/40"
+                    class="flex items-center justify-end gap-2.5 border-t border-neutral-200 bg-neutral-50/70 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-950/40 sm:px-6 sm:py-4"
                 >
                     <button
                         @click="closeOverrideModal"
                         type="button"
                         class="rounded-xl border border-neutral-200 bg-white px-4 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300"
                     >
-                        Cancel
+                        Batal
                     </button>
                     <button
                         :disabled="isSubmittingOverride"
@@ -1175,7 +1194,7 @@ const submitManualOverride = () => {
                     >
                         <RefreshCw v-if="isSubmittingOverride" class="size-3.5 animate-spin" />
                         <ShieldCheck v-else class="size-3.5" />
-                        <span>{{ isSubmittingOverride ? 'Executing Override...' : 'Apply Manual Override' }}</span>
+                        <span>{{ isSubmittingOverride ? 'Menerapkan penyesuaian…' : 'Terapkan Penyesuaian Manual' }}</span>
                     </button>
                 </div>
             </div>
