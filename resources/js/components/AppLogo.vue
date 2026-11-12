@@ -10,11 +10,9 @@ const props = defineProps<Props>();
 
 <template>
     <span :class="['flex min-w-0 flex-1 items-center gap-2', props.class]">
-        <img src="/images/SirkulaFood-mark.png" alt="" class="size-8 shrink-0 object-contain dark:hidden" />
-        <img src="/images/SirkulaFood-mark-dark.png" alt="" class="hidden size-8 shrink-0 object-contain dark:block" />
-        <span class="ml-1 grid min-w-0 flex-1 text-left text-sm">
-            <span class="mb-0.5 truncate font-semibold leading-none">SirkulaFood</span>
-            <span class="truncate text-xs text-muted-foreground">Selamatkan pangan, jaga nilainya</span>
-        </span>
+        <img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[190px] object-contain dark:hidden group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-logo-dark.png" alt="SirkulaFood" class="hidden h-7 w-auto max-w-[190px] object-contain dark:block group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-mark.png" alt="SirkulaFood" class="hidden size-8 shrink-0 object-contain group-data-[collapsible=icon]:block dark:group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-mark-dark.png" alt="SirkulaFood" class="hidden size-8 shrink-0 object-contain dark:group-data-[collapsible=icon]:block" />
     </span>
 </template>

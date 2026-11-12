@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1056 270" role="img" aria-label="SirkulaFood">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 919 250" role="img" aria-label="SirkulaFood">
   <style>.light{display:block}.dark{display:none}@media(prefers-color-scheme:dark){.light{display:none}.dark{display:block}}</style>
-  <image class="light" href="/images/SirkulaFood-logo-light.png" width="1056" height="270" preserveAspectRatio="xMidYMid meet"/>
-  <image class="dark" href="/images/SirkulaFood-logo-dark.png" width="1056" height="270" preserveAspectRatio="xMidYMid meet"/>
+  <image class="light" href="/images/SirkulaFood-logo-light.png" width="919" height="250" preserveAspectRatio="xMidYMid meet"/>
+  <image class="dark" href="/images/SirkulaFood-logo-dark.png" width="919" height="250" preserveAspectRatio="xMidYMid meet"/>
 </svg>

@@ -1,5 +1,8 @@
 <div align="center">
-  <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood dengan latar transparan" width="356">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/SirkulaFood-logo-dark.png">
+    <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood transparan" width="356">
+  </picture>
   <h1>Selamatkan pangan, jaga nilainya.</h1>
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
