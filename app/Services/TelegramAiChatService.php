@@ -434,7 +434,7 @@ class TelegramAiChatService
     {
         $actor = $this->resolveActor($chatId);
         if ($actor === null) {
-            return 'Mulai dengan /start untuk melihat Chat ID, hubungkan Chat ID ke akun SirkulaFood, lalu kirim pertanyaan di chat ini.';
+            return 'Mulai dengan /start untuk melihat Chat ID, hubungkan Chat ID ke akun SirkulaFood, lalu kirim pertanyaan di chat ini. Jika ID masih terhubung ke akun lama, jalankan /resetid untuk melepasnya sebelum menghubungkan akun baru.';
         }
 
         $guidance = match ($actor['role']) {
@@ -443,7 +443,7 @@ class TelegramAiChatService
             default => 'Yayasan/mitra donasi: tanyakan produk donasi terbaru, ide menu dari bahan yang diterima, penyimpanan, dan urutan penggunaan berdasarkan tanggal kedaluwarsa.',
         };
 
-        return "Saya SirkulaFood AI. {$guidance}\nGunakan /reset untuk memulai percakapan baru. Saya hanya menjawab berdasarkan data SirkulaFood yang tersedia dan tidak dapat memastikan keamanan pangan hanya dari informasi chat.";
+        return "Saya SirkulaFood AI. {$guidance}\nGunakan /reset untuk memulai percakapan baru, atau /resetid untuk melepas koneksi dari akun lama. Chat ID Telegram tidak berubah setelah reset. Saya hanya menjawab berdasarkan data SirkulaFood yang tersedia dan tidak dapat memastikan keamanan pangan hanya dari informasi chat.";
     }
 
     public function reset(string $chatId): string
