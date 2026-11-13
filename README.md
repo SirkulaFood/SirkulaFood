@@ -10,6 +10,8 @@
     <img src="https://img.shields.io/badge/Automation-n8n-C3A05B?style=flat-square&logo=n8n&logoColor=142C25" alt="n8n">
     <img src="https://img.shields.io/badge/AI%20gateway-9Router-8E9C75?style=flat-square" alt="9Router">
     <img src="https://img.shields.io/badge/Chat-Telegram-0B3B2E?style=flat-square&logo=telegram&logoColor=F5F1E8" alt="Telegram">
+    <img width="1223" height="456" alt="image" src="https://github.com/user-attachments/assets/485e094d-b396-4ead-b4ba-f05c0ad95c99" />
+
   </p>
     <p>
     <a href="https://sirkulafood.my.id/">Kunjungi Website</a> ·
@@ -65,6 +67,7 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 | **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
 | **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
 | **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
+| **Email** | Notifikasi donasi dari SirkulaFood Agent bahwa makanan sudah didonasikan dan stok supermarket sudah dikurangi. |
 | **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
 | **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
 
