@@ -81,51 +81,108 @@ Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan
 
 ## Menjalankan secara lokal
 
-### Persyaratan
 
-- PHP 8.2 atau lebih baru dan Composer
-- Node.js dan npm
-- MySQL atau SQLite
-- Ekstensi PHP yang dibutuhkan Laravel 12
-
-### Instalasi
-
-```powershell
-git clone https://github.com/SirkulaFood/SirkulaFood.git
-Set-Location SirkulaFood
-composer install
 npm install
+```
+
+Tunggu setiap perintah selesai. Jika instalasi gagal karena versi runtime, ekstensi, atau dependency, penuhi persyaratan yang disebutkan lalu ulangi perintah yang gagal.
+
+### 3. Buat konfigurasi lokal
+
+Salin konfigurasi contoh dan hasilkan kunci aplikasi:
+
+```powershell
 Copy-Item .env.example .env
-php artisan key:generate
-```
 
-Atur koneksi database di `.env`, lalu jalankan migrasi dan build aset frontend:
+Buka `.env` di editor dan pilih salah satu konfigurasi database berikut.
 
-```powershell
-php artisan migrate
-npm run build
-```
+#### SQLite (disarankan untuk mulai)
 
-Untuk pengembangan lokal, jalankan layanan yang diperlukan pada terminal terpisah:
+Pastikan ekstensi `pdo_sqlite` aktif, kemudian buat file databasenya:
 
 ```powershell
-php artisan serve
-php artisan queue:listen --tries=1 --timeout=0
-npm run dev
+New-Item -ItemType File -Path database/database.sqlite -Force
 ```
 
-Atau gunakan skrip Composer yang tersedia:
+Atur nilai berikut di `.env`:
+
+```dotenv
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+
+Kosongkan `DB_HOST`, `DB_PORT`, `DB_USERNAME`, dan `DB_PASSWORD` jika nilainya terisi. Konfigurasi contoh menggunakan database juga untuk session, cache, dan antrean.
+
+#### MySQL
+
+Jalankan MySQL dan buat database kosong bernama `SirkulaFood_db` (atau nama pilihan Anda). Isi `.env` dengan nilai lokal yang benar:
+
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=SirkulaFood_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Sesuaikan pengguna dan kata sandi dengan instalasi MySQL Anda.
+
+Untuk menjalankan fitur dasar secara lokal, pastikan pengaturan berikut sesuai:
+
+```dotenv
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+ENABLE_MOCK_AI=true
+```
+
+Mode mock AI memungkinkan aplikasi berjalan tanpa API AI eksternal.
+
+### 4. Siapkan database dan frontend
+
+
+Migrasi membuat tabel aplikasi dan tabel pendukung yang digunakan konfigurasi database untuk session, cache, dan queue.
+
+### 5. Jalankan aplikasi
+
+Cara termudah adalah menjalankan server Laravel, worker antrean, dan Vite sekaligus:
 
 ```powershell
 composer run dev
 ```
 
-### Integrasi opsional
+Biarkan proses itu tetap berjalan dan buka **http://127.0.0.1:8000** di browser. Alternatifnya, jalankan proses berikut dari tiga terminal terpisah di folder proyek:
 
-- **9Router:** Atur `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, dan `NINEROUTER_VISION_MODEL`. Contoh URL dasar adalah `http://127.0.0.1:20128/v1`; proses Laravel harus dapat menjangkaunya.
-- **Telegram:** Atur `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET`, lalu daftarkan webhook HTTPS publik dengan `php artisan telegram:set-webhook --url=https://domain-anda.example`.
-- **n8n:** Atur variabel webhook di `.env` sesuai kebutuhan. Alur kerja yang disertakan tidak aktif sebelum dikonfigurasi dan diaktifkan di lingkungan n8n.
-- **Antrean dan penjadwal:** Konfigurasikan pekerja antrean serta penjadwal Laravel untuk notifikasi dan tugas terjadwal.
+php artisan serve
+```
+
+```powershell
+php artisan queue:listen --tries=1 --timeout=0
+```
+
+```powershell
+npm run dev
+
+Untuk menghentikan proses tekan `Ctrl+C` di terminal terkait. Jika ingin mencoba tanpa Vite development server, jalankan `npm run build`, lalu `php artisan serve`.
+
+### 6. Integrasi opsional
+
+Aplikasi dasar dapat dijalankan tanpa mengisi kunci integrasi. Atur hanya layanan yang ingin digunakan:
+
+- **9Router/AI:** Isi `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, dan `NINEROUTER_VISION_MODEL`. URL contoh di `.env.example` adalah `http://127.0.0.1:20128/v1`; pastikan gateway berjalan dan dapat dijangkau Laravel. Variabel `GEMINI_API_KEY` dan `GROQ_API_KEY` tersedia untuk konfigurasi terkait. Simpan kunci secara privat.
+- **Telegram:** Isi `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET`. Webhook memerlukan URL HTTPS publik yang dapat dijangkau Telegram; localhost saja tidak cukup. Daftarkan URL dengan `php artisan telegram:set-webhook --url=https://domain-anda.example` setelah endpoint publik siap.
+- **n8n:** Atur `N8N_WEBHOOK_URL`, `N8N_EVENT_WEBHOOK_URL`, dan kredensial webhook jika diperlukan. File workflow di repository adalah draf; impor ke n8n, atur endpoint/kredensial, lalu aktifkan secara manual.
+- **Penjadwal Laravel:** Tugas di `routes/console.php` memerlukan proses terpisah. Untuk menjalankannya selama pengembangan lokal, buka terminal lain dan jalankan `php artisan schedule:work`.
+
+### Pemecahan masalah
+
+- **`could not find driver`:** Aktifkan `pdo_sqlite` atau `pdo_mysql` sesuai database, kemudian buka terminal baru.
+- **Database tidak tersambung:** Pastikan layanan MySQL aktif dan nilai koneksi benar. Untuk SQLite, pastikan file `database/database.sqlite` ada dan `DB_CONNECTION=sqlite`.
+- **Perubahan `.env` tidak terbaca:** Jalankan `php artisan config:clear`, lalu mulai ulang server.
+- **Tampilan atau perubahan frontend tidak muncul:** Pastikan `npm run dev` tetap berjalan, atau jalankan ulang `npm run build`.
+- **Port 8000 sudah digunakan:** Jalankan `php artisan serve --port=8001` dan ubah `APP_URL` menjadi `http://127.0.0.1:8001`.
+
 
 ## Struktur proyek
 
