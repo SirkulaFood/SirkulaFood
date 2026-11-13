@@ -31,6 +31,54 @@ Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan 
 
 Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; bukan klaim pencapaian target SDGs secara keseluruhan. Pengukuran dampak membutuhkan data operasional dan tolok ukur yang jelas.
 
+## Jenis akun
+
+| Jenis akun | Kegunaan | Pendaftaran |
+|:--|:--|:--|
+| **Mitra sosial / yayasan** | Menerima produk yang didonasikan. | Tersedia pada halaman pendaftaran. |
+| **Mitra UMKM** | Menerima informasi produk diskon. | Tersedia pada halaman pendaftaran. |
+| **Supermarket / toko** | Mengelola inventaris serta menawarkan produk untuk diskon atau donasi. | Tersedia pada halaman pendaftaran. |
+| **Admin sistem** | Mengelola platform dan akun mitra. | Dibuat oleh administrator. |
+
+Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelola atau kasir.
+
+## Alur pengelolaan pangan
+
+| Tahap | Dukungan SirkulaFood |
+|:--|:--|
+| **Pantau** | Tinjau produk, batch, jumlah stok, harga, dan sisa masa simpan. |
+| **Periksa** | Gunakan analisis gambar sebagai bantuan awal untuk menilai kondisi produk. |
+| **Pertahankan nilai** | Tinjau rekomendasi dan persetujuan diskon sebelum perubahan diterapkan. |
+| **Salurkan** | Siapkan produk yang memenuhi syarat untuk mitra donasi dan koordinasikan serah terima. |
+| **Catat** | Simpan aktivitas, keputusan, serta rekap untuk ditinjau. |
+
+## Teknologi dan integrasi
+
+| Teknologi | Peran |
+|:--|:--|
+| **Laravel 12** | Backend, inventaris, aturan bisnis, persetujuan, audit, dan API. |
+| **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
+| **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
+| **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
+| **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
+| **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
+
+### Alur keputusan AI
+
+```text
+Data inventaris / foto produk
+              ↓
+Laravel memvalidasi konteks dan permintaan
+              ↓
+9Router → model AI yang dikonfigurasi → hasil terstruktur
+              ↓
+Staf meninjau / menyetujui melalui aplikasi atau Telegram
+              ↓
+Diskon atau donasi yang disetujui → dicatat oleh Laravel
+```
+
+Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
+
 ## Menjalankan secara lokal
 
 Panduan ini menggunakan Windows PowerShell sebagai contoh. Jalankan perintah dari folder akar repository, yaitu folder yang berisi `artisan`, `composer.json`, dan `package.json`.
@@ -158,7 +206,7 @@ npm run dev
 
 Untuk menghentikan proses, tekan `Ctrl+C` di terminal terkait. Jika ingin mencoba tanpa Vite development server, jalankan `npm run build`, lalu `php artisan serve`.
 
-### 6. Integrasi opsional
+### 6. Integrasi (Opsional)
 
 Aplikasi dasar dapat dijalankan tanpa mengisi kunci integrasi. Atur hanya layanan yang ingin digunakan:
 
@@ -227,54 +275,6 @@ SirkulaFood/
 
 > Catatan: Folder `vendor/` dan direktori runtime Laravel dibuat secara lokal saat instalasi atau aplikasi dijalankan.
 ---
-
-## Jenis akun
-
-| Jenis akun | Kegunaan | Pendaftaran |
-|:--|:--|:--|
-| **Mitra sosial / yayasan** | Menerima produk yang didonasikan. | Tersedia pada halaman pendaftaran. |
-| **Mitra UMKM** | Menerima informasi produk diskon. | Tersedia pada halaman pendaftaran. |
-| **Supermarket / toko** | Mengelola inventaris serta menawarkan produk untuk diskon atau donasi. | Tersedia pada halaman pendaftaran. |
-| **Admin sistem** | Mengelola platform dan akun mitra. | Dibuat oleh administrator. |
-
-Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelola atau kasir.
-
-## Alur pengelolaan pangan
-
-| Tahap | Dukungan SirkulaFood |
-|:--|:--|
-| **Pantau** | Tinjau produk, batch, jumlah stok, harga, dan sisa masa simpan. |
-| **Periksa** | Gunakan analisis gambar sebagai bantuan awal untuk menilai kondisi produk. |
-| **Pertahankan nilai** | Tinjau rekomendasi dan persetujuan diskon sebelum perubahan diterapkan. |
-| **Salurkan** | Siapkan produk yang memenuhi syarat untuk mitra donasi dan koordinasikan serah terima. |
-| **Catat** | Simpan aktivitas, keputusan, serta rekap untuk ditinjau. |
-
-## Teknologi dan integrasi
-
-| Teknologi | Peran |
-|:--|:--|
-| **Laravel 12** | Backend, inventaris, aturan bisnis, persetujuan, audit, dan API. |
-| **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
-| **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
-| **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
-| **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
-| **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
-
-### Alur keputusan AI
-
-```text
-Data inventaris / foto produk
-              ↓
-Laravel memvalidasi konteks dan permintaan
-              ↓
-9Router → model AI yang dikonfigurasi → hasil terstruktur
-              ↓
-Staf meninjau / menyetujui melalui aplikasi atau Telegram
-              ↓
-Diskon atau donasi yang disetujui → dicatat oleh Laravel
-```
-
-Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
 
 <div align="center">
   <sub>Kelola stok, tentukan langkah berikutnya, dan jaga keputusan tetap berada di tangan manusia.</sub>
