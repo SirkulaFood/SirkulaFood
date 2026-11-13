@@ -81,7 +81,35 @@ Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan
 
 ## Menjalankan secara lokal
 
+Panduan ini menggunakan Windows PowerShell sebagai contoh. Jalankan perintah dari folder akar repository, yaitu folder yang berisi `artisan`, `composer.json`, dan `package.json`.
 
+### 1. Persyaratan
+
+- **Git** untuk mengambil source code.
+- **PHP 8.2 atau lebih baru** dengan ekstensi `ctype`, `curl`, `dom`, `fileinfo`, `filter`, `hash`, `mbstring`, `openssl`, `PDO`, `session`, `tokenizer`, dan `xml`. Aktifkan `pdo_sqlite` untuk SQLite atau `pdo_mysql` untuk MySQL.
+- **Composer 2** untuk memasang dependency PHP.
+- **Node.js 20 LTS atau lebih baru dan npm** untuk memasang dependency serta menjalankan aset Vue/Vite.
+- **SQLite atau MySQL** yang sudah siap digunakan. SQLite adalah pilihan paling sederhana untuk penggunaan lokal.
+
+Pastikan program-program tersebut dikenali oleh terminal baru:
+
+```powershell
+git --version
+php -v
+php -m
+composer --version
+node --version
+npm --version
+```
+
+Periksa ekstensi PHP pada keluaran `php -m`. Setelah memasang atau mengaktifkan ekstensi, buka terminal baru dan periksa kembali.
+
+### 2. Clone branch dan pasang dependency
+
+```powershell
+git clone --branch developer-guidance https://github.com/SirkulaFood/SirkulaFood.git
+Set-Location SirkulaFood
+composer install
 npm install
 ```
 
@@ -89,16 +117,18 @@ Tunggu setiap perintah selesai. Jika instalasi gagal karena versi runtime, ekste
 
 ### 3. Buat konfigurasi lokal
 
-Salin konfigurasi contoh dan hasilkan kunci aplikasi:
+Salin konfigurasi contoh, lalu buat kunci aplikasi:
 
 ```powershell
 Copy-Item .env.example .env
+php artisan key:generate
+```
 
 Buka `.env` di editor dan pilih salah satu konfigurasi database berikut.
 
 #### SQLite (disarankan untuk mulai)
 
-Pastikan ekstensi `pdo_sqlite` aktif, kemudian buat file databasenya:
+Pastikan ekstensi `pdo_sqlite` aktif, kemudian buat file database:
 
 ```powershell
 New-Item -ItemType File -Path database/database.sqlite -Force
@@ -126,9 +156,9 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Sesuaikan pengguna dan kata sandi dengan instalasi MySQL Anda.
+Sesuaikan nama pengguna dan kata sandi dengan instalasi MySQL Anda.
 
-Untuk menjalankan fitur dasar secara lokal, pastikan pengaturan berikut sesuai:
+Untuk menjalankan fitur dasar secara lokal, pastikan pengaturan berikut juga sesuai:
 
 ```dotenv
 APP_ENV=local
@@ -141,8 +171,14 @@ Mode mock AI memungkinkan aplikasi berjalan tanpa API AI eksternal.
 
 ### 4. Siapkan database dan frontend
 
+Jalankan migrasi database dan build aset frontend:
 
-Migrasi membuat tabel aplikasi dan tabel pendukung yang digunakan konfigurasi database untuk session, cache, dan queue.
+```powershell
+php artisan migrate
+npm run build
+```
+
+Migrasi membuat tabel aplikasi dan tabel pendukung yang digunakan konfigurasi database untuk session, cache, dan antrean.
 
 ### 5. Jalankan aplikasi
 
@@ -152,8 +188,11 @@ Cara termudah adalah menjalankan server Laravel, worker antrean, dan Vite sekali
 composer run dev
 ```
 
-Biarkan proses itu tetap berjalan dan buka **http://127.0.0.1:8000** di browser. Alternatifnya, jalankan proses berikut dari tiga terminal terpisah di folder proyek:
+Biarkan proses tersebut tetap berjalan, lalu buka **http://127.0.0.1:8000** di browser.
 
+Alternatifnya, jalankan setiap proses dari terminal terpisah di folder proyek:
+
+```powershell
 php artisan serve
 ```
 
@@ -163,37 +202,78 @@ php artisan queue:listen --tries=1 --timeout=0
 
 ```powershell
 npm run dev
+```
 
-Untuk menghentikan proses tekan `Ctrl+C` di terminal terkait. Jika ingin mencoba tanpa Vite development server, jalankan `npm run build`, lalu `php artisan serve`.
+Untuk menghentikan proses, tekan `Ctrl+C` di terminal terkait. Jika ingin mencoba tanpa Vite development server, jalankan `npm run build`, lalu `php artisan serve`.
 
 ### 6. Integrasi opsional
 
 Aplikasi dasar dapat dijalankan tanpa mengisi kunci integrasi. Atur hanya layanan yang ingin digunakan:
 
-- **9Router/AI:** Isi `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, dan `NINEROUTER_VISION_MODEL`. URL contoh di `.env.example` adalah `http://127.0.0.1:20128/v1`; pastikan gateway berjalan dan dapat dijangkau Laravel. Variabel `GEMINI_API_KEY` dan `GROQ_API_KEY` tersedia untuk konfigurasi terkait. Simpan kunci secara privat.
-- **Telegram:** Isi `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET`. Webhook memerlukan URL HTTPS publik yang dapat dijangkau Telegram; localhost saja tidak cukup. Daftarkan URL dengan `php artisan telegram:set-webhook --url=https://domain-anda.example` setelah endpoint publik siap.
-- **n8n:** Atur `N8N_WEBHOOK_URL`, `N8N_EVENT_WEBHOOK_URL`, dan kredensial webhook jika diperlukan. File workflow di repository adalah draf; impor ke n8n, atur endpoint/kredensial, lalu aktifkan secara manual.
+- **9Router/AI:** Isi `NINEROUTER_API_KEY`, `NINEROUTER_BASE_URL`, `NINEROUTER_MODEL`, dan `NINEROUTER_VISION_MODEL`. URL contoh di `.env.example` adalah `http://127.0.0.1:20128/v1`; pastikan gateway berjalan dan dapat dijangkau Laravel. Variabel `GEMINI_API_KEY` dan `GROQ_API_KEY` tersedia untuk konfigurasi terkait. Simpan kunci API secara privat.
+- **Telegram:** Isi `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_WEBHOOK_SECRET`. Webhook memerlukan URL HTTPS publik yang dapat dijangkau Telegram; localhost saja tidak cukup. Setelah endpoint publik siap, daftarkan URL dengan `php artisan telegram:set-webhook --url=https://domain-anda.example`.
+- **n8n:** Atur `N8N_WEBHOOK_URL`, `N8N_EVENT_WEBHOOK_URL`, dan kredensial webhook jika diperlukan. File workflow di repository adalah draf; impor ke n8n, atur endpoint dan kredensial, lalu aktifkan secara manual.
 - **Penjadwal Laravel:** Tugas di `routes/console.php` memerlukan proses terpisah. Untuk menjalankannya selama pengembangan lokal, buka terminal lain dan jalankan `php artisan schedule:work`.
 
 ### Pemecahan masalah
 
-- **`could not find driver`:** Aktifkan `pdo_sqlite` atau `pdo_mysql` sesuai database, kemudian buka terminal baru.
+- **`could not find driver`:** Aktifkan `pdo_sqlite` atau `pdo_mysql` sesuai database yang digunakan, kemudian buka terminal baru.
 - **Database tidak tersambung:** Pastikan layanan MySQL aktif dan nilai koneksi benar. Untuk SQLite, pastikan file `database/database.sqlite` ada dan `DB_CONNECTION=sqlite`.
 - **Perubahan `.env` tidak terbaca:** Jalankan `php artisan config:clear`, lalu mulai ulang server.
 - **Tampilan atau perubahan frontend tidak muncul:** Pastikan `npm run dev` tetap berjalan, atau jalankan ulang `npm run build`.
 - **Port 8000 sudah digunakan:** Jalankan `php artisan serve --port=8001` dan ubah `APP_URL` menjadi `http://127.0.0.1:8001`.
 
-
 ## Struktur proyek
 
 ```text
-app/                    Backend Laravel, controller, model, layanan, dan job
-resources/js/            Halaman Vue dan komponen antarmuka
-resources/css/           Gaya aplikasi
-routes/                  Rute web, API, dan tugas terjadwal
-SirkulaFood-agent-*.json Ekspor alur kerja n8n
+SirkulaFood/
+├── app/
+│   ├── Console/Commands/         Perintah Artisan untuk admin, inventaris, dan integrasi
+│   ├── Http/                     Controller, middleware, request, dan resource API
+│   ├── Jobs/                     Job antrean untuk notifikasi dan workflow
+│   ├── Models/                   Model Eloquent
+│   ├── Providers/                Service provider Laravel
+│   └── Services/                 Layanan AI, inventaris, donasi, Telegram, dan notifikasi
+├── bootstrap/                    Bootstrap aplikasi dan registrasi provider
+├── config/                       Konfigurasi Laravel dan layanan
+├── database/
+│   ├── factories/                Factory data
+│   ├── migrations/               Skema dan perubahan database
+│   └── seeders/                  Seeder data awal
+├── docs/assets/                  Logo, poster, dan gambar README
+├── public/                       Entry point web dan aset publik
+├── resources/
+│   ├── css/                      Gaya aplikasi
+│   ├── js/
+│   │   ├── components/           Komponen Vue dan komponen UI
+│   │   ├── composables/          Composable Vue
+│   │   ├── layouts/              Layout aplikasi, autentikasi, dan pengaturan
+│   │   ├── lib/                  Helper frontend
+│   │   ├── pages/                Halaman Vue untuk dashboard dan fitur aplikasi
+│   │   └── types/                Tipe TypeScript
+│   └── views/                    Template Blade
+├── routes/
+│   ├── api.php                   Rute API dan webhook
+│   ├── auth.php                  Rute autentikasi
+│   ├── console.php               Perintah console dan tugas terjadwal
+│   ├── settings.php              Rute pengaturan akun
+│   └── web.php                   Rute halaman web
+├── tests/
+│   ├── Feature/                  Pengujian alur aplikasi
+│   └── Unit/                     Pengujian unit
+├── SirkulaFood-agent-error-handler.json
+├── SirkulaFood-agent-n8n.json    Ekspor workflow n8n
+├── .env.example                  Contoh konfigurasi lingkungan lokal
+├── artisan                       CLI Laravel
+├── composer.json / composer.lock Dependency PHP dan lockfile
+├── package.json / package-lock.json
+│                                Dependency JavaScript dan lockfile
+├── vite.config.ts                Konfigurasi Vite
+├── tailwind.config.js            Konfigurasi Tailwind CSS
+└── tsconfig.json                 Konfigurasi TypeScript
 ```
 
+Direktori seperti `vendor/` dan beberapa direktori runtime Laravel dibuat atau diisi secara lokal saat menyiapkan aplikasi.
 ---
 
 <div align="center">
