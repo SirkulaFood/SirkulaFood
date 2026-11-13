@@ -31,6 +31,7 @@ class TelegramWebhookController extends Controller
             'callback_query.from.id' => ['required_with:callback_query', 'numeric'],
             'callback_query.message.chat.id' => ['required_with:callback_query', 'numeric'],
             'message' => ['sometimes', 'array'],
+            'message.message_id' => ['sometimes', 'integer', 'min:1'],
             'message.chat.id' => ['required_with:message', 'numeric'],
             'message.text' => ['required_with:message', 'string', 'max:2000'],
         ]);
@@ -223,7 +224,7 @@ class TelegramWebhookController extends Controller
                     return response()->json(['ok' => true]);
                 }
 
-                $aiResponse = $aiChat->reply($chatId, $text);
+                $aiResponse = $aiChat->reply($chatId, $text, isset($message['message_id']) ? (string) $message['message_id'] : null);
                 $telegram->sendMessage($chatId, $aiResponse['text'], $aiResponse['reply_markup']);
             }
         } catch (Throwable $exception) {
