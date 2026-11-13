@@ -48,8 +48,8 @@ return [
     'ninerouter' => [
         'api_key' => env('NINEROUTER_API_KEY'),
         'base_url' => env('NINEROUTER_BASE_URL', 'http://127.0.0.1:20128/v1'),
-        'model' => env('NINEROUTER_MODEL', 'openrouter/google/gemma-4-31b-it:free'),
-        'vision_model' => env('NINEROUTER_VISION_MODEL', 'openrouter/nvidia/nemotron-3.5-super-vl:free'),
+        'model' => env('NINEROUTER_MODEL', 'sirkulafood'),
+        'vision_model' => env('NINEROUTER_VISION_MODEL', 'tokenharbor/deepseek-v4.1-flash:free'),
     ],
 
     'n8n' => [
