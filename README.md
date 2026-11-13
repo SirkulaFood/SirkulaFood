@@ -10,7 +10,6 @@
     <img src="https://img.shields.io/badge/Automation-n8n-C3A05B?style=flat-square&logo=n8n&logoColor=142C25" alt="n8n">
     <img src="https://img.shields.io/badge/AI%20gateway-9Router-8E9C75?style=flat-square" alt="9Router">
     <img src="https://img.shields.io/badge/Chat-Telegram-0B3B2E?style=flat-square&logo=telegram&logoColor=F5F1E8" alt="Telegram">
-    <img width="1223" height="456" alt="image" src="https://github.com/user-attachments/assets/485e094d-b396-4ead-b4ba-f05c0ad95c99" />
 
   </p>
     <p>
