@@ -107,7 +107,7 @@ Periksa ekstensi PHP pada keluaran `php -m`. Setelah memasang atau mengaktifkan 
 ### 2. Clone branch dan pasang dependency
 
 ```powershell
-git clone --branch developer-guidance https://github.com/SirkulaFood/SirkulaFood.git
+git clone https://github.com/SirkulaFood/SirkulaFood.git
 Set-Location SirkulaFood
 composer install
 npm install
@@ -273,7 +273,7 @@ SirkulaFood/
 └── tsconfig.json                 Konfigurasi TypeScript
 ```
 
-Direktori seperti `vendor/` dan beberapa direktori runtime Laravel dibuat atau diisi secara lokal saat menyiapkan aplikasi.
+> Catatan: Folder `vendor/` dan direktori runtime Laravel dibuat secara lokal saat instalasi atau aplikasi dijalankan.
 ---
 
 <div align="center">
