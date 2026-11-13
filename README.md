@@ -20,12 +20,12 @@
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
 </div>
 
-![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
-<br><sub>Tampilan Landing page SirkulaFood</sub> 
-
 ## Tentang SirkulaFood
 
 SirkulaFood adalah platform berbasis Laravel dan Vue untuk mengelola produk, batch inventaris, serta tanggal kedaluwarsa. Tim dapat meninjau produk berisiko, mempertimbangkan rekomendasi diskon, dan mengoordinasikan surplus pangan dengan mitra donasi. Setiap rekomendasi dan tindak lanjut dicatat agar dapat ditinjau kembali.
+
+![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
+<br><sub>Tampilan Landing page SirkulaFood</sub> 
 
 ## Kontribusi Terhadap SDGs
 
