@@ -13,10 +13,8 @@
 
   </p>
     <p>
-    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> |
-        
-    <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> |
-    
+    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> .
+    <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> .
     <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
   </p>
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
