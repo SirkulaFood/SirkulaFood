@@ -3,7 +3,7 @@
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/SirkulaFood-logo-dark.png">
     <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood transparan" width="356">
   </picture>
-  <h1>Selamatkan pangan. Jaga nilainya.</h1>
+  <h1>Selamatkan Pangan. Jaga Nilainya.</h1>
     <p>
     <img src="https://img.shields.io/badge/Laravel-12-0B3B2E?style=flat-square&logo=laravel&logoColor=F5F1E8" alt="Laravel 12">
     <img src="https://img.shields.io/badge/Vue-3-526347?style=flat-square&logo=vuedotjs&logoColor=F5F1E8" alt="Vue 3">
