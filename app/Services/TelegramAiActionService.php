@@ -18,6 +18,276 @@ class TelegramAiActionService
 {
     public function __construct(private readonly NotificationService $notifications) {}
 
+    /** Execute an explicitly authorized, product-scoped donation from an owner or manager. */
+    public function executeDirectAutomaticDonation(
+        ?int $productId,
+        string $productName,
+        ?int $quantity,
+        ?string $unit,
+        User $user,
+        string $chatId,
+        ?string $telegramMessageId = null
+    ): string {
+        if (! in_array($user->role, ['business_owner', 'manager'], true)
+            || ! filled($user->telegram_chat_id)
+            || ! hash_equals((string) $user->telegram_chat_id, $chatId)) {
+            throw new AuthorizationException('Only the linked business owner or manager may directly authorize an automatic donation.');
+        }
+
+        $product = Product::query()
+            ->whereIn('status', ['active', 'discounted'])
+            ->when($productId, fn ($query) => $query->whereKey($productId))
+            ->when(! $productId && $productName !== '', function ($query) use ($productName): void {
+                $normalizedName = mb_strtolower(trim($productName));
+                $query->where(function ($productQuery) use ($normalizedName): void {
+                    $productQuery->whereRaw('LOWER(name) = ?', [$normalizedName])
+                        ->orWhereRaw('LOWER(sku) = ?', [$normalizedName]);
+                });
+            })
+            ->first();
+
+        if (! $product || ($productName !== ''
+            && strcasecmp(trim($productName), (string) $product->name) !== 0
+            && strcasecmp(trim($productName), (string) $product->sku) !== 0)) {
+            return 'Saya belum dapat mencocokkan produk itu secara persis dengan stok aktif. Sebutkan nama atau SKU yang tampil di Inventory. Kebijakan dan stok tidak berubah.';
+        }
+
+        if ($quantity !== null && ($quantity < 1 || ! $this->unitsMatch($unit, (string) $product->unit))) {
+            return "Jumlah donasi harus bilangan bulat positif dan satuannya harus {$product->unit}. Kebijakan dan stok tidak berubah.";
+        }
+
+        $messageKey = $telegramMessageId !== null ? hash('sha256', $chatId.':'.$telegramMessageId) : null;
+        $prepared = DB::transaction(function () use ($product, $quantity, $unit, $user, $chatId, $messageKey): array {
+            User::query()->whereKey($user->id)->lockForUpdate()->firstOrFail();
+
+            if ($messageKey !== null) {
+                $previousRequest = TelegramAiAction::query()
+                    ->where('action_type', 'automation_policy')
+                    ->where('payload->source_message_key', $messageKey)
+                    ->first();
+                if ($previousRequest) {
+                    return ['duplicate_reply' => (string) ($previousRequest->result['reply'] ?? 'Perintah donasi ini sudah diterima dan sedang diproses.'), 'action_ids' => []];
+                }
+            }
+
+            $lockedProduct = Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $hasActiveDonationPartners = DonationPartner::query()->active()->where('partner_type', 'foundation')->exists();
+            if (! $hasActiveDonationPartners) {
+                return ['error' => 'Belum ada Yayasan/Donation Partner aktif yang dapat menerima donasi. Kebijakan dan stok tidak berubah.', 'action_ids' => []];
+            }
+
+            $today = now('Asia/Jakarta')->startOfDay();
+            $eligibleThrough = $today->copy()->addDays(2);
+            $batches = ProductBatch::query()
+                ->where('product_id', $lockedProduct->id)
+                ->where('quantity_available', '>', 0)
+                ->whereIn('status', ['active', 'discounted'])
+                ->whereDate('expiration_date', '>=', $today->toDateString())
+                ->whereDate('expiration_date', '<=', $eligibleThrough->toDateString())
+                ->orderBy('expiration_date')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            $batchIds = $batches->modelKeys();
+            $unreducedDonations = AgentLog::query()
+                ->where('product_id', $lockedProduct->id)
+                ->where('action_type', 'donation_requested')
+                ->where('status', 'success')
+                ->where('payload->event_type', 'donation_completed')
+                ->get(['payload'])
+                ->filter(fn (AgentLog $log): bool => in_array((int) ($log->payload['batch_id'] ?? 0), $batchIds, true)
+                    && ($log->payload['stock_reduction_applied'] ?? true) === false)
+                ->groupBy(fn (AgentLog $log): int => (int) $log->payload['batch_id'])
+                ->map(fn ($logs): int => (int) $logs->sum(fn (AgentLog $log): int => (int) ($log->payload['quantity_donated'] ?? 0)));
+
+            $availableByBatch = $batches->mapWithKeys(fn (ProductBatch $batch): array => [
+                $batch->id => max(0, (int) $batch->quantity_available - (int) $unreducedDonations->get($batch->id, 0)),
+            ]);
+            $availableQuantity = (int) $availableByBatch->sum();
+            if ($quantity !== null && $quantity > $availableQuantity) {
+                return ['error' => sprintf(
+                    'Stok batch %s yang memenuhi syarat 0–2 hari hanya %d %s; permintaan %d %s belum dijalankan. Kebijakan dan stok tidak berubah.',
+                    $lockedProduct->name,
+                    $availableQuantity,
+                    $lockedProduct->unit,
+                    $quantity,
+                    $lockedProduct->unit
+                ), 'action_ids' => []];
+            }
+
+            $policy = ProductAutomationPolicy::query()->where('product_id', $lockedProduct->id)->lockForUpdate()->first()
+                ?? new ProductAutomationPolicy(['product_id' => $lockedProduct->id]);
+            $policy->auto_donation_enabled = true;
+            $policy->auto_donation_prealert_enabled = true;
+            $policy->updated_by = $user->id;
+            $policy->save();
+
+            $scopes = ['donation', 'donation_prealert'];
+            $change = [[
+                'product_id' => $lockedProduct->id,
+                'product_name' => $lockedProduct->name,
+                'sku' => $lockedProduct->sku,
+                'enabled' => true,
+                'scopes' => $scopes,
+            ]];
+            $scopeDescription = $lockedProduct->name.' ['.$lockedProduct->sku.'] otomatis tanpa konfirmasi per item untuk donasi dan pre-alert donasi besok';
+            $policyReply = 'Donasi otomatis tanpa konfirmasi per item aktif untuk '.$lockedProduct->name.'.';
+            $policyAction = TelegramAiAction::query()->create([
+                'id' => (string) Str::uuid(),
+                'telegram_chat_id' => $chatId,
+                'requested_by' => $user->id,
+                'decided_by' => $user->id,
+                'action_type' => 'automation_policy',
+                'product_id' => null,
+                'payload' => [
+                    'enabled' => true,
+                    'scopes' => [],
+                    'product_changes' => $change,
+                    'direct_owner_command' => true,
+                    'source_message_key' => $messageKey,
+                ],
+                'status' => 'processing',
+                'expires_at' => now()->addMinutes(10),
+            ]);
+
+            AgentLog::query()->create([
+                'action_type' => 'manual_override',
+                'reasoning' => sprintf('Product donation automation explicitly enabled by %s through a direct Telegram instruction: %s.', $user->name, $scopeDescription),
+                'payload' => [
+                    'event' => 'product_automation_policy_updated',
+                    'scopes' => $scopes,
+                    'enabled' => true,
+                    'product_changes' => $change,
+                    'direct_owner_command' => true,
+                    'actor_id' => $user->id,
+                    'telegram_chat_id' => $chatId,
+                    'telegram_message_key' => $messageKey,
+                ],
+                'status' => 'success',
+            ]);
+
+            $targetQuantity = $quantity ?? $availableQuantity;
+            $remainingQuantity = $targetQuantity;
+            $donationActions = [];
+            foreach ($batches as $batch) {
+                $batchAvailable = (int) $availableByBatch->get($batch->id, 0);
+                $batchQuantity = min($batchAvailable, $remainingQuantity);
+                if ($batchQuantity < 1) {
+                    continue;
+                }
+
+                TelegramAiAction::query()
+                    ->where('action_type', 'donation_batch')
+                    ->where('payload->batch_id', $batch->id)
+                    ->whereIn('status', ['pending', 'scheduled', 'deferred', 'awaiting_quantity'])
+                    ->update(['status' => 'cancelled', 'completed_at' => now()]);
+
+                $donationAction = TelegramAiAction::query()->create([
+                    'id' => (string) Str::uuid(),
+                    'telegram_chat_id' => $chatId,
+                    'requested_by' => $user->id,
+                    'decided_by' => $user->id,
+                    'action_type' => 'donation_batch',
+                    'product_id' => $lockedProduct->id,
+                    'payload' => [
+                        'batch_id' => $batch->id,
+                        'batch_code' => $batch->batch_code,
+                        'quantity' => $batchQuantity,
+                        'recommended_quantity' => $batchQuantity,
+                        'unit' => $lockedProduct->unit,
+                        'stock_mode' => 'reduce',
+                        'preapproved' => true,
+                        'automation_policy' => true,
+                        'prealert_auto' => false,
+                        'stage' => 'auto_preapproved',
+                        'eligible_on' => $today->toDateString(),
+                        'notification_date' => $today->toDateString(),
+                        'reasoning' => 'Donasi diminta langsung oleh Business Owner/Manager melalui Telegram tanpa konfirmasi per item.',
+                        'ai_provider' => 'SirkulaFood_direct_owner_command',
+                        'source_message_key' => $messageKey,
+                    ],
+                    'status' => 'scheduled',
+                    'expires_at' => Carbon::parse($batch->expiration_date, 'Asia/Jakarta')->endOfDay(),
+                ]);
+                $donationActions[] = $donationAction->id;
+                $remainingQuantity -= $batchQuantity;
+                if ($remainingQuantity < 1) {
+                    break;
+                }
+            }
+
+            $policyAction->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+                'result' => ['enabled' => true, 'scopes' => $scopes, 'product_changes' => $change, 'reply' => $policyReply],
+            ]);
+
+            return [
+                'policy_action_id' => $policyAction->id,
+                'product_name' => $lockedProduct->name,
+                'unit' => $lockedProduct->unit,
+                'requested_quantity' => $targetQuantity,
+                'action_ids' => $donationActions,
+                'eligible_quantity' => $availableQuantity,
+                'message_key' => $messageKey,
+            ];
+        });
+
+        if (isset($prepared['error'])) {
+            return $prepared['error'];
+        }
+        if (isset($prepared['duplicate_reply'])) {
+            return $prepared['duplicate_reply'];
+        }
+
+        $donationResults = [];
+        foreach ($prepared['action_ids'] as $actionId) {
+            $result = $this->completeScheduledDonation($actionId, false);
+            if ($result !== null) {
+                $donationResults[] = $result;
+            }
+        }
+
+        $reply = sprintf(
+            'Donasi otomatis tanpa konfirmasi per item aktif untuk %s; pre-alert donasi besok juga aktif.',
+            $prepared['product_name']
+        );
+        if ($prepared['action_ids'] === []) {
+            $reply .= ' Belum ada batch produk ini yang kedaluwarsa dalam 0–2 hari, jadi stok belum berubah. Batch yang memenuhi syarat berikutnya akan diproses otomatis.';
+        } else {
+            $completedActions = TelegramAiAction::query()
+                ->whereIn('id', $prepared['action_ids'])
+                ->where('status', 'completed')
+                ->get(['result']);
+            $donatedQuantity = (int) $completedActions->sum(fn (TelegramAiAction $action): int => (int) ($action->result['quantity'] ?? 0));
+            $reply .= sprintf(
+                ' Donasi sebanyak %d dari %d %s diproses dari batch terdekat kedaluwarsa; stok dikurangi dan notifikasi dikirim ke semua Yayasan aktif.',
+                $donatedQuantity,
+                (int) $prepared['requested_quantity'],
+                $prepared['unit']
+            );
+            if ($donatedQuantity < (int) $prepared['requested_quantity']) {
+                $reply .= ' Batch yang berubah atau gagal diproses tidak mengurangi stok; kebijakan otomatis tetap aktif untuk batch berikutnya yang memenuhi syarat.';
+            }
+            if ($donationResults !== []) {
+                $reply .= ' '.implode(' ', $donationResults);
+            }
+        }
+
+        TelegramAiAction::query()->whereKey($prepared['policy_action_id'])->update([
+            'result' => [
+                'enabled' => true,
+                'scopes' => ['donation', 'donation_prealert'],
+                'product_id' => $product->id,
+                'donation_action_ids' => $prepared['action_ids'],
+                'reply' => $reply,
+            ],
+        ]);
+
+        return $reply;
+    }
+
     /** @return array{text: string, reply_markup: array<string, mixed>|null} */
     public function decideAutomationPolicy(string $actionId, User $user, string $chatId, string $decision): array
     {
@@ -395,7 +665,7 @@ class TelegramAiActionService
     }
 
     /** Execute a pre-approved donation after it enters the eligibility window. */
-    public function completeScheduledDonation(string $actionId): void
+    public function completeScheduledDonation(string $actionId, bool $notifyActor = true): ?string
     {
         $action = DB::transaction(function () use ($actionId): ?TelegramAiAction {
             $action = TelegramAiAction::query()->lockForUpdate()->find($actionId);
@@ -426,12 +696,12 @@ class TelegramAiActionService
             return $action->fresh();
         });
         if (! $action) {
-            return;
+            return null;
         }
         if ($action->status === 'pending') {
             $this->notifications->queueDonationApprovalBatch([$action]);
 
-            return;
+            return 'Batch tidak lagi berada di kebijakan otomatis; permintaan dikembalikan ke jalur persetujuan.';
         }
 
         // Re-read the payload from the claimed action. The transaction closure
@@ -449,9 +719,11 @@ class TelegramAiActionService
                 'action_id' => $action->id,
                 'product_id' => $action->product_id,
             ]);
-            $this->notifications->queueTelegramActionResult($action->telegram_chat_id, $message, 'donation-result:'.$action->id);
+            if ($notifyActor) {
+                $this->notifications->queueTelegramActionResult($action->telegram_chat_id, $message, 'donation-result:'.$action->id);
+            }
 
-            return;
+            return $message;
         }
 
         $managerId = (int) ($action->decided_by ?? $action->requested_by);
@@ -462,7 +734,11 @@ class TelegramAiActionService
             ($payload['stock_mode'] ?? 'reduce') === 'reduce',
             true
         );
-        $this->notifications->queueTelegramActionResult($action->telegram_chat_id, $result, 'donation-result:'.$action->id);
+        if ($notifyActor) {
+            $this->notifications->queueTelegramActionResult($action->telegram_chat_id, $result, 'donation-result:'.$action->id);
+        }
+
+        return $result;
     }
 
     private function authorizedDonationAction(string $actionId, User $user, string $chatId): TelegramAiAction
@@ -549,8 +825,11 @@ class TelegramAiActionService
         ]);
         $this->cancelSiblingDonationActions($action->fresh());
 
+        $sourceLabel = ($payload['automation_policy'] ?? false) === true ? 'Donasi otomatis selesai' : 'Donasi dikonfirmasi';
+
         return sprintf(
-            'Donasi dikonfirmasi: %s %d %s. Stok %s; tersisa %d %s. Pemberitahuan %s kepada %d yayasan aktif.',
+            '%s: %s %d %s. Stok %s; tersisa %d %s. Pemberitahuan %s kepada %d yayasan aktif.',
+            $sourceLabel,
             $result['product']['name'],
             $quantity,
             $result['unit'],
@@ -560,6 +839,29 @@ class TelegramAiActionService
             $result['notifications_queued'] ? 'diantrekan' : 'perlu diperiksa',
             $result['partner_count']
         );
+    }
+
+    private function unitsMatch(?string $requestedUnit, string $productUnit): bool
+    {
+        if ($requestedUnit === null || trim($requestedUnit) === '') {
+            return false;
+        }
+
+        $normalize = static function (string $unit): string {
+            $unit = mb_strtolower(trim($unit));
+            $unit = preg_replace('/[^a-z0-9]/', '', $unit) ?? '';
+
+            return match ($unit) {
+                'kilo', 'kilos', 'kilogram', 'kilograms' => 'kg',
+                'gr', 'gram', 'grams' => 'g',
+                'pc', 'piece', 'pieces', 'unit', 'units' => 'pcs',
+                'liter', 'liters', 'litre', 'litres' => 'l',
+                'milliliter', 'milliliters', 'millilitre', 'millilitres' => 'ml',
+                default => $unit,
+            };
+        };
+
+        return $normalize($requestedUnit) === $normalize($productUnit);
     }
 
     private function cancelSiblingDonationActions(TelegramAiAction $action): void
