@@ -20,7 +20,7 @@
 
 SirkulaFood adalah platform berbasis Laravel dan Vue untuk mengelola produk, batch inventaris, serta tanggal kedaluwarsa. Tim dapat meninjau produk berisiko, mempertimbangkan rekomendasi diskon, dan mengoordinasikan surplus pangan dengan mitra donasi. Setiap rekomendasi dan tindak lanjut dicatat agar dapat ditinjau kembali.
 
-## Kontribusi terhadap SDGs
+## Kontribusi Terhadap SDGs
 
 Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan penyaluran donasi, SirkulaFood mendukung upaya menuju konsumsi dan produksi yang lebih bertanggung jawab, pengurangan kelaparan, inovasi operasional, dan kemitraan untuk mencapai tujuan bersama.
 
@@ -29,9 +29,7 @@ Melalui pemantauan inventaris, strategi diskon, pemeriksaan kondisi pangan, dan 
   <br><sub>EcoLoop poster</sub>
 </p>
 
-Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; bukan klaim pencapaian target SDGs secara keseluruhan. Pengukuran dampak membutuhkan data operasional dan tolok ukur yang jelas.
-
-## Jenis akun
+## Jenis Akun
 
 | Jenis akun | Kegunaan | Pendaftaran |
 |:--|:--|:--|
@@ -42,7 +40,7 @@ Kontribusi tersebut menggambarkan dukungan melalui alur kerja dan kemitraan; buk
 
 Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelola atau kasir.
 
-## Alur pengelolaan pangan
+## Alur Pengelolaan Pangan
 
 | Tahap | Dukungan SirkulaFood |
 |:--|:--|
@@ -52,7 +50,7 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 | **Salurkan** | Siapkan produk yang memenuhi syarat untuk mitra donasi dan koordinasikan serah terima. |
 | **Catat** | Simpan aktivitas, keputusan, serta rekap untuk ditinjau. |
 
-## Teknologi dan integrasi
+## Teknologi dan Integrasi
 
 | Teknologi | Peran |
 |:--|:--|
@@ -63,7 +61,7 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 | **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
 | **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
 
-### Alur keputusan AI
+### Alur Keputusan AI
 
 ```text
 Data inventaris / foto produk
@@ -79,7 +77,7 @@ Diskon atau donasi yang disetujui → dicatat oleh Laravel
 
 Analisis AI membantu memberikan konteks, tetapi foto saja tidak dapat memastikan kesegaran, kontaminasi, bau, atau keamanan pangan. Staf tetap berwenang menentukan kelayakan dan keputusan operasional.
 
-## Menjalankan secara lokal
+## Menjalankan Secara Lokal
 
 Panduan ini menggunakan Windows PowerShell sebagai contoh. Jalankan perintah dari folder akar repository, yaitu folder yang berisi `artisan`, `composer.json`, dan `package.json`.
 
@@ -104,7 +102,7 @@ npm --version
 
 Periksa ekstensi PHP pada keluaran `php -m`. Setelah memasang atau mengaktifkan ekstensi, buka terminal baru dan periksa kembali.
 
-### 2. Clone branch dan pasang dependency
+### 2. Clone Branch dan Pasang Dependency
 
 ```powershell
 git clone https://github.com/SirkulaFood/SirkulaFood.git
@@ -115,7 +113,7 @@ npm install
 
 Tunggu setiap perintah selesai. Jika instalasi gagal karena versi runtime, ekstensi, atau dependency, penuhi persyaratan yang disebutkan lalu ulangi perintah yang gagal.
 
-### 3. Buat konfigurasi lokal
+### 3. Buat Konfigurasi Lokal
 
 Salin konfigurasi contoh, lalu buat kunci aplikasi:
 
@@ -126,7 +124,7 @@ php artisan key:generate
 
 Buka `.env` di editor dan pilih salah satu konfigurasi database berikut.
 
-#### SQLite (disarankan untuk mulai)
+#### SQLite (Disarankan untuk mulai)
 
 Pastikan ekstensi `pdo_sqlite` aktif, kemudian buat file database:
 
@@ -169,7 +167,7 @@ ENABLE_MOCK_AI=true
 
 Mode mock AI memungkinkan aplikasi berjalan tanpa API AI eksternal.
 
-### 4. Siapkan database dan frontend
+### 4. Siapkan Database dan Frontend
 
 Jalankan migrasi database dan build aset frontend:
 
@@ -180,7 +178,7 @@ npm run build
 
 Migrasi membuat tabel aplikasi dan tabel pendukung yang digunakan konfigurasi database untuk session, cache, dan antrean.
 
-### 5. Jalankan aplikasi
+### 5. Jalankan Aplikasi
 
 Cara termudah adalah menjalankan server Laravel, worker antrean, dan Vite sekaligus:
 
@@ -215,7 +213,7 @@ Aplikasi dasar dapat dijalankan tanpa mengisi kunci integrasi. Atur hanya layana
 - **n8n:** Atur `N8N_WEBHOOK_URL`, `N8N_EVENT_WEBHOOK_URL`, dan kredensial webhook jika diperlukan. File workflow di repository adalah draf; impor ke n8n, atur endpoint dan kredensial, lalu aktifkan secara manual.
 - **Penjadwal Laravel:** Tugas di `routes/console.php` memerlukan proses terpisah. Untuk menjalankannya selama pengembangan lokal, buka terminal lain dan jalankan `php artisan schedule:work`.
 
-### Pemecahan masalah
+### Pemecahan Masalah
 
 - **`could not find driver`:** Aktifkan `pdo_sqlite` atau `pdo_mysql` sesuai database yang digunakan, kemudian buka terminal baru.
 - **Database tidak tersambung:** Pastikan layanan MySQL aktif dan nilai koneksi benar. Untuk SQLite, pastikan file `database/database.sqlite` ada dan `DB_CONNECTION=sqlite`.
@@ -223,7 +221,7 @@ Aplikasi dasar dapat dijalankan tanpa mengisi kunci integrasi. Atur hanya layana
 - **Tampilan atau perubahan frontend tidak muncul:** Pastikan `npm run dev` tetap berjalan, atau jalankan ulang `npm run build`.
 - **Port 8000 sudah digunakan:** Jalankan `php artisan serve --port=8001` dan ubah `APP_URL` menjadi `http://127.0.0.1:8001`.
 
-## Struktur proyek
+## Struktur Proyek
 
 ```text
 SirkulaFood/
