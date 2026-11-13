@@ -8,7 +8,9 @@
     <a href="https://sirkulafood.my.id/">Kunjungi Website</a> ·
     <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> ·
     <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
+    [![Gmail](https://img.shields.io/badge/Gmail-D14836?logo=gmail&logoColor=white)](#)
   </p>
+    
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
 </div>
