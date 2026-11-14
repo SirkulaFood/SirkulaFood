@@ -827,6 +827,14 @@ onBeforeUnmount(() => {
                             <img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-11 w-auto max-w-[190px]" />
                         </a>
                         <p class="mt-4 max-w-sm text-[10px] leading-5 text-white/65">Sistem sirkular yang menjaga nilai pangan. Dari stok toko, menuju pangan yang lebih bermanfaat.</p>
+                        <div class="mt-4 flex items-center gap-3" aria-label="Media sosial SirkulaFood">
+                            <a href="https://youtu.be/5un13SpsDpI?si=6xmhCDbSdV4CBz9I" target="_blank" rel="noopener noreferrer" aria-label="SirkulaFood di YouTube" title="YouTube" class="inline-flex items-center transition hover:scale-110 hover:opacity-80">
+                                <img src="/images/youtube-social.png" alt="" class="h-5 w-7 object-contain" />
+                            </a>
+                            <a href="https://t.me/sirkulafood_bot" target="_blank" rel="noopener noreferrer" aria-label="SirkulaFood di Telegram" title="Telegram" class="inline-flex items-center transition hover:scale-110 hover:opacity-80">
+                                <img src="/images/telegram-social.png" alt="" class="size-6 object-contain" />
+                            </a>
+                        </div>
                     </div>
                     <div>
                         <h2 class="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d4c28f]">Jelajahi</h2>
