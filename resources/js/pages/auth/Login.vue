@@ -12,6 +12,10 @@ import { LoaderCircle } from 'lucide-vue-next';
 defineProps<{
     status?: string;
     canResetPassword: boolean;
+    demoAdmin: {
+        email: string;
+        password: string;
+    };
 }>();
 
 const form = useForm({
@@ -38,7 +42,10 @@ const submit = () => {
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Alamat email</Label>
+                    <div class="flex items-center justify-between gap-3">
+                        <Label for="email">Alamat email</Label>
+                        <span class="text-xs font-medium text-primary">Akun Demo Admin</span>
+                    </div>
                     <Input
                         id="email"
                         type="email"
@@ -50,6 +57,7 @@ const submit = () => {
                         placeholder="email@example.com"
                     />
                     <InputError :message="form.errors.email" />
+                    <p class="text-xs text-muted-foreground">Email: {{ demoAdmin.email }}</p>
                 </div>
 
                 <div class="grid gap-2">
@@ -67,6 +75,7 @@ const submit = () => {
                         placeholder="Kata sandi"
                     />
                     <InputError :message="form.errors.password" />
+                    <p class="text-xs text-muted-foreground">Password Admin: {{ demoAdmin.password }}</p>
                 </div>
 
                 <div class="flex items-center justify-between" tabindex="3">
