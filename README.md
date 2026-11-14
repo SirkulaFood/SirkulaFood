@@ -3,22 +3,30 @@
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/SirkulaFood-logo-dark.png">
     <img src="docs/assets/SirkulaFood-logo-light.png" alt="Logo SirkulaFood transparan" width="356">
   </picture>
-  <h1>Selamatkan pangan. Jaga nilainya.</h1>
+  <h1>Selamatkan Pangan. Jaga Nilainya.</h1>
     <p>
-    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> ·
-    <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> ·
+    <img src="https://img.shields.io/badge/Laravel-12-0B3B2E?style=flat-square&logo=laravel&logoColor=F5F1E8" alt="Laravel 12">
+    <img src="https://img.shields.io/badge/Vue-3-526347?style=flat-square&logo=vuedotjs&logoColor=F5F1E8" alt="Vue 3">
+    <img src="https://img.shields.io/badge/Automation-n8n-C3A05B?style=flat-square&logo=n8n&logoColor=142C25" alt="n8n">
+    <img src="https://img.shields.io/badge/AI%20gateway-9Router-8E9C75?style=flat-square" alt="9Router">
+    <img src="https://img.shields.io/badge/Chat-Telegram-0B3B2E?style=flat-square&logo=telegram&logoColor=F5F1E8" alt="Telegram">
+
+  </p>
+    <p>
+    <a href="https://sirkulafood.my.id/">Kunjungi Website</a> .
+    <a href="https://t.me/SirkulaFood_bot">Buka Telegram</a> .
     <a href="https://github.com/SirkulaFood/SirkulaFood">Source Code</a>
   </p>
   <p><strong>Manajemen inventaris cerdas untuk mengurangi limbah pangan.</strong></p>
   <p>SirkulaFood membantu tim ritel memantau produk mendekati kedaluwarsa, mengelola diskon, dan menyalurkan surplus pangan layak kepada mitra donasi.</p>
 </div>
 
-![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
-<br><sub>Tampilan Landing page SirkulaFood</sub> 
-
 ## Tentang SirkulaFood
 
 SirkulaFood adalah platform berbasis Laravel dan Vue untuk mengelola produk, batch inventaris, serta tanggal kedaluwarsa. Tim dapat meninjau produk berisiko, mempertimbangkan rekomendasi diskon, dan mengoordinasikan surplus pangan dengan mitra donasi. Setiap rekomendasi dan tindak lanjut dicatat agar dapat ditinjau kembali.
+
+![Tampilan landing page SirkulaFood](docs/assets/SirkulaFood-landing-page.png)
+<br><sub>Tampilan Landing page SirkulaFood</sub> 
 
 ## Kontribusi Terhadap SDGs
 
@@ -56,8 +64,9 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 |:--|:--|
 | **Laravel 12** | Backend, inventaris, aturan bisnis, persetujuan, audit, dan API. |
 | **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
-| **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
+| **9Router** | Gateway kompatibel dari berbagai Provider untuk model bahasa dan visi yang dikonfigurasi. |
 | **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
+| **Email** | Notifikasi donasi dari SirkulaFood Agent bahwa makanan sudah didonasikan dan stok supermarket sudah dikurangi. |
 | **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
 | **MySQL / SQLite** | Penyimpanan aplikasi sesuai konfigurasi lokal. |
 
