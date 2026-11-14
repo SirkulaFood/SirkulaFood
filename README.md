@@ -64,7 +64,7 @@ Pemilik toko dapat memberikan akses operasional kepada staf dengan peran pengelo
 |:--|:--|
 | **Laravel 12** | Backend, inventaris, aturan bisnis, persetujuan, audit, dan API. |
 | **Vue 3 + Inertia** | Dasbor, portal mitra, simulasi, dan alur kerja pengguna. |
-| **9Router** | Gateway kompatibel OpenAI untuk model bahasa dan visi yang dikonfigurasi. |
+| **9Router** | Gateway kompatibel dari berbagai Provider untuk model bahasa dan visi yang dikonfigurasi. |
 | **Telegram** | Percakapan berbasis webhook dan tindak lanjut inventaris. Persetujuan tetap dilakukan oleh staf berwenang. |
 | **Email** | Notifikasi donasi dari SirkulaFood Agent bahwa makanan sudah didonasikan dan stok supermarket sudah dikurangi. |
 | **n8n** | Berkas alur kerja tersedia sebagai draf nonaktif. Atur endpoint dan kredensial sebelum diimpor atau diaktifkan. |
