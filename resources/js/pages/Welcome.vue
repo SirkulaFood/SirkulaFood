@@ -226,12 +226,12 @@ onBeforeUnmount(() => {
             <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-2 rounded-full border border-white/65 bg-[#F2EEE5]/85 px-3 py-2.5 shadow-lg backdrop-blur-2xl sm:px-7 sm:py-3">
                 <a href="#home" class="inline-flex items-center rounded-lg px-1" aria-label="SirkulaFood — kembali ke beranda"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[92px] sm:h-9 sm:max-w-[150px]" /></a>
                 <nav class="hidden items-center gap-8 text-[12px] font-medium text-[#6d6a5f] lg:flex" aria-label="Navigasi utama">
-                    <a href="#solusi">Solusi</a><a href="#alur">Cara kerja</a><a href="#dampak">Dampak</a><a href="#integrasi">Integrasi</a><a href="#sdgs">Kontribusi SDGs</a><a href="#faq">FAQ</a>
+                    <a href="#solusi">Solusi</a><a href="#sdgs">Kontribusi SDGs</a><a href="#alur">Cara kerja</a><a href="#integrasi">Integrasi</a><a href="#faq">FAQ</a>
                 </nav>
                 <div class="flex items-center gap-2"><Link :href="primaryHref" class="btn-lift inline-flex items-center gap-2 rounded-full bg-[#171512] px-3 py-2.5 text-[10px] font-semibold text-[#F2EEE5] sm:px-5 sm:text-[12px]"><span class="hidden sm:inline">{{ primaryLabel }}</span><span class="sm:hidden">{{ isSignedIn ? 'Dasbor' : 'Masuk' }}</span> <ArrowUpRight class="size-3.5" /></Link><button type="button" class="grid size-10 place-items-center rounded-full border border-[#d8d2c5] text-[#3B4B34] transition active:scale-95 lg:hidden" :aria-expanded="mobileMenuOpen" aria-controls="mobile-site-menu" aria-label="Buka navigasi" @click="mobileMenuOpen = !mobileMenuOpen"><X v-if="mobileMenuOpen" class="size-4" /><Menu v-else class="size-4" /></button></div>
             </div>
             <nav v-if="mobileMenuOpen" id="mobile-site-menu" class="mx-auto mt-2 grid max-w-[1440px] gap-1 rounded-3xl border border-white/70 bg-[#F2EEE5]/95 p-3 text-sm text-[#3b4b34] shadow-xl backdrop-blur-2xl lg:hidden">
-                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Dampak', href: '#dampak' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'Kontribusi SDGs', href: '#sdgs' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
+                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Kontribusi SDGs', href: '#sdgs' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
             </nav>        </header>
         <main id="home">
             <section class="hero relative isolate flex min-h-[760px] items-center px-5 pb-20 pt-36 sm:px-8 lg:min-h-[900px] lg:px-12 lg:pt-40">
@@ -486,6 +486,64 @@ onBeforeUnmount(() => {
                 </div>
             </section>
 
+            <section id="sdgs" class="scroll-mt-24 overflow-hidden bg-[#e9e5da] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+                <div class="mx-auto max-w-[1320px]">
+                    <div class="grid items-center gap-12 lg:grid-cols-[.85fr_1.15fr] lg:gap-20">
+                        <div class="reveal">
+                            <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c7c1b3] bg-[#F2EEE5] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.18em] text-[#667352]">
+                                <Leaf class="size-3.5" /> Dampak yang saling terhubung
+                            </p>
+                            <h2 class="w-anim max-w-[580px] font-serif text-[clamp(2.8rem,5.5vw,5rem)] leading-[.94] tracking-[-.035em] text-[#20271d]">
+                                Pangan terselamatkan,<br /><span class="italic text-[#667352]">dampak berlanjut.</span>
+                            </h2>
+                            <p class="mt-6 max-w-[480px] text-[12px] leading-6 text-[#77746a]">
+                                Melalui pemantauan stok, keputusan yang lebih tepat, dan kerja sama lintas mitra, SirkulaFood mendukung beberapa Tujuan Pembangunan Berkelanjutan (SDGs).
+                            </p>
+                            <p class="mt-4 text-[9px] leading-5 text-[#8c887c]">Kontribusi ini menggambarkan dukungan melalui alur kerja dan kemitraan, bukan klaim pencapaian target SDGs secara keseluruhan.</p>
+                        </div>
+
+                        <div class="reveal relative mx-auto aspect-[1.15] w-full max-w-[560px] overflow-hidden rounded-[32px] bg-[#193b32] p-5 text-[#F2EEE5] shadow-[0_28px_70px_rgba(28,44,34,.18)] sm:p-8">
+                            <div class="absolute -right-20 -top-24 size-72 rounded-full border border-[#c5aa66]/25"></div>
+                            <div class="absolute -bottom-36 -left-20 size-80 rounded-full border border-[#c5aa66]/20"></div>
+                            <svg class="absolute inset-0 h-full w-full opacity-70" viewBox="0 0 560 480" fill="none" aria-hidden="true">
+                                <path d="M280 242 C220 188 135 155 88 124 M280 242 C360 182 423 154 477 124 M280 242 C210 312 147 341 92 369 M280 242 C354 313 418 345 468 369" stroke="#C5AA66" stroke-width="1.5" stroke-dasharray="5 8" />
+                                <circle cx="280" cy="242" r="142" stroke="#F2EEE5" stroke-opacity=".16" />
+                                <circle cx="280" cy="242" r="184" stroke="#C5AA66" stroke-opacity=".28" />
+                            </svg>
+                            <div class="relative flex h-full items-center justify-center">
+                                <div class="absolute left-0 top-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:left-3 sm:top-5">
+                                    <Store class="size-4 text-[#d7c28d]" /><span class="text-[9px] font-medium">Toko</span>
+                                </div>
+                                <div class="absolute right-0 top-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:right-3 sm:top-5">
+                                    <Tag class="size-4 text-[#d7c28d]" /><span class="text-[9px] font-medium">Diskon tepat waktu</span>
+                                </div>
+                                <div class="absolute bottom-2 left-0 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:bottom-5 sm:left-3">
+                                    <Leaf class="size-4 text-[#bdcaa6]" /><span class="text-[9px] font-medium">Pangan terselamatkan</span>
+                                </div>
+                                <div class="absolute bottom-2 right-0 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.08] px-3 py-2 backdrop-blur-md sm:bottom-5 sm:right-3">
+                                    <Handshake class="size-4 text-[#bdcaa6]" /><span class="text-[9px] font-medium">Mitra sosial</span>
+                                </div>
+                                <div class="relative z-10 grid size-28 place-items-center rounded-full border border-[#d3bd7d]/60 bg-[#F2EEE5] text-[#193b32] shadow-[0_0_0_14px_rgba(242,238,229,.06)] sm:size-36">
+                                    <div class="text-center"><Package class="mx-auto size-8" /><span class="mt-1 block text-[9px] font-bold tracking-wide">SIKLUS PANGAN</span></div>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 top-1/2 z-20 grid size-7 -translate-x-1/2 -translate-y-[5.7rem] place-items-center rounded-full bg-[#c5aa66] text-[#193b32] sm:-translate-y-[7.2rem]"><ArrowRight class="size-3.5" /></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <article v-for="goal in sdgContributions" :key="goal.number" class="group rounded-[22px] border border-[#dcd7cb] bg-[#F7F4ED] p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="font-serif text-[42px] leading-none" :style="{ color: goal.color }">{{ goal.number }}</span>
+                                <span class="grid size-10 place-items-center rounded-full bg-[#e9e5da] text-[#3B4B34] transition group-hover:bg-[#193b32] group-hover:text-[#F2EEE5]"><component :is="goal.icon" class="size-4" /></span>
+                            </div>
+                            <h3 class="mt-5 min-h-[42px] text-[12px] font-semibold leading-5 text-[#283326]">{{ goal.title }}</h3>
+                            <p class="mt-2 text-[10px] leading-5 text-[#77746a]">{{ goal.description }}</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
             <section id="alur" class="bg-[#e9e5da] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
                 <div class="mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-[.9fr_1.1fr]">
                     <div class="reveal">
@@ -630,6 +688,43 @@ onBeforeUnmount(() => {
 
 
 
+            <section id="faq" class="scroll-mt-24 px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+                <div class="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[.72fr_1.28fr]">
+                    <div class="reveal">
+                        <p class="mb-4 text-[10px] uppercase tracking-[.18em] text-[#71805f]">FAQ</p>
+                        <h2 class="w-anim font-serif text-[clamp(2.8rem,5vw,4.6rem)] leading-[.95]">
+                            Kami siap<br /><span class="italic text-[#3B4B34]">membantu.</span>
+                        </h2>
+                        <p class="mt-5 max-w-[310px] text-[11px] leading-6 text-[#77746a]">Tim kami siap membantu merancang alur kerja yang sesuai dengan kebutuhan Anda.</p>
+                        <a href="mailto:hello@SirkulaFood.id" class="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-[#3B4B34]"
+                            >Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5"
+                        /></a>
+                    </div>
+                    <div class="reveal divide-y divide-[#dcd7cb] border-y border-[#dcd7cb]">
+                        <article v-for="(faq, index) in faqs" :key="faq.question" class="py-5">
+                            <button
+                                type="button"
+                                class="flex w-full items-center justify-between gap-5 text-left"
+                                :aria-expanded="openFaq === index"
+                                :aria-controls="'faq-panel-' + index"
+                                @click="openFaq = openFaq === index ? -1 : index"
+                            >
+                                <span class="font-serif text-[20px] sm:text-[23px]">{{ faq.question }}</span
+                                ><span
+                                    class="grid size-8 place-items-center rounded-full border border-[#d9d5c9] text-[#3B4B34] transition-transform"
+                                    :class="{ 'rotate-180 bg-[#3B4B34] text-white': openFaq === index }"
+                                    ><ChevronDown class="size-4"
+                                /></span>
+                            </button>
+                            <div :id="'faq-panel-' + index" class="faq-body" :style="{ maxHeight: openFaq === index ? '220px' : '0px' }">
+                                <p class="max-w-[590px] pr-10 pt-3 text-[11px] leading-6 text-[#77746a]">{{ faq.answer }}</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+
             <section id="sdgs" class="scroll-mt-24 overflow-hidden bg-[#e9e5da] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
                 <div class="mx-auto max-w-[1320px]">
                     <div class="grid items-center gap-12 lg:grid-cols-[.85fr_1.15fr] lg:gap-20">
@@ -739,6 +834,23 @@ onBeforeUnmount(() => {
                             <a href="#solusi" class="transition hover:text-white">Solusi</a>
                             <a href="#alur" class="transition hover:text-white">Cara kerja</a>
                             <a href="#sdgs" class="transition hover:text-white">Kontribusi SDGs</a>
+                            <a href="#faq" class="transition hover:text-white">FAQ</a>
+                        </nav>
+                    </div>
+                    <div>
+                        <h2 class="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d4c28f]">Mari berkolaborasi</h2>
+                        <p class="mt-4 max-w-xs text-[10px] leading-5 text-white/65">Punya pertanyaan atau ingin menjajaki penerapan di tempat Anda?</p>
+                        <a href="mailto:hello@SirkulaFood.id" class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[.07] px-4 py-2.5 text-[10px] font-semibold transition hover:bg-white/[.14]">
+                            Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5" />
+                        </a>
+                    </div>
+                    <div>
+                        <h2 class="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d4c28f]">Jelajahi</h2>
+                        <nav class="mt-4 flex flex-col items-start gap-3 text-[10px] text-white/65" aria-label="Navigasi footer">
+                            <a href="#solusi" class="transition hover:text-white">Solusi</a>
+                            <a href="#sdgs" class="transition hover:text-white">Kontribusi SDGs</a>
+                            <a href="#alur" class="transition hover:text-white">Cara kerja</a>
+                            <a href="#integrasi" class="transition hover:text-white">Integrasi</a>
                             <a href="#faq" class="transition hover:text-white">FAQ</a>
                         </nav>
                     </div>
