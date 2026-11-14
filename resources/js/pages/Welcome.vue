@@ -226,20 +226,12 @@ onBeforeUnmount(() => {
             <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-2 rounded-full border border-white/65 bg-[#F2EEE5]/85 px-3 py-2.5 shadow-lg backdrop-blur-2xl sm:px-7 sm:py-3">
                 <a href="#home" class="inline-flex items-center rounded-lg px-1" aria-label="SirkulaFood — kembali ke beranda"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[92px] sm:h-9 sm:max-w-[150px]" /></a>
                 <nav class="hidden items-center gap-8 text-[12px] font-medium text-[#6d6a5f] lg:flex" aria-label="Navigasi utama">
-<<<<<<< HEAD
                     <a href="#solusi">Solusi</a><a href="#sdgs">Kontribusi SDGs</a><a href="#alur">Cara kerja</a><a href="#integrasi">Integrasi</a><a href="#faq">FAQ</a>
-=======
-                    <a href="#solusi">Solusi</a><a href="#alur">Cara kerja</a><a href="#dampak">Dampak</a><a href="#integrasi">Integrasi</a><a href="#faq">FAQ</a>
->>>>>>> ed17a04ba2079ffad9f95fbcc235e300c4afd13b
                 </nav>
                 <div class="flex items-center gap-2"><Link :href="primaryHref" class="btn-lift inline-flex items-center gap-2 rounded-full bg-[#171512] px-3 py-2.5 text-[10px] font-semibold text-[#F2EEE5] sm:px-5 sm:text-[12px]"><span class="hidden sm:inline">{{ primaryLabel }}</span><span class="sm:hidden">{{ isSignedIn ? 'Dasbor' : 'Masuk' }}</span> <ArrowUpRight class="size-3.5" /></Link><button type="button" class="grid size-10 place-items-center rounded-full border border-[#d8d2c5] text-[#3B4B34] transition active:scale-95 lg:hidden" :aria-expanded="mobileMenuOpen" aria-controls="mobile-site-menu" aria-label="Buka navigasi" @click="mobileMenuOpen = !mobileMenuOpen"><X v-if="mobileMenuOpen" class="size-4" /><Menu v-else class="size-4" /></button></div>
             </div>
             <nav v-if="mobileMenuOpen" id="mobile-site-menu" class="mx-auto mt-2 grid max-w-[1440px] gap-1 rounded-3xl border border-white/70 bg-[#F2EEE5]/95 p-3 text-sm text-[#3b4b34] shadow-xl backdrop-blur-2xl lg:hidden">
-<<<<<<< HEAD
                 <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Kontribusi SDGs', href: '#sdgs' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
-=======
-                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Dampak', href: '#dampak' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
->>>>>>> ed17a04ba2079ffad9f95fbcc235e300c4afd13b
             </nav>        </header>
         <main id="home">
             <section class="hero relative isolate flex min-h-[760px] items-center px-5 pb-20 pt-36 sm:px-8 lg:min-h-[900px] lg:px-12 lg:pt-40">
