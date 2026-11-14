@@ -226,12 +226,12 @@ onBeforeUnmount(() => {
             <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-2 rounded-full border border-white/65 bg-[#F2EEE5]/85 px-3 py-2.5 shadow-lg backdrop-blur-2xl sm:px-7 sm:py-3">
                 <a href="#home" class="inline-flex items-center rounded-lg px-1" aria-label="SirkulaFood — kembali ke beranda"><img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[92px] sm:h-9 sm:max-w-[150px]" /></a>
                 <nav class="hidden items-center gap-8 text-[12px] font-medium text-[#6d6a5f] lg:flex" aria-label="Navigasi utama">
-                    <a href="#solusi">Solusi</a><a href="#alur">Cara kerja</a><a href="#dampak">Dampak</a><a href="#integrasi">Integrasi</a><a href="#faq">FAQ</a>
+                    <a href="#solusi">Solusi</a><a href="#alur">Cara kerja</a><a href="#dampak">Dampak</a><a href="#integrasi">Integrasi</a><a href="#sdgs">Kontribusi SDGs</a><a href="#faq">FAQ</a>
                 </nav>
                 <div class="flex items-center gap-2"><Link :href="primaryHref" class="btn-lift inline-flex items-center gap-2 rounded-full bg-[#171512] px-3 py-2.5 text-[10px] font-semibold text-[#F2EEE5] sm:px-5 sm:text-[12px]"><span class="hidden sm:inline">{{ primaryLabel }}</span><span class="sm:hidden">{{ isSignedIn ? 'Dasbor' : 'Masuk' }}</span> <ArrowUpRight class="size-3.5" /></Link><button type="button" class="grid size-10 place-items-center rounded-full border border-[#d8d2c5] text-[#3B4B34] transition active:scale-95 lg:hidden" :aria-expanded="mobileMenuOpen" aria-controls="mobile-site-menu" aria-label="Buka navigasi" @click="mobileMenuOpen = !mobileMenuOpen"><X v-if="mobileMenuOpen" class="size-4" /><Menu v-else class="size-4" /></button></div>
             </div>
             <nav v-if="mobileMenuOpen" id="mobile-site-menu" class="mx-auto mt-2 grid max-w-[1440px] gap-1 rounded-3xl border border-white/70 bg-[#F2EEE5]/95 p-3 text-sm text-[#3b4b34] shadow-xl backdrop-blur-2xl lg:hidden">
-                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Dampak', href: '#dampak' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
+                <a v-for="item in [{ label: 'Solusi', href: '#solusi' }, { label: 'Cara kerja', href: '#alur' }, { label: 'Dampak', href: '#dampak' }, { label: 'Integrasi', href: '#integrasi' }, { label: 'Kontribusi SDGs', href: '#sdgs' }, { label: 'FAQ', href: '#faq' }]" :key="item.href" :href="item.href" class="rounded-xl px-4 py-3 transition hover:bg-[#e7ebde] active:scale-[.99]" @click="mobileMenuOpen = false">{{ item.label }}</a>
             </nav>        </header>
         <main id="home">
             <section class="hero relative isolate flex min-h-[760px] items-center px-5 pb-20 pt-36 sm:px-8 lg:min-h-[900px] lg:px-12 lg:pt-40">
@@ -628,43 +628,9 @@ onBeforeUnmount(() => {
                 </div>
             </section>
 
-            <section id="faq" class="px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
-                <div class="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[.72fr_1.28fr]">
-                    <div class="reveal">
-                        <p class="mb-4 text-[10px] uppercase tracking-[.18em] text-[#71805f]">FAQ</p>
-                        <h2 class="w-anim font-serif text-[clamp(2.8rem,5vw,4.6rem)] leading-[.95]">
-                            Kami siap<br /><span class="italic text-[#3B4B34]">membantu.</span>
-                        </h2>
-                        <p class="mt-5 max-w-[310px] text-[11px] leading-6 text-[#77746a]">Tim kami siap membantu merancang alur kerja yang sesuai dengan kebutuhan Anda.</p>
-                        <a href="mailto:hello@SirkulaFood.id" class="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-[#3B4B34]"
-                            >Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5"
-                        /></a>
-                    </div>
-                    <div class="reveal divide-y divide-[#dcd7cb] border-y border-[#dcd7cb]">
-                        <article v-for="(faq, index) in faqs" :key="faq.question" class="py-5">
-                            <button
-                                type="button"
-                                class="flex w-full items-center justify-between gap-5 text-left"
-                                :aria-expanded="openFaq === index"
-                                :aria-controls="'faq-panel-' + index"
-                                @click="openFaq = openFaq === index ? -1 : index"
-                            >
-                                <span class="font-serif text-[20px] sm:text-[23px]">{{ faq.question }}</span
-                                ><span
-                                    class="grid size-8 place-items-center rounded-full border border-[#d9d5c9] text-[#3B4B34] transition-transform"
-                                    :class="{ 'rotate-180 bg-[#3B4B34] text-white': openFaq === index }"
-                                    ><ChevronDown class="size-4"
-                                /></span>
-                            </button>
-                            <div :id="'faq-panel-' + index" class="faq-body" :style="{ maxHeight: openFaq === index ? '220px' : '0px' }">
-                                <p class="max-w-[590px] pr-10 pt-3 text-[11px] leading-6 text-[#77746a]">{{ faq.answer }}</p>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-            </section>
 
-            <section id="sdgs" class="overflow-hidden bg-[#e9e5da] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+
+            <section id="sdgs" class="scroll-mt-24 overflow-hidden bg-[#e9e5da] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
                 <div class="mx-auto max-w-[1320px]">
                     <div class="grid items-center gap-12 lg:grid-cols-[.85fr_1.15fr] lg:gap-20">
                         <div class="reveal">
@@ -717,6 +683,42 @@ onBeforeUnmount(() => {
                             </div>
                             <h3 class="mt-5 min-h-[42px] text-[12px] font-semibold leading-5 text-[#283326]">{{ goal.title }}</h3>
                             <p class="mt-2 text-[10px] leading-5 text-[#77746a]">{{ goal.description }}</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faq" class="scroll-mt-24 px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+                <div class="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[.72fr_1.28fr]">
+                    <div class="reveal">
+                        <p class="mb-4 text-[10px] uppercase tracking-[.18em] text-[#71805f]">FAQ</p>
+                        <h2 class="w-anim font-serif text-[clamp(2.8rem,5vw,4.6rem)] leading-[.95]">
+                            Kami siap<br /><span class="italic text-[#3B4B34]">membantu.</span>
+                        </h2>
+                        <p class="mt-5 max-w-[310px] text-[11px] leading-6 text-[#77746a]">Tim kami siap membantu merancang alur kerja yang sesuai dengan kebutuhan Anda.</p>
+                        <a href="mailto:hello@SirkulaFood.id" class="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-[#3B4B34]"
+                            >Hubungi tim SirkulaFood <ArrowUpRight class="size-3.5"
+                        /></a>
+                    </div>
+                    <div class="reveal divide-y divide-[#dcd7cb] border-y border-[#dcd7cb]">
+                        <article v-for="(faq, index) in faqs" :key="faq.question" class="py-5">
+                            <button
+                                type="button"
+                                class="flex w-full items-center justify-between gap-5 text-left"
+                                :aria-expanded="openFaq === index"
+                                :aria-controls="'faq-panel-' + index"
+                                @click="openFaq = openFaq === index ? -1 : index"
+                            >
+                                <span class="font-serif text-[20px] sm:text-[23px]">{{ faq.question }}</span
+                                ><span
+                                    class="grid size-8 place-items-center rounded-full border border-[#d9d5c9] text-[#3B4B34] transition-transform"
+                                    :class="{ 'rotate-180 bg-[#3B4B34] text-white': openFaq === index }"
+                                    ><ChevronDown class="size-4"
+                                /></span>
+                            </button>
+                            <div :id="'faq-panel-' + index" class="faq-body" :style="{ maxHeight: openFaq === index ? '220px' : '0px' }">
+                                <p class="max-w-[590px] pr-10 pt-3 text-[11px] leading-6 text-[#77746a]">{{ faq.answer }}</p>
+                            </div>
                         </article>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AgentLog;
+use App\Models\DonationPartner;
 use App\Models\InventorySyncSetting;
 use App\Models\Product;
 use App\Models\ProductAutomationPolicy;
@@ -13,6 +14,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TelegramAiActionService
 {
@@ -32,6 +34,10 @@ class TelegramAiActionService
             || ! filled($user->telegram_chat_id)
             || ! hash_equals((string) $user->telegram_chat_id, $chatId)) {
             throw new AuthorizationException('Only the linked business owner or manager may directly authorize an automatic donation.');
+        }
+
+        if (! $productId && trim($productName) === '') {
+            return 'Saya belum dapat mengenali nama produk dari pesan itu. Sebutkan nama produk atau SKU yang tampil di Inventory. Kebijakan dan stok tidak berubah.';
         }
 
         $product = Product::query()
@@ -57,7 +63,7 @@ class TelegramAiActionService
         }
 
         $messageKey = $telegramMessageId !== null ? hash('sha256', $chatId.':'.$telegramMessageId) : null;
-        $prepared = DB::transaction(function () use ($product, $quantity, $unit, $user, $chatId, $messageKey): array {
+        $prepared = DB::transaction(function () use ($product, $quantity, $user, $chatId, $messageKey): array {
             User::query()->whereKey($user->id)->lockForUpdate()->firstOrFail();
 
             if ($messageKey !== null) {
@@ -241,12 +247,8 @@ class TelegramAiActionService
             return $prepared['duplicate_reply'];
         }
 
-        $donationResults = [];
         foreach ($prepared['action_ids'] as $actionId) {
-            $result = $this->completeScheduledDonation($actionId, false);
-            if ($result !== null) {
-                $donationResults[] = $result;
-            }
+            $this->completeScheduledDonation($actionId, false);
         }
 
         $reply = sprintf(
@@ -269,9 +271,6 @@ class TelegramAiActionService
             );
             if ($donatedQuantity < (int) $prepared['requested_quantity']) {
                 $reply .= ' Batch yang berubah atau gagal diproses tidak mengurangi stok; kebijakan otomatis tetap aktif untuk batch berikutnya yang memenuhi syarat.';
-            }
-            if ($donationResults !== []) {
-                $reply .= ' '.implode(' ', $donationResults);
             }
         }
 
