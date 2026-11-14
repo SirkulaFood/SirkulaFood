@@ -15,10 +15,10 @@ use Throwable;
 class AiAgentService
 {
     /**
-     * Identify a product from an eligible inventory catalog and screen its visible condition.
+     * Identify a stocked product from an image and return a separate analysis and recommendation.
      *
      * @param  Collection<int, ProductBatch>  $batches
-     * @return array{matched_product_id: int|null, donation_eligible: bool, confidence: float, condition: string, reasoning: string, safety_note: string, provider: string}
+     * @return array{matched_product_id: int|null, donation_eligible: bool, confidence: float, match_confidence: float, condition_confidence: float, analysis_available: bool, analysis: string, recommendation: string, condition: string, reasoning: string, safety_note: string, provider: string}
      */
     public function identifyAndEvaluateDonationPhoto(Collection $batches, string $imageData, string $mimeType, bool $partnerMode = false): array
     {
@@ -26,115 +26,362 @@ class AiAgentService
             'matched_product_id' => null,
             'donation_eligible' => false,
             'confidence' => 0.0,
+            'match_confidence' => 0.0,
+            'condition_confidence' => 0.0,
+            'analysis_available' => false,
+            'analysis' => 'AI belum berhasil menganalisis foto.',
+            'recommendation' => 'Jangan mengambil atau mengubah stok berdasarkan hasil yang belum tersedia. Periksa produk secara manual atau coba lagi.',
             'condition' => 'unclear',
-            'reasoning' => 'Produk tidak dapat dikenali dengan yakin. Periksa stok secara manual atau coba foto ulang.',
+            'reasoning' => 'AI belum berhasil menganalisis foto.',
             'safety_note' => 'Foto tidak dapat memastikan keamanan mikrobiologis, bau, suhu penyimpanan, maupun kontaminasi makanan.',
             'provider' => 'manual_review',
         ];
 
-        if (! $this->hasNineRouterKey() || $batches->isEmpty()) {
-            return $manualReview;
+        if (! $this->hasNineRouterKey()) {
+            return [
+                ...$manualReview,
+                'reasoning' => 'Konfigurasi 9Router belum tersedia untuk analisis gambar.',
+                'analysis' => 'Konfigurasi 9Router belum tersedia untuk analisis gambar.',
+                'recommendation' => 'Periksa NINEROUTER_API_KEY dan NINEROUTER_VISION_MODEL sebelum mencoba kembali.',
+            ];
         }
 
-        $products = $batches->unique('product_id')->map(fn (ProductBatch $batch): Product => $batch->product)->values();
+        if ($batches->isEmpty()) {
+            return [
+                ...$manualReview,
+                'reasoning' => 'Tidak ada batch stok aktif yang dapat dicocokkan dengan foto.',
+                'analysis' => 'Tidak ada batch stok aktif yang dapat dicocokkan dengan foto.',
+                'recommendation' => 'Periksa daftar stok aktif atau tambahkan batch produk terlebih dahulu.',
+            ];
+        }
+
+        $products = $batches
+            ->unique('product_id')
+            ->map(fn (ProductBatch $batch): Product => $batch->product)
+            ->filter()
+            ->values();
         $catalog = $products->map(fn (Product $product): array => [
             'candidate_id' => (string) $product->id,
             'sku' => (string) $product->sku,
             'name' => (string) $product->name,
-            'category' => (string) ($product->category?->name ?? 'General'),
+            'category' => (string) ($product->category?->name ?? 'Makanan'),
         ])->all();
-        $candidateMap = $products->keyBy(fn (Product $product): string => (string) $product->id);
         $catalogJson = json_encode($catalog, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $partnerRule = $partnerMode
-            ? 'good dan acceptable boleh donation_eligible=true bila confidence minimal 0.75; good berarti produk masih layak konsumsi, acceptable berarti tidak layak jual tetapi masih tampak layak konsumsi.'
-            : 'Hanya acceptable boleh donation_eligible=true bila confidence minimal 0.75; good (masih layak dijual), poor, dan unclear wajib false.';
+            ? 'Untuk mitra donasi, good maupun acceptable dapat ditawarkan untuk diambil jika tampak layak konsumsi; mitra tetap memeriksa langsung saat serah terima.'
+            : 'Untuk staf supermarket, hanya acceptable dapat direkomendasikan untuk donasi; good masih layak jual dan poor atau unclear tidak boleh didonasikan.';
 
         $prompt = <<<PROMPT
-Kenali produk pada foto dengan memilih TEPAT SATU candidate_id dari katalog stok berikut. Jangan membuat kandidat atau ID baru.
+Analisis foto dan pilih produk yang paling cocok dari katalog stok. Hanya gunakan candidate_id, SKU, dan nama yang benar-benar ada di katalog. Jangan mengarang produk atau ID.
 [KATALOG STOK]
 {$catalogJson}
 
-Setelah mengenali produk, nilai kondisi visualnya:
-- good: tampak layak konsumsi dan masih layak dijual.
-- acceptable: tampak tidak layak dijual karena kematangan/cacat tampilan ringan, tetapi masih berpotensi layak konsumsi.
-- poor: tampak busuk, berjamur, rusak berat, atau ada tanda tidak layak konsumsi.
-- unclear: objek/jenis/kondisi tidak terlihat jelas atau kandidat tidak cocok.
-Aturan donation_eligible: {$partnerRule}
-Jika tidak dapat mencocokkan foto ke kandidat tertentu dengan yakin, candidate_id=null, condition=unclear, donation_eligible=false.
+Tentukan dua skor secara terpisah:
+- match_confidence: kemiripan objek pada foto dengan satu produk katalog (0 sampai 1).
+- condition_confidence: keyakinan atas kondisi visual produk (0 sampai 1).
+Jika match_confidence lebih dari 0.50, pilih candidate_id produk tersebut. Jika tidak ada kandidat yang cocok di atas 0.50, candidate_id=null.
+Kondisi:
+- good: tampak layak dikonsumsi dan masih layak dijual.
+- acceptable: tampak tidak layak dijual karena kematangan atau cacat tampilan ringan, tetapi masih berpotensi layak dikonsumsi.
+- poor: tampak busuk, berjamur, rusak berat, atau ada tanda tidak layak dikonsumsi.
+- unclear: foto, produk, atau kondisi tidak cukup jelas.
+{$partnerRule}
 Jangan memilih acceptable hanya karena tanggal kedaluwarsa dekat. Foto tidak membuktikan keamanan makanan. Jika ragu, minta pemeriksaan manual.
-Kembalikan HANYA JSON valid dengan candidate_id (string atau null), donation_eligible (boolean), confidence (angka 0 sampai 1), condition (good|acceptable|poor|unclear), reasoning (Bahasa Indonesia), safety_note (Bahasa Indonesia).
+Berikan analisis singkat berdasarkan hal yang benar-benar terlihat dan rekomendasi tindakan yang jelas dalam Bahasa Indonesia. Jangan menyatakan makanan pasti aman.
+Kembalikan hanya JSON valid dengan key candidate_id (string atau null), candidate_name, match_confidence, condition_confidence, condition, donation_eligible, analysis, recommendation, safety_note.
 PROMPT;
 
         try {
             $model = (string) config('services.ninerouter.vision_model');
             $baseUrl = rtrim((string) config('services.ninerouter.base_url', 'http://127.0.0.1:20128/v1'), '/');
-            $response = Http::timeout(45)
+            $response = Http::timeout(60)
                 ->withToken((string) config('services.ninerouter.api_key'))
                 ->acceptJson()
                 ->post($baseUrl.'/chat/completions', [
                     'model' => $model,
                     'messages' => [
-                        ['role' => 'system', 'content' => 'You are a cautious visual food identification and condition screening assistant. Select only an exact candidate from the supplied catalog. Never claim food is certainly safe. Return strict JSON only.'],
+                        ['role' => 'system', 'content' => 'You are a careful visual product-matching and food-condition assistant for SirkulaFood. Select only an exact product from the catalog, return Indonesian analysis and recommendation, and never claim that a photo proves food safety. Return strict JSON only.'],
                         ['role' => 'user', 'content' => [
                             ['type' => 'text', 'text' => $prompt],
-                            ['type' => 'image_url', 'image_url' => ['url' => 'data:'.$mimeType.';base64,'.$imageData, 'detail' => 'low']],
+                            ['type' => 'image_url', 'image_url' => ['url' => 'data:'.$mimeType.';base64,'.$imageData, 'detail' => 'high']],
                         ]],
                     ],
                     'response_format' => ['type' => 'json_object'],
                     'temperature' => 0.1,
+                    'max_tokens' => 500,
                     'stream' => false,
                 ]);
 
             if (! $response->successful()) {
-                Log::warning('9Router inventory photo identification returned an error.', ['status' => $response->status()]);
+                $upstreamMessage = mb_strtolower((string) $response->json('error.message', ''));
+                $quotaLimited = $response->status() === 429
+                    || str_contains($upstreamMessage, 'free-models-per-day')
+                    || str_contains($upstreamMessage, 'rate limit');
+                $reasoning = $quotaLimited
+                    ? 'Analisis tidak dijalankan karena kuota model visi 9Router sedang habis.'
+                    : ($response->status() === 503
+                        ? 'Layanan model visi 9Router sedang tidak tersedia.'
+                        : 'Model visi 9Router menolak permintaan analisis foto (HTTP '.$response->status().').');
+                $recommendation = $quotaLimited
+                    ? 'Coba lagi setelah kuota model pulih, atau pilih model vision lain yang masih tersedia di 9Router.'
+                    : 'Periksa ketersediaan model vision dan dukungan input gambar di 9Router, lalu coba foto ulang.';
 
-                return $manualReview;
-            }
+                Log::warning('9Router inventory photo identification returned an error.', [
+                    'status' => $response->status(),
+                    'quota_limited' => $quotaLimited,
+                    'model' => $model,
+                ]);
 
-            $rawText = $response->json('choices.0.message.content');
-            if (! is_string($rawText) || trim($rawText) === '') {
-                return $manualReview;
-            }
-
-            $rawText = trim(preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($rawText)) ?? '');
-            $decision = json_decode($rawText, true, 512, JSON_THROW_ON_ERROR);
-            if (! is_array($decision)) {
-                return $manualReview;
-            }
-
-            $candidateId = is_string($decision['candidate_id'] ?? null) ? $decision['candidate_id'] : '';
-            if (! $candidateMap->has($candidateId)) {
                 return [
                     ...$manualReview,
-                    'reasoning' => is_string($decision['reasoning'] ?? null) ? trim($decision['reasoning']) : $manualReview['reasoning'],
-                    'provider' => '9router:'.$model,
+                    'analysis' => $reasoning,
+                    'reasoning' => $reasoning,
+                    'recommendation' => $recommendation,
+                    'provider' => '9router_unavailable',
                 ];
             }
 
-            $confidence = is_numeric($decision['confidence'] ?? null)
-                ? max(0.0, min(1.0, (float) $decision['confidence']))
-                : 0.0;
-            $condition = in_array($decision['condition'] ?? null, ['good', 'acceptable', 'poor', 'unclear'], true)
-                ? $decision['condition']
-                : 'unclear';
+            $rawText = $response->json('choices.0.message.content');
+            if (is_array($rawText)) {
+                $rawText = collect($rawText)
+                    ->pluck('text')
+                    ->filter(fn ($text): bool => is_string($text))
+                    ->implode("\n");
+            }
+            if (! is_string($rawText) || trim($rawText) === '') {
+                return [
+                    ...$manualReview,
+                    'provider' => '9router:'.$model,
+                    'reasoning' => 'Model merespons tetapi tidak mengirimkan hasil analisis yang dapat dibaca.',
+                    'analysis' => 'Model merespons tetapi tidak mengirimkan hasil analisis yang dapat dibaca.',
+                    'recommendation' => 'Coba model vision lain di 9Router atau ambil foto ulang dengan produk terlihat jelas.',
+                ];
+            }
+
+            $decision = $this->decodeVisionDecision($rawText);
+            if ($decision === null) {
+                return [
+                    ...$manualReview,
+                    'provider' => '9router:'.$model,
+                    'reasoning' => 'Respons model tidak terbaca sebagai JSON analisis yang valid.',
+                    'analysis' => 'Respons model tidak terbaca sebagai JSON analisis yang valid.',
+                    'recommendation' => 'Coba model vision lain di 9Router atau ambil foto ulang dengan produk terlihat jelas.',
+                ];
+            }
+
+            $matchConfidence = $this->normalizeVisionScore(
+                $decision['match_confidence']
+                    ?? $decision['similarity_score']
+                    ?? $decision['similarity']
+                    ?? $decision['confidence']
+                    ?? 0
+            );
+            $conditionConfidence = $this->normalizeVisionScore(
+                $decision['condition_confidence']
+                    ?? $decision['food_condition_confidence']
+                    ?? $decision['confidence']
+                    ?? $matchConfidence
+            );
+            $matchedProduct = $this->matchVisionCandidate($decision, $products);
+            $isMatched = $matchedProduct !== null && $matchConfidence > 0.50;
+            $condition = $this->normalizeVisionCondition($decision['condition'] ?? null);
             $allowedConditions = $partnerMode ? ['good', 'acceptable'] : ['acceptable'];
-            $eligible = $confidence >= 0.75
+            $modelAllowsDonation = filter_var($decision['donation_eligible'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $eligible = $isMatched
+                && $modelAllowsDonation
+                && $conditionConfidence >= 0.75
                 && in_array($condition, $allowedConditions, true);
+            $analysis = $this->visionText($decision['analysis'] ?? $decision['reasoning'] ?? null)
+                ?? ($isMatched
+                    ? 'Foto paling mirip dengan '.$matchedProduct->name.'. Kondisi visual dinilai '.$condition.'.'
+                    : 'Foto belum cocok dengan produk stok di atas ambang kemiripan 50%.');
+            $recommendation = $this->visionText($decision['recommendation'] ?? null)
+                ?? $this->fallbackVisionRecommendation($condition, $partnerMode, $isMatched);
+            $safetyNote = $this->visionText($decision['safety_note'] ?? null)
+                ?? $manualReview['safety_note'];
 
             return [
-                'matched_product_id' => (int) $candidateId,
+                'matched_product_id' => $isMatched ? (int) $matchedProduct->id : null,
                 'donation_eligible' => $eligible,
-                'confidence' => $confidence,
+                'confidence' => $matchConfidence,
+                'match_confidence' => $matchConfidence,
+                'condition_confidence' => $conditionConfidence,
+                'analysis_available' => true,
+                'analysis' => $analysis,
+                'recommendation' => $recommendation,
                 'condition' => $condition,
-                'reasoning' => is_string($decision['reasoning'] ?? null) ? trim($decision['reasoning']) : $manualReview['reasoning'],
-                'safety_note' => is_string($decision['safety_note'] ?? null) ? trim($decision['safety_note']) : $manualReview['safety_note'],
+                'reasoning' => $analysis,
+                'safety_note' => $safetyNote,
                 'provider' => '9router:'.$model,
             ];
         } catch (Throwable $exception) {
-            Log::warning('9Router inventory photo identification failed.', ['error' => $exception->getMessage()]);
+            Log::warning('9Router inventory photo identification failed.', [
+                'error' => $exception->getMessage(),
+                'model' => config('services.ninerouter.vision_model'),
+            ]);
 
-            return $manualReview;
+            $reasoning = 'Layanan analisis gambar 9Router tidak merespons. Coba lagi atau gunakan model vision lain.';
+
+            return [
+                ...$manualReview,
+                'analysis' => $reasoning,
+                'reasoning' => $reasoning,
+                'recommendation' => 'Tidak ada produk yang dianggap cocok dan stok tidak berubah. Coba foto ulang setelah layanan pulih.',
+                'provider' => '9router_unavailable',
+            ];
         }
+    }
+
+    private function decodeVisionDecision(string $rawText): ?array
+    {
+        $cleaned = trim(preg_replace('/^\xEF\xBB\xBF/u', '', trim($rawText)) ?? trim($rawText));
+        $cleaned = preg_replace('/^```(?:json)?\s*/i', '', $cleaned) ?? $cleaned;
+        $cleaned = preg_replace('/\s*```$/', '', $cleaned) ?? $cleaned;
+        $decision = json_decode($cleaned, true);
+        if (is_array($decision)) {
+            return $decision;
+        }
+
+        if (is_string($decision) && $decision !== $cleaned) {
+            $nestedDecision = $this->decodeVisionDecision($decision);
+            if ($nestedDecision !== null) {
+                return $nestedDecision;
+            }
+        }
+
+        $length = strlen($cleaned);
+        for ($start = 0; $start < $length; $start++) {
+            if ($cleaned[$start] !== '{') {
+                continue;
+            }
+
+            $depth = 0;
+            $insideString = false;
+            $escaped = false;
+            for ($end = $start; $end < $length; $end++) {
+                $character = $cleaned[$end];
+                if ($insideString) {
+                    if ($escaped) {
+                        $escaped = false;
+                    } elseif ($character === '\\') {
+                        $escaped = true;
+                    } elseif ($character === '"') {
+                        $insideString = false;
+                    }
+
+                    continue;
+                }
+
+                if ($character === '"') {
+                    $insideString = true;
+                } elseif ($character === '{') {
+                    $depth++;
+                } elseif ($character === '}') {
+                    $depth--;
+                    if ($depth === 0) {
+                        $decision = json_decode(substr($cleaned, $start, $end - $start + 1), true);
+                        if (is_array($decision)) {
+                            return $decision;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeVisionScore(mixed $value): float
+    {
+        if (! is_numeric($value)) {
+            return 0.0;
+        }
+
+        $score = (float) $value;
+        if ($score > 1 && $score <= 100) {
+            $score /= 100;
+        }
+
+        return max(0.0, min(1.0, $score));
+    }
+
+    private function normalizeVisionCondition(mixed $value): string
+    {
+        $condition = mb_strtolower(trim((string) $value));
+
+        return match ($condition) {
+            'good', 'fresh', 'saleable', 'sellable', 'layak jual' => 'good',
+            'acceptable', 'fair', 'not_salable', 'not for sale', 'layak donasi' => 'acceptable',
+            'poor', 'spoiled', 'rotten', 'unsafe', 'rusak' => 'poor',
+            default => 'unclear',
+        };
+    }
+
+    private function matchVisionCandidate(array $decision, Collection $products): ?Product
+    {
+        foreach (['candidate_id', 'matched_product_id', 'product_id', 'sku', 'candidate_sku'] as $field) {
+            $reference = $decision[$field] ?? null;
+            if (! is_scalar($reference) || trim((string) $reference) === '') {
+                continue;
+            }
+
+            $reference = trim((string) $reference);
+            $product = $products->first(fn (Product $candidate): bool => (string) $candidate->id === $reference || strcasecmp((string) $candidate->sku, $reference) === 0
+            );
+            if ($product instanceof Product) {
+                return $product;
+            }
+        }
+
+        foreach (['candidate_name', 'matched_product_name', 'product_name', 'name'] as $field) {
+            $name = $this->visionText($decision[$field] ?? null);
+            if ($name === null) {
+                continue;
+            }
+
+            $normalizedName = $this->normalizeVisionName($name);
+            $product = $products->first(fn (Product $candidate): bool => $this->normalizeVisionName((string) $candidate->name) === $normalizedName
+            );
+            if ($product instanceof Product) {
+                return $product;
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeVisionName(string $name): string
+    {
+        $normalized = preg_replace('/[^\pL\pN]+/u', ' ', mb_strtolower(trim($name))) ?? '';
+
+        return trim($normalized);
+    }
+
+    private function visionText(mixed $value): ?string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        return trim($value);
+    }
+
+    private function fallbackVisionRecommendation(string $condition, bool $partnerMode, bool $matched): string
+    {
+        if (! $matched) {
+            return 'Ambil foto ulang dengan satu produk terlihat jelas. Stok tidak berubah selama produk belum cocok dengan kemiripan di atas 50%.';
+        }
+
+        return match ($condition) {
+            'good' => $partnerMode
+                ? 'Produk cocok dan tampak layak konsumsi. Mitra dapat melanjutkan pengambilan setelah memeriksa kondisi produk langsung.'
+                : 'Produk masih tampak layak jual. Pertahankan untuk penjualan dan jangan ajukan donasi melalui hasil ini.',
+            'acceptable' => 'Periksa produk secara langsung. Jika kondisinya sesuai, lanjutkan proses donasi sesuai alur persetujuan yang berlaku.',
+            'poor' => 'Jangan donasikan. Pisahkan produk dan ikuti prosedur pemeriksaan pangan toko.',
+            default => 'Hasil belum cukup jelas. Periksa produk secara manual atau ambil foto ulang.',
+        };
     }
 
     /**
@@ -202,12 +449,17 @@ PROMPT;
             }
 
             $rawText = $response->json('choices.0.message.content');
+            if (is_array($rawText)) {
+                $rawText = collect($rawText)
+                    ->pluck('text')
+                    ->filter(fn ($text): bool => is_string($text))
+                    ->implode("\n");
+            }
             if (! is_string($rawText) || trim($rawText) === '') {
                 return $manualReview;
             }
 
-            $rawText = trim(preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($rawText)) ?? '');
-            $decision = json_decode($rawText, true, 512, JSON_THROW_ON_ERROR);
+            $decision = $this->decodeVisionDecision($rawText);
             if (! is_array($decision)) {
                 return $manualReview;
             }

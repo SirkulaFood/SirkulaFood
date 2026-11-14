@@ -110,7 +110,13 @@ Untuk pengembangan lokal, jalankan layanan yang diperlukan pada terminal terpisa
 
 ```powershell
 php artisan serve
+```
+
+```powershell
 php artisan queue:listen --tries=1 --timeout=0
+```
+
+```powershell
 npm run dev
 ```
 

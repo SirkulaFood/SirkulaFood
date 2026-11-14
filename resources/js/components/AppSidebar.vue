@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
@@ -9,16 +8,16 @@ import { BadgePercent, CalendarDays, FlaskConical, Handshake, HeartHandshake, Hi
 import AppLogo from './AppLogo.vue';
 
 const page = usePage<{ auth: { user: { role: string } | null } }>();
-const partnerRoles = ['donation_partner', 'umkm_partner'];
 const userRole = page.props.auth.user?.role;
+const businessRoles = ['manager', 'cashier', 'business_owner'];
 const supermarketNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Dasbor',
         href: '/dashboard',
         icon: LayoutGrid,
     },
     {
-        title: 'Inventory',
+        title: 'Stok Produk',
         href: '/inventory',
         icon: Package,
     },
@@ -28,26 +27,31 @@ const supermarketNavItems: NavItem[] = [
         icon: History,
     },
     {
-        title: 'AI Simulation',
+        title: 'Simulasi AI',
         href: '/simulation',
         icon: FlaskConical,
     },
     {
-        title: 'Agent Logs',
+        title: 'Log Aktivitas Agen AI',
         href: '/agent-logs',
         icon: ScrollText,
     },
     {
-        title: 'Settings',
+        title: 'Pengaturan',
         href: '/settings',
         icon: Settings,
     },
 ];
+const reportNavItems: NavItem[] = [
+    { title: 'Rekap Donasi', href: '/reports?type=donation', icon: HeartHandshake },
+    { title: 'Rekap Diskon', href: '/reports?type=discount', icon: Percent },
+];
+
 const mainNavItems: NavItem[] = userRole === 'SirkulaFood_admin'
     ? [{ title: 'Kelola Mitra', href: '/admin/partners', icon: Handshake }]
     : userRole === 'donation_partner'
         ? [
-            { title: 'Scan Produk', href: '/partner/scan', icon: FlaskConical },
+            { title: 'Pindai Produk', href: '/partner/scan', icon: FlaskConical },
             { title: 'Donasi Hari Ini', href: '/partner/donations/today', icon: HeartHandshake },
             { title: 'Daftar Supermarket/Toko', href: '/partner/stores', icon: Store },
             { title: 'Riwayat Donasi', href: '/partner/donations/history', icon: History },
@@ -58,20 +62,9 @@ const mainNavItems: NavItem[] = userRole === 'SirkulaFood_admin'
                 { title: 'Daftar Supermarket/Toko', href: '/umkm/stores', icon: Store },
                 { title: 'Riwayat Diskon', href: '/umkm/discount-history', icon: History },
             ]
-        : supermarketNavItems;
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Rekap Donasi (PDF)',
-        href: '/reports?type=donation',
-        icon: HeartHandshake,
-    },
-    {
-        title: 'Rekap Diskon (PDF)',
-        href: '/reports?type=discount',
-        icon: Percent,
-    },
-].filter(() => !partnerRoles.includes(userRole ?? '') && userRole !== 'SirkulaFood_admin');
+        : businessRoles.includes(userRole ?? '')
+          ? [...supermarketNavItems, ...reportNavItems]
+          : supermarketNavItems;
 </script>
 
 <template>
@@ -93,7 +86,6 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

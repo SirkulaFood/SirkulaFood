@@ -33,8 +33,15 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $validated = $request->validated();
+        $telegramChatId = $validated['telegram_chat_id'] ?? null;
 
-        DB::transaction(function () use ($user, $validated): void {
+        DB::transaction(function () use ($user, $validated, $telegramChatId): void {
+            // Partner accounts are resolved through donation_partners.telegram_chat_id.
+            // Keep their Telegram link in one canonical place so the bot can resolve the role.
+            if (in_array($user->role, ['donation_partner', 'umkm_partner'], true)) {
+                $validated['telegram_chat_id'] = null;
+            }
+
             $user->fill($validated);
 
             if ($user->isDirty('email')) {
@@ -50,6 +57,13 @@ class ProfileController extends Controller
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'telegram_chat_id' => $user->telegram_chat_id,
+                ]);
+            } elseif (in_array($user->role, ['donation_partner', 'umkm_partner'], true) && $user->donationPartner) {
+                $user->donationPartner->update([
+                    'contact_person' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'telegram_chat_id' => $telegramChatId,
                 ]);
             }
         });
