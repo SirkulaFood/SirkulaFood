@@ -202,7 +202,7 @@ test('scan inventory command evaluates products and logs to agent_logs', functio
         'status' => 'active',
     ]);
 
-    $this->artisan('SirkulaFood:scan-inventory', ['--days' => 7])
+    $this->artisan('sirkulafood:scan-inventory', ['--days' => 7])
         ->assertSuccessful();
 
     // Urgent item should be reserved for donation
@@ -234,7 +234,7 @@ test('scan inventory command in dry run mode logs without mutating product statu
         'status' => 'active',
     ]);
 
-    $this->artisan('SirkulaFood:scan-inventory', ['--days' => 5, '--dry-run' => true])
+    $this->artisan('sirkulafood:scan-inventory', ['--days' => 5, '--dry-run' => true])
         ->assertSuccessful();
 
     // Status should remain unchanged in dry run

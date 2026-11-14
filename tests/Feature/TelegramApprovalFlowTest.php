@@ -89,7 +89,7 @@ test('telegram webhook rejects a missing or incorrect secret', function () {
 
 test('telegram webhook command registers a public https endpoint without exposing its token', function () {
     config([
-        'app.url' => 'https://SirkulaFood-demo.example',
+        'app.url' => 'https://sirkulafood-demo.example',
         'services.telegram.bot_token' => 'test-token-never-print',
         'services.telegram.webhook_secret' => 'test-webhook-secret',
     ]);
@@ -98,7 +98,7 @@ test('telegram webhook command registers a public https endpoint without exposin
     $this->artisan('telegram:set-webhook')->assertSuccessful();
 
     Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/setWebhook')
-        && $request['url'] === 'https://SirkulaFood-demo.example/api/v1/telegram/webhook'
+        && $request['url'] === 'https://sirkulafood-demo.example/api/v1/telegram/webhook'
         && $request['secret_token'] === 'test-webhook-secret');
 });
 

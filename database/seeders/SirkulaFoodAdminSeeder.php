@@ -13,7 +13,7 @@ class SirkulaFoodAdminSeeder extends Seeder
     public function run(): void
     {
         $email = 'rotteyzn007@gmail.com';
-        $password = (string) env('SirkulaFood_ADMIN_PASSWORD');
+        $password = (string) env('SIRKULAFOOD_ADMIN_PASSWORD');
 
         if ($password !== '') {
             $validator = validator(['password' => $password], [
@@ -21,19 +21,19 @@ class SirkulaFoodAdminSeeder extends Seeder
             ]);
 
             if ($validator->fails()) {
-                throw new RuntimeException('SirkulaFood_ADMIN_PASSWORD must be at least 12 characters and include uppercase, lowercase, and numbers.');
+                throw new RuntimeException('SIRKULAFOOD_ADMIN_PASSWORD must be at least 12 characters and include uppercase, lowercase, and numbers.');
             }
         }
 
         $user = User::query()
-            ->whereIn('email', ['admin2@SirkulaFood.com', $email])
+            ->whereIn('email', ['admin2@ecoloop.com', $email])
             ->orderByRaw('email = ? DESC', [$email])
             ->first() ?? new User;
         $isNew = ! $user->exists;
         $user->fill([
             'email' => $email,
             'name' => 'Admin SirkulaFood',
-            'role' => 'SirkulaFood_admin',
+            'role' => 'ecoloop_admin',
         ]);
         if ($password !== '') {
             $user->password = Hash::make($password);

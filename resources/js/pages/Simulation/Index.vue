@@ -75,6 +75,11 @@ interface DonationPartnerOption {
 interface VisionResult {
     donation_eligible: boolean;
     confidence: number;
+    match_confidence?: number;
+    condition_confidence?: number;
+    analysis_available?: boolean;
+    analysis?: string;
+    recommendation?: string;
     condition: 'good' | 'acceptable' | 'poor' | 'unclear';
     reasoning: string;
     safety_note: string;
@@ -490,7 +495,9 @@ function claimReviewedPhoto(): void {
                             v-if="visionResult"
                             class="space-y-3 rounded-lg border p-4"
                             :class="
-                                visionResult.donation_eligible
+                                visionResult.analysis_available === false
+                                    ? 'border-red-300 bg-red-500/5 dark:border-red-900'
+                                    : visionResult.donation_eligible
                                     ? 'border-emerald-300 bg-emerald-500/5 dark:border-emerald-900'
                                     : visionResult.condition === 'good'
                                       ? 'border-blue-300 bg-blue-500/5 dark:border-blue-900'
@@ -508,7 +515,9 @@ function claimReviewedPhoto(): void {
                                 <div>
                                     <p class="font-semibold text-foreground">
                                         {{
-                                            !visionResult.product_name
+                                            visionResult.analysis_available === false
+                                                ? 'Analisis AI tidak tersedia — stok tidak berubah'
+                                                : !visionResult.product_name
                                                 ? 'Produk tidak cocok dengan stok yang tersedia — tidak ada stok berubah'
                                                 : visionResult.donation_eligible && isPartnerPortal
                                                   ? 'Layak konsumsi — dapat diambil sebagai donasi, meski masih layak jual'
@@ -527,11 +536,26 @@ function claimReviewedPhoto(): void {
                                         <template v-if="visionResult.product_name">
                                             {{ visionResult.product_name }} · {{ visionResult.batch_code || 'Batch' }} ·
                                         </template>
-                                        {{ Math.round(visionResult.confidence * 100) }}% tingkat keyakinan visual
+                                        <template v-if="visionResult.analysis_available !== false">
+                                            {{ Math.round((visionResult.match_confidence ?? visionResult.confidence) * 100) }}% kemiripan produk
+                                            <template v-if="visionResult.condition_confidence !== undefined">
+                                                · {{ Math.round(visionResult.condition_confidence * 100) }}% keyakinan kondisi
+                                            </template>
+                                        </template>
+                                        <template v-else>Skor kemiripan belum tersedia</template>
                                     </p>
                                 </div>
                             </div>
-                            <p class="text-sm text-foreground">{{ visionResult.reasoning }}</p>
+                            <div class="space-y-1">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Analisis foto</p>
+                                <p class="text-sm text-foreground">{{ visionResult.analysis || visionResult.reasoning }}</p>
+                            </div>
+                            <div class="space-y-1 rounded-md bg-muted/40 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                    {{ visionResult.analysis_available === false ? 'Saran sementara' : 'Rekomendasi AI' }}
+                                </p>
+                                <p class="text-sm text-foreground">{{ visionResult.recommendation || 'Periksa produk secara langsung sebelum mengambil tindakan.' }}</p>
+                            </div>
                             <p class="text-xs leading-relaxed text-muted-foreground">{{ visionResult.safety_note }}</p>
                             <div
                                 v-if="visionResult.donation_eligible && visionResult.review_token"

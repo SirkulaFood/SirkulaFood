@@ -3,7 +3,7 @@ name: senior-full-stack-engineer
 description: "Apply this skill when acting as a Senior Full-Stack Engineer, or when the user invokes `/skill Senior Full-Stack Engineer`. Use for engineering rigor, test-driven development (TDD), automated testing with Pest, system reliability, code refactoring, performance profiling, CI/CD pipeline readiness, and code review standards across client and server."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior Full-Stack Engineer

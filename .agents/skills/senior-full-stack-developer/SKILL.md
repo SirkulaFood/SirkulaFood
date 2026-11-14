@@ -3,7 +3,7 @@ name: senior-full-stack-developer
 description: "Apply this skill when acting as a Senior Full-Stack Developer, or when the user invokes `/skill Senior Full-Stack Developer`. Use for end-to-end feature delivery spanning Laravel 12 backend (PHP 8.4, Eloquent, FormRequests, Actions) and Vue 3 frontend (Composition API, TypeScript, Inertia.js v2, Tailwind CSS). Focuses on clean data contracts, full-stack state synchronization, transactional integrity, and unified debugging."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior Full-Stack Developer

@@ -6,7 +6,7 @@
       "parameters": {
         "httpMethod": "POST",
         "responseMode": "onReceived",
-        "path": "SirkulaFood-scan",
+        "path": "ecoloop-scan",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -26,7 +26,7 @@
       "parameters": {
         "httpMethod": "GET",
         "responseMode": "onReceived",
-        "path": "SirkulaFood-scan",
+        "path": "ecoloop-scan",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -329,7 +329,7 @@
       "name": "Format Discount Log Response",
       "id": "f0110001-0000-4000-8000-000000000017",
       "parameters": {
-        "jsCode": "const responses = $input.all();\nreturn responses.map((item, index) => {\n  const response = item.json;\n  const decision = $('Route AI Decision').itemMatching(index).json;\n  const statusCode = Number(response.statusCode ?? response.status) || null;\n  const body = response.body ?? {};\n  const success = statusCode === 200 && !response.error && body.success !== false && String(body.status ?? '').toLowerCase() !== 'error';\n  return { json: {\n    event: success ? 'SirkulaFood_discount_applied' : 'SirkulaFood_discount_failed',\n    success,\n    action: 'discount',\n    processing_status: success ? 'success' : 'failed',\n    http_status: statusCode,\n    product_id: decision.product_id,\n    discount_percentage: decision.discount_percentage,\n    reason: decision.reasoning,\n    api_message: body.message ?? null,\n    error: success ? null : response.error?.message ?? body.message ?? 'Discount callback did not return HTTP 200.',\n    logged_at: new Date().toISOString(),\n  } };\n});",
+        "jsCode": "const responses = $input.all();\nreturn responses.map((item, index) => {\n  const response = item.json;\n  const decision = $('Route AI Decision').itemMatching(index).json;\n  const statusCode = Number(response.statusCode ?? response.status) || null;\n  const body = response.body ?? {};\n  const success = statusCode === 200 && !response.error && body.success !== false && String(body.status ?? '').toLowerCase() !== 'error';\n  return { json: {\n    event: success ? 'ecoloop_discount_applied' : 'ecoloop_discount_failed',\n    success,\n    action: 'discount',\n    processing_status: success ? 'success' : 'failed',\n    http_status: statusCode,\n    product_id: decision.product_id,\n    discount_percentage: decision.discount_percentage,\n    reason: decision.reasoning,\n    api_message: body.message ?? null,\n    error: success ? null : response.error?.message ?? body.message ?? 'Discount callback did not return HTTP 200.',\n    logged_at: new Date().toISOString(),\n  } };\n});",
         "mode": "runOnceForAllItems"
       }
     },
@@ -583,7 +583,7 @@
       ],
       "parameters": {
         "httpMethod": "POST",
-        "path": "SirkulaFood-demo-trigger",
+        "path": "ecoloop-demo-trigger",
         "responseMode": "responseNode",
         "options": {}
       },

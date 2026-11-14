@@ -15,7 +15,7 @@ class ManagerAccountSeeder extends Seeder
     public function run(): void
     {
         $owner = User::firstOrCreate(
-            ['email' => 'admin@SirkulaFood.local'],
+            ['email' => 'admin@ecoloop.local'],
             [
                 'name' => 'Pemberi Donasi SirkulaFood',
                 'password' => Hash::make('password'),

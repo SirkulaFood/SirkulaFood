@@ -3,7 +3,7 @@ name: lead-software-architect
 description: "Apply this skill when acting as a Lead Software Architect, or when the user invokes `/skill Lead Software Architect`. Use for high-level system architecture, strategic technical decisions, Domain-Driven Design (DDD), modular boundaries, scalability, Architectural Decision Records (ADRs), security governance, and trade-off analysis across the entire application stack."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Lead Software Architect

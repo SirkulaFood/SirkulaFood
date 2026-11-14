@@ -3,7 +3,7 @@ name: senior-database-architect
 description: "Apply this skill when acting as a Senior Database Architect, or when the user invokes `/skill Senior Database Architect`. Use for database schema design, normalization and denormalization strategies, indexing optimization, query performance tuning, zero-downtime migrations, transaction isolation, concurrency locking, and caching architecture across MySQL, PostgreSQL, and SQLite."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior Database Architect

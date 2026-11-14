@@ -118,12 +118,12 @@ class ProductController extends Controller
                     'unit' => $product->unit,
                     'original_price' => (float) $product->original_price,
                     'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
-                    'original_price_formatted' => 'Rp '.number_format((float) $product->original_price, 0, ',', '.'),
+                    'original_price_formatted' => 'IDR '.number_format((float) $product->original_price, 0, ',', '.'),
                     'discount_price_formatted' => $product->discount_price !== null
-                        ? 'Rp '.number_format((float) $product->discount_price, 0, ',', '.')
+                        ? 'IDR '.number_format((float) $product->discount_price, 0, ',', '.')
                         : null,
                     'expiration_date' => $product->expiration_date->toDateString(),
-                    'expiration_date_formatted' => $product->expiration_date->locale('id')->translatedFormat('d F Y'),
+                    'expiration_date_formatted' => $product->expiration_date->format('M d, Y'),
                     'days_remaining' => $daysRemaining,
                     'urgency' => $urgencyLevel,
                     'status' => $product->status,
@@ -445,7 +445,7 @@ class ProductController extends Controller
             return redirect()->route('inventory.sync-history')->with(
                 'error',
                 sprintf(
-                    'Demo sync updated %d products, but only %d of %d urgent products received manager Telegram approval requests. %s',
+                    'Sync Now updated %d products, but only %d of %d urgent products received manager Telegram approval requests. %s',
                     $result['changed_products'],
                     $result['demo_pending_products'] ?? 0,
                     $result['demo_expected_products'],
@@ -457,13 +457,12 @@ class ProductController extends Controller
         return redirect()->route('inventory.sync-history')->with(
             'success',
             sprintf(
-                'Sync Now completed: %d new products, %d products updated, %d units received, %d units sold, %d discount recommendations pending (including %d demo discount batches), %d donation pre-alerts for products expiring in 3 days, and %d urgent products await Telegram approval (%d approval buttons). No donation stock changed before confirmation.',
+                'Sync Now completed: %d new products, %d products updated, %d units received, %d units sold, %d discount recommendations pending, %d donation pre-alerts for products expiring in 3 days, and %d urgent products await Telegram approval (%d approval buttons). No donation stock changed before confirmation.',
                 $result['new_products'],
                 $result['changed_products'],
                 $result['received_units'],
                 $result['sold_units'],
                 $result['discount_recommendations'],
-                $result['demo_discount_products'],
                 $result['demo_prealert_products'],
                 $result['demo_pending_products'],
                 $result['demo_approval_actions']

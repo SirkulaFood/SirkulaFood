@@ -201,7 +201,7 @@ test('notification service dispatches donation alert and logs to agent_logs', fu
 });
 
 test('notification service sends http post to n8n webhook when configured', function () {
-    Config::set('services.n8n.webhook_url', 'https://n8n.SirkulaFood.test/webhook/donation-alert');
+    Config::set('services.n8n.webhook_url', 'https://n8n.sirkulafood.test/webhook/donation-alert');
 
     $partner = DonationPartner::factory()->create([
         'name' => 'Surplus Angels',
@@ -215,7 +215,7 @@ test('notification service sends http post to n8n webhook when configured', func
     ]);
 
     Http::fake([
-        'https://n8n.SirkulaFood.test/webhook/donation-alert' => Http::response(['dispatched' => true], 200),
+        'https://n8n.sirkulafood.test/webhook/donation-alert' => Http::response(['dispatched' => true], 200),
     ]);
 
     $service = new NotificationService;
@@ -225,7 +225,7 @@ test('notification service sends http post to n8n webhook when configured', func
         ->and($result['status'])->toBe('success');
 
     Http::assertSent(function ($request) use ($partner, $product) {
-        return $request->url() === 'https://n8n.SirkulaFood.test/webhook/donation-alert'
+        return $request->url() === 'https://n8n.sirkulafood.test/webhook/donation-alert'
             && $request['recipient']['name'] === $partner->name
             && $request['donation']['name'] === $product->name;
     });

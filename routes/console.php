@@ -8,11 +8,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('SirkulaFood:sync-central-inventory')
+Schedule::command('sirkulafood:sync-central-inventory')
     ->everyFiveMinutes()
     ->withoutOverlapping();
 
-Schedule::command('SirkulaFood:scan-donation-approvals')
+Schedule::command('sirkulafood:scan-donation-approvals')
     ->everyFifteenMinutes()
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();

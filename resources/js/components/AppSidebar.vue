@@ -47,7 +47,8 @@ const reportNavItems: NavItem[] = [
     { title: 'Rekap Diskon', href: '/reports?type=discount', icon: Percent },
 ];
 
-const mainNavItems: NavItem[] = userRole === 'SirkulaFood_admin'
+const isEcoLoopAdmin = ['SirkulaFood_admin', 'ecoloop_admin'].includes(userRole ?? '');
+const mainNavItems: NavItem[] = isEcoLoopAdmin
     ? [{ title: 'Kelola Mitra', href: '/admin/partners', icon: Handshake }]
     : userRole === 'donation_partner'
         ? [

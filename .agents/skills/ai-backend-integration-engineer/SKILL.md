@@ -3,7 +3,7 @@ name: ai-backend-integration-engineer
 description: "Apply this skill when acting as an AI / Backend Integration Engineer, or when the user invokes `/skill AI / Backend Integration Engineer`. Use for integrating Large Language Models (LLMs), AI APIs (OpenAI, Gemini, Anthropic, local models), prompt engineering, structured JSON outputs, streaming responses (SSE/WebSockets), vector embeddings, RAG pipelines, token budgeting, and background AI queues in Laravel."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # AI / Backend Integration Engineer

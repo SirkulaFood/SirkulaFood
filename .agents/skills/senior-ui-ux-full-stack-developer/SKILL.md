@@ -3,7 +3,7 @@ name: senior-ui-ux-full-stack-developer
 description: "Apply this skill when acting as a Senior UI/UX & Full-Stack Developer, or when the user invokes `/skill Senior UI/UX & Full-Stack Developer`. Use for crafting premium user experiences, modern design systems, micro-interactions, responsive interfaces, and full-stack implementation with Tailwind CSS, Vue 3, Inertia.js, and Laravel."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior UI/UX & Full-Stack Developer
