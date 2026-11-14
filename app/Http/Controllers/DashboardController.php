@@ -41,9 +41,8 @@ class DashboardController extends Controller
 
         $foodSavedKg = (float) $savedProducts->sum('quantity');
 
-        // 3. Financial loss prevented (in IDR: benchmark exchange rate: 1 USD = Rp 16,000)
-        $exchangeRate = 16000;
-        $financialLossPreventedUsd = $savedProducts->reduce(function (float $carry, Product $p) {
+        // 3. Financial value preserved from product prices stored directly in IDR.
+        $financialLossPreventedIdr = $savedProducts->reduce(function (float $carry, Product $p) {
             $effectiveValue = $p->status === 'discounted' && $p->discount_price !== null
                 ? (float) $p->discount_price * $p->quantity
                 : (float) $p->original_price * $p->quantity;
@@ -51,7 +50,7 @@ class DashboardController extends Controller
             return $carry + $effectiveValue;
         }, 0.0);
 
-        $financialLossPreventedIdr = round($financialLossPreventedUsd * $exchangeRate);
+        $financialLossPreventedIdr = round($financialLossPreventedIdr);
 
         // 4. CO2 emission reduction (EPA benchmark: 2.5 kg CO2e per 1 kg food waste diverted from landfill)
         $co2EmissionReducedKg = round($foodSavedKg * 2.5, 1);
@@ -84,13 +83,13 @@ class DashboardController extends Controller
                 'reasoning' => $log->reasoning,
                 'payload' => $log->payload,
                 'status' => $log->status,
-                'created_at' => $log->created_at?->diffForHumans() ?? 'Just now',
+                'created_at' => $log->created_at?->locale('id')->diffForHumans() ?? 'Baru saja',
                 'created_at_exact' => $log->created_at?->toIso8601String(),
                 'product' => $log->product ? [
                     'id' => $log->product->id,
                     'name' => $log->product->name,
                     'sku' => $log->product->sku,
-                    'category' => $log->product->category?->name ?? 'General',
+                    'category' => $log->product->category?->name ?? 'Umum',
                 ] : null,
                 'partner' => $partner ? [
                     'id' => $partner->id,

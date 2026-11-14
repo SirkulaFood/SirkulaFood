@@ -71,8 +71,8 @@ const props = defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Donation Partners', href: '/donation-partners' },
+    { title: 'Dasbor', href: '/dashboard' },
+    { title: 'Mitra Donasi', href: '/donation-partners' },
 ];
 
 const page = usePage();
@@ -115,7 +115,7 @@ const clearFilters = () => {
 
 const hasActiveFilters = computed(() => Boolean(search.value || selectedStatus.value));
 
-// Modal State: Create / Edit Partner
+// Modal State: Create / Ubah Mitra
 const isFormModalOpen = ref(false);
 const editingPartner = ref<PartnerItem | null>(null);
 const clientErrors = ref<Record<string, string>>({});
@@ -257,7 +257,7 @@ const toggleStatus = (partner: PartnerItem) => {
 </script>
 
 <template>
-    <Head title="Donation Partners - SirkulaFood Agent" />
+    <Head title="Mitra Donasi - SirkulaFood" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
@@ -282,9 +282,9 @@ const toggleStatus = (partner: PartnerItem) => {
             <!-- Header Section -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Donation Partners & Charity Network</h1>
+                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Mitra Donasi & Jaringan Amal</h1>
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                        Manage verified food banks, shelters, and orphanages receiving automated surplus food dispatches.
+                        Kelola bank pangan, penampungan, dan panti asuhan terverifikasi yang menerima penyaluran pangan berlebih.
                     </p>
                 </div>
                 <div class="flex items-center gap-2.5">
@@ -294,7 +294,7 @@ const toggleStatus = (partner: PartnerItem) => {
                         @click="openCreateModal"
                     >
                         <Plus class="size-4" />
-                        <span>Register Partner</span>
+                        <span>Daftarkan Mitra</span>
                     </button>
                 </div>
             </div>
@@ -303,46 +303,46 @@ const toggleStatus = (partner: PartnerItem) => {
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div class="rounded-xl border border-neutral-200/80 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Partners</span>
+                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Mitra</span>
                         <Building2 class="size-4 text-neutral-400" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
                         {{ stats.total_partners }}
                     </p>
-                    <p class="mt-0.5 text-xs text-neutral-400">Registered charity organizations</p>
+                    <p class="mt-0.5 text-xs text-neutral-400">Organisasi amal terdaftar</p>
                 </div>
 
                 <div class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Active Recipients</span>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Penerima Aktif</span>
                         <CheckCircle2 class="size-4 text-emerald-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
                         {{ stats.active_partners }}
                     </p>
-                    <p class="mt-0.5 text-xs text-emerald-400/80">Ready for automated pickup</p>
+                    <p class="mt-0.5 text-xs text-emerald-400/80">Siap untuk pengambilan</p>
                 </div>
 
                 <div class="rounded-xl border border-neutral-200/80 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Inactive Partners</span>
+                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Mitra Nonaktif</span>
                         <Users class="size-4 text-neutral-400" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
                         {{ stats.inactive_partners }}
                     </p>
-                    <p class="mt-0.5 text-xs text-neutral-400">Temporarily paused</p>
+                    <p class="mt-0.5 text-xs text-neutral-400">Dijeda sementara</p>
                 </div>
 
                 <div class="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">Donation Dispatches</span>
+                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">Penyaluran Donasi</span>
                         <HeartHandshake class="size-4 text-purple-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-purple-600 dark:text-purple-400">
                         {{ stats.donations_dispatched }}
                     </p>
-                    <p class="mt-0.5 text-xs text-purple-400/80">Batches safely redirected</p>
+                    <p class="mt-0.5 text-xs text-purple-400/80">Batch pangan berhasil disalurkan</p>
                 </div>
             </div>
 
@@ -355,7 +355,7 @@ const toggleStatus = (partner: PartnerItem) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="Search by organization, contact person, email, or address..."
+                            placeholder="Cari organisasi, kontak, email, atau alamat..."
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 py-2 pl-9 pr-8 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @input="handleSearchInput"
                         />
@@ -379,20 +379,20 @@ const toggleStatus = (partner: PartnerItem) => {
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @change="applyFilters"
                         >
-                            <option value="">All Partner Statuses</option>
-                            <option value="active">Active Recipients Only</option>
-                            <option value="inactive">Inactive / Paused</option>
+                            <option value="">Semua Status Mitra</option>
+                            <option value="active">Penerima Aktif saja</option>
+                            <option value="inactive">Nonaktif / Dijeda</option>
                         </select>
 
                         <button
                             v-if="hasActiveFilters"
                             type="button"
-                            title="Reset filters"
+                            title="Hapus semua filter"
                             class="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                             @click="clearFilters"
                         >
                             <RefreshCw class="size-3.5" />
-                            <span>Reset</span>
+                            <span>Atur ulang</span>
                         </button>
                     </div>
                 </div>
@@ -406,12 +406,12 @@ const toggleStatus = (partner: PartnerItem) => {
                             class="border-b border-neutral-200 bg-neutral-50/75 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:border-neutral-800 dark:bg-neutral-800/50 dark:text-neutral-400"
                         >
                             <tr>
-                                <th scope="col" class="px-4 py-3.5 sm:px-6">Partner Organization</th>
-                                <th scope="col" class="px-4 py-3.5">Contact Person</th>
-                                <th scope="col" class="px-4 py-3.5">Contact Channels</th>
-                                <th scope="col" class="px-4 py-3.5">Delivery / Pickup Address</th>
+                                <th scope="col" class="px-4 py-3.5 sm:px-6">Organisasi Mitra</th>
+                                <th scope="col" class="px-4 py-3.5">Nama Kontak</th>
+                                <th scope="col" class="px-4 py-3.5">Informasi Kontak</th>
+                                <th scope="col" class="px-4 py-3.5">Alamat Penyaluran / Pengambilan</th>
                                 <th scope="col" class="px-4 py-3.5">Status</th>
-                                <th scope="col" class="px-4 py-3.5 text-right sm:pr-6">Actions</th>
+                                <th scope="col" class="px-4 py-3.5 text-right sm:pr-6">Tindakan</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-200/80 dark:divide-neutral-800/80">
@@ -439,7 +439,7 @@ const toggleStatus = (partner: PartnerItem) => {
                                     </div>
                                 </td>
 
-                                <!-- Contact Person -->
+                                <!-- Nama Kontak -->
                                 <td class="whitespace-nowrap px-4 py-4 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                                     <div class="flex items-center gap-1.5">
                                         <User class="size-3.5 text-neutral-400" />
@@ -447,7 +447,7 @@ const toggleStatus = (partner: PartnerItem) => {
                                     </div>
                                 </td>
 
-                                <!-- Contact Channels (Phone / Email) -->
+                                <!-- Informasi Kontak (Phone / Email) -->
                                 <td class="whitespace-nowrap px-4 py-4 text-xs text-neutral-600 dark:text-neutral-300">
                                     <div class="flex flex-col gap-1">
                                         <a
@@ -480,7 +480,7 @@ const toggleStatus = (partner: PartnerItem) => {
                                     <button
                                         type="button"
                                         :disabled="togglingId === partner.id"
-                                        title="Click to toggle active status"
+                                        title="Klik untuk mengubah status aktif"
                                         class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition"
                                         :class="[
                                             partner.is_active
@@ -494,13 +494,13 @@ const toggleStatus = (partner: PartnerItem) => {
                                     </button>
                                 </td>
 
-                                <!-- Actions -->
+                                <!-- Tindakan -->
                                 <td class="whitespace-nowrap px-4 py-4 text-right sm:pr-6">
                                     <div class="flex items-center justify-end gap-1.5">
                                         <!-- Edit Button -->
                                         <button
                                             type="button"
-                                            title="Edit Partner"
+                                            title="Ubah Mitra"
                                             class="inline-flex items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white"
                                             @click="openEditModal(partner)"
                                         >
@@ -510,7 +510,7 @@ const toggleStatus = (partner: PartnerItem) => {
                                         <!-- Delete Button -->
                                         <button
                                             type="button"
-                                            title="Delete Partner"
+                                            title="Hapus Mitra"
                                             class="inline-flex items-center rounded-md border border-neutral-200 bg-white p-1 text-neutral-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-red-500/20"
                                             @click="openDeleteModal(partner)"
                                         >
@@ -527,12 +527,12 @@ const toggleStatus = (partner: PartnerItem) => {
                                         <div class="rounded-full bg-neutral-100 p-3 text-neutral-400 dark:bg-neutral-800">
                                             <Handshake class="size-8" />
                                         </div>
-                                        <h3 class="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No donation partners found</h3>
+                                        <h3 class="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">Mitra donasi tidak ditemukan</h3>
                                         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                                             {{
                                                 hasActiveFilters
-                                                    ? 'No partners matched your filter criteria.'
-                                                    : 'Register your first food bank or orphanage to start surplus allocations.'
+                                                    ? 'Tidak ada mitra yang sesuai dengan filter.'
+                                                    : 'Daftarkan bank pangan atau panti asuhan untuk mulai menyalurkan pangan berlebih.'
                                             }}
                                         </p>
                                         <div class="mt-4 flex gap-2">
@@ -542,14 +542,14 @@ const toggleStatus = (partner: PartnerItem) => {
                                                 class="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                                                 @click="clearFilters"
                                             >
-                                                Clear filters
+                                                Hapus filter
                                             </button>
                                             <button
                                                 type="button"
                                                 class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500"
                                                 @click="openCreateModal"
                                             >
-                                                Register Partner
+                                                Daftarkan Mitra
                                             </button>
                                         </div>
                                     </div>
@@ -565,7 +565,7 @@ const toggleStatus = (partner: PartnerItem) => {
                     class="flex flex-col items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3 dark:border-neutral-800 sm:flex-row sm:px-6"
                 >
                     <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                        Showing
+                        Menampilkan
                         <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ partners.from ?? 0 }}</span>
                         to
                         <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ partners.to ?? 0 }}</span>
@@ -596,7 +596,7 @@ const toggleStatus = (partner: PartnerItem) => {
                 </div>
             </div>
 
-            <!-- MODAL: Create / Edit Partner -->
+            <!-- MODAL: Create / Ubah Mitra -->
             <div
                 v-if="isFormModalOpen"
                 class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
@@ -609,7 +609,7 @@ const toggleStatus = (partner: PartnerItem) => {
                         <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
                             <Building2 class="size-5" />
                             <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">
-                                {{ editingPartner ? 'Edit Donation Partner' : 'Register New Donation Partner' }}
+                                {{ editingPartner ? 'Ubah Mitra Donasi' : 'Daftarkan Mitra Donasi' }}
                             </h3>
                         </div>
 
@@ -631,7 +631,7 @@ const toggleStatus = (partner: PartnerItem) => {
                             <input
                                 v-model="form.name"
                                 type="text"
-                                placeholder="e.g. Jakarta Community Food Bank"
+                                placeholder="Contoh: Bank Pangan Komunitas Jakarta"
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3.5 py-2.5 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                                 :class="{ 'border-red-500': form.errors.name || clientErrors.name }"
                             />
@@ -641,16 +641,16 @@ const toggleStatus = (partner: PartnerItem) => {
                             </p>
                         </div>
 
-                        <!-- Contact Person & Phone -->
+                        <!-- Nama Kontak & Phone -->
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label class="block text-xs font-semibold uppercase text-neutral-700 dark:text-neutral-300">
-                                    Contact Person <span class="text-red-500">*</span>
+                                    Nama Kontak <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     v-model="form.contact_person"
                                     type="text"
-                                    placeholder="e.g. Maria Kusuma"
+                                    placeholder="Contoh: Maria Kusuma"
                                     class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3.5 py-2.5 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                                     :class="{ 'border-red-500': form.errors.contact_person || clientErrors.contact_person }"
                                 />
@@ -665,12 +665,12 @@ const toggleStatus = (partner: PartnerItem) => {
 
                             <div>
                                 <label class="block text-xs font-semibold uppercase text-neutral-700 dark:text-neutral-300">
-                                    Phone (WhatsApp) <span class="text-red-500">*</span>
+                                    Telepon (WhatsApp) <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     v-model="form.phone"
                                     type="text"
-                                    placeholder="e.g. +62 812 3456 7890"
+                                    placeholder="Contoh: +62 812 3456 7890"
                                     class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3.5 py-2.5 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                                     :class="{ 'border-red-500': form.errors.phone || clientErrors.phone }"
                                 />
@@ -689,7 +689,7 @@ const toggleStatus = (partner: PartnerItem) => {
                             <input
                                 v-model="form.email"
                                 type="email"
-                                placeholder="e.g. logistics@jakartafoodbank.org"
+                                placeholder="Contoh: logistik@bankpangankota.id"
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3.5 py-2.5 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                                 :class="{ 'border-red-500': form.errors.email || clientErrors.email }"
                             />
@@ -701,25 +701,25 @@ const toggleStatus = (partner: PartnerItem) => {
 
                         <!-- Telegram Chat ID -->
                         <div>
-                            <label class="block text-xs font-semibold uppercase text-neutral-700 dark:text-neutral-300">Telegram Chat ID (optional)</label>
+                            <label class="block text-xs font-semibold uppercase text-neutral-700 dark:text-neutral-300">ID Obrolan Telegram (opsional)</label>
                             <input
                                 v-model="form.telegram_chat_id"
                                 type="text"
-                                placeholder="For Telegram donation alerts to this partner"
+                                placeholder="Untuk mengirim pemberitahuan donasi melalui Telegram kepada mitra ini"
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3.5 py-2.5 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                             />
-                            <p class="mt-1 text-xs text-muted-foreground">Add this after the partner starts your bot and shares its chat ID.</p>
+                            <p class="mt-1 text-xs text-muted-foreground">Isi setelah mitra memulai bot dan mengirimkan ID obrolannya.</p>
                         </div>
 
-                        <!-- Delivery / Pickup Address -->
+                        <!-- Alamat Penyaluran / Pengambilan -->
                         <div>
                             <label class="block text-xs font-semibold uppercase text-neutral-700 dark:text-neutral-300">
-                                Physical Address / Warehouse <span class="text-red-500">*</span>
+                                Alamat / Gudang <span class="text-red-500">*</span>
                             </label>
                             <textarea
                                 v-model="form.address"
                                 rows="2"
-                                placeholder="Full street address and delivery instructions for cold-chain couriers..."
+                                placeholder="Alamat lengkap dan petunjuk pengiriman untuk kurir rantai dingin..."
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 p-2.5 text-xs text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                                 :class="{ 'border-red-500': form.errors.address || clientErrors.address }"
                             ></textarea>
@@ -738,25 +738,25 @@ const toggleStatus = (partner: PartnerItem) => {
                                 class="size-4 rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500/20 dark:border-neutral-700"
                             />
                             <label for="is_active_checkbox" class="text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                                Active partner eligible for automated surplus food donation dispatches
+                                Mitra aktif dapat menerima penyaluran otomatis pangan berlebih
                             </label>
                         </div>
 
-                        <!-- Modal Actions -->
+                        <!-- Modal Tindakan -->
                         <div class="flex items-center justify-end gap-2.5 border-t border-neutral-200 pt-4 dark:border-neutral-800">
                             <button
                                 type="button"
                                 class="rounded-lg px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                                 @click="closeFormModal"
                             >
-                                Cancel
+                                Batal
                             </button>
                             <button
                                 type="submit"
                                 :disabled="form.processing"
                                 class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-500 disabled:opacity-50"
                             >
-                                <span v-if="form.processing">Saving...</span>
+                                <span v-if="form.processing">Menyimpan…</span>
                                 <span v-else>{{ editingPartner ? 'Update Partner' : 'Save Partner' }}</span>
                             </button>
                         </div>
@@ -775,11 +775,11 @@ const toggleStatus = (partner: PartnerItem) => {
                 >
                     <div class="flex items-center gap-3 text-red-500">
                         <AlertTriangle class="size-6 shrink-0" />
-                        <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Delete Partner?</h3>
+                        <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Hapus Mitra?</h3>
                     </div>
 
                     <p class="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
-                        Are you sure you want to remove
+                        Apakah Anda yakin ingin menghapus
                         <span class="font-semibold text-neutral-900 dark:text-neutral-100">
                             {{ deleteTargetPartner?.name }}
                         </span>
@@ -792,7 +792,7 @@ const toggleStatus = (partner: PartnerItem) => {
                             class="rounded-lg px-3.5 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                             @click="closeDeleteModal"
                         >
-                            Cancel
+                            Batal
                         </button>
                         <button
                             type="button"
@@ -800,8 +800,8 @@ const toggleStatus = (partner: PartnerItem) => {
                             class="rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
                             @click="confirmDelete"
                         >
-                            <span v-if="isDeleting">Deleting...</span>
-                            <span v-else>Delete Permanently</span>
+                            <span v-if="isDeleting">Menghapus…</span>
+                            <span v-else>Hapus Permanen</span>
                         </button>
                     </div>
                 </div>

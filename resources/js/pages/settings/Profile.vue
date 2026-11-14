@@ -23,7 +23,7 @@ defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Pengaturan profil',
         href: '/settings/profile',
     },
 ];
@@ -47,35 +47,35 @@ const submit = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Profile settings" />
+        <Head title="Pengaturan profil" />
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your contact details and Telegram chat ID for SirkulaFood alerts" />
+                <HeadingSmall title="Informasi profil" description="Perbarui informasi kontak dan ID Telegram untuk menerima pemberitahuan SirkulaFood" />
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
-                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Full name" />
+                        <Label for="name">Nama lengkap</Label>
+                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Nama lengkap" />
                         <InputError class="mt-2" :message="form.errors.name" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="phone">Phone number</Label>
+                        <Label for="phone">Nomor telepon</Label>
                         <Input id="phone" type="tel" class="mt-1 block w-full" v-model="form.phone" autocomplete="tel" placeholder="+62..." />
                         <InputError class="mt-2" :message="form.errors.phone" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="telegram_chat_id">Telegram chat ID</Label>
-                        <Input id="telegram_chat_id" class="mt-1 block w-full" v-model="form.telegram_chat_id" placeholder="Start your SirkulaFood bot, then enter your chat ID" />
-                        <p class="text-sm text-muted-foreground">Start the SirkulaFood bot, send <code>/id</code>, then paste the numeric chat ID here. A phone number alone cannot receive bot messages.</p>
-                        <p v-if="!telegramBotConfigured" class="text-sm text-amber-600">Telegram bot is not configured on the server yet.</p>
+                        <Label for="telegram_chat_id">ID obrolan Telegram</Label>
+                        <Input id="telegram_chat_id" class="mt-1 block w-full" v-model="form.telegram_chat_id" placeholder="Mulai bot SirkulaFood, lalu masukkan ID obrolan Anda" />
+                        <p class="text-sm text-muted-foreground">Mulai bot SirkulaFood, kirim <code>/id</code>, lalu tempel ID obrolan numerik di sini. Nomor telepon saja tidak dapat menerima pesan bot.</p>
+                        <p v-if="!telegramBotConfigured" class="text-sm text-amber-600">Bot Telegram belum dikonfigurasi di server.</p>
                         <InputError class="mt-2" :message="form.errors.telegram_chat_id" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
+                        <Label for="email">Alamat email</Label>
                         <Input
                             id="email"
                             type="email"
@@ -83,31 +83,31 @@ const submit = () => {
                             v-model="form.email"
                             required
                             autocomplete="username"
-                            placeholder="Email address"
+                            placeholder="Alamat email"
                         />
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
                         <p class="mt-2 text-sm text-neutral-800">
-                            Your email address is unverified.
+                            Alamat email Anda belum diverifikasi.
                             <Link
                                 :href="route('verification.send')"
                                 method="post"
                                 as="button"
                                 class="focus:outline-hidden rounded-md text-sm text-neutral-600 underline hover:text-neutral-900 focus:ring-2 focus:ring-offset-2"
                             >
-                                Click here to re-send the verification email.
+                                Klik di sini untuk mengirim ulang email verifikasi.
                             </Link>
                         </p>
 
                         <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-                            A new verification link has been sent to your email address.
+                            Tautan verifikasi baru telah dikirim ke alamat email Anda.
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save</Button>
+                        <Button :disabled="form.processing">Simpan</Button>
 
                         <TransitionRoot
                             :show="form.recentlySuccessful"
@@ -116,7 +116,7 @@ const submit = () => {
                             leave="transition ease-in-out"
                             leave-to="opacity-0"
                         >
-                            <p class="text-sm text-neutral-600">Saved.</p>
+                            <p class="text-sm text-neutral-600">Tersimpan.</p>
                         </TransitionRoot>
                     </div>
                 </form>

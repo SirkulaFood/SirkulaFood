@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import type { HTMLAttributes } from 'vue';
 
 interface Props {
-    class?: string;
+    class?: HTMLAttributes['class'];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="flex aspect-square size-8 items-center justify-center rounded-md bg-emerald-600 text-white">
-        <AppLogoIcon class="size-5 fill-current" />
-    </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate font-semibold leading-none">SirkulaFood Agent</span>
-        <span class="truncate text-xs text-muted-foreground">Circular Economy Platform</span>
-    </div>
+    <span :class="['flex min-w-0 flex-1 items-center gap-2', props.class]">
+        <img src="/images/SirkulaFood-logo-light.png" alt="SirkulaFood" class="h-7 w-auto max-w-[190px] object-contain dark:hidden group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-logo-dark.png" alt="SirkulaFood" class="hidden h-7 w-auto max-w-[190px] object-contain dark:block group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-mark.png" alt="SirkulaFood" class="hidden size-8 shrink-0 object-contain group-data-[collapsible=icon]:block dark:group-data-[collapsible=icon]:hidden" />
+        <img src="/images/SirkulaFood-mark-dark.png" alt="SirkulaFood" class="hidden size-8 shrink-0 object-contain dark:group-data-[collapsible=icon]:block" />
+    </span>
 </template>
