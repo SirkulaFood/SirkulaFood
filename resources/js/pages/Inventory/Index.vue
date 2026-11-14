@@ -43,8 +43,8 @@ interface ProductItem {
     status: 'active' | 'discounted' | 'reserved_donation' | 'donated' | 'disposed' | 'sold_out';
     created_at?: string;
     received_quantity: number;
-    donated_quantity: number;
-    sold_quantity: number;
+    didonasikan_quantity: number;
+    terjual_quantity: number;
     batches: ProductBatchItem[];
 }
 
@@ -97,10 +97,10 @@ interface AutoSyncSummary {
     new_batches: number;
     received_units: number;
     sales_transactions: number;
-    sold_units: number;
+    terjual_units: number;
     changed_products?: number;
     discount_recommendations?: number;
-    donated_units?: number;
+    didonasikan_units?: number;
     demo_new_products?: number;
     demo_donated_products?: number;
     demo_donated_units?: number;
@@ -136,8 +136,8 @@ const props = defineProps<{
 const isBusinessOwner = computed(() => props.is_business_owner === true);
 const inventoryBasePath = computed(() => '/inventory');
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Inventory', href: '/inventory' },
+    { title: 'Dasbor', href: '/dashboard' },
+    { title: 'Stok Produk', href: '/inventory' },
 ]);
 
 const page = usePage();
@@ -226,7 +226,7 @@ const isSubmittingDiscount = ref(false);
 const openDiscountModal = (product: ProductItem) => {
     discountTargetProduct.value = product;
     discountPercentage.value = product.days_remaining <= 2 ? 50 : 30;
-    discountReason.value = `Manual clearance markdown due to ${product.days_remaining} day(s) shelf life remaining.`;
+    discountReason.value = `Diskon manual karena sisa masa simpan ${product.days_remaining} hari.`;
     isDiscountModalOpen.value = true;
 };
 
@@ -236,7 +236,7 @@ const closeDiscountModal = () => {
     isSubmittingDiscount.value = false;
 };
 
-const calculatedDiscountPrice = computed(() => {
+const calculatedDiscountHarga = computed(() => {
     if (!discountTargetProduct.value) return 0;
     const orig = discountTargetProduct.value.original_price;
     const discount = orig * (discountPercentage.value / 100);
@@ -274,7 +274,7 @@ const isSubmittingDonation = ref(false);
 const openDonationModal = (product: ProductItem) => {
     donationTargetProduct.value = product;
     selectedPartnerId.value = props.donation_partners[0]?.id || '';
-    donationReason.value = `Surplus food allocation for immediate community pantry pickup (${product.quantity} ${product.unit}).`;
+    donationReason.value = `Alokasi pangan berlebih untuk segera diambil mitra komunitas (${product.quantity} ${product.unit}).`;
     isDonationModalOpen.value = true;
 };
 
@@ -380,15 +380,15 @@ const getUrgencyBadgeClasses = (urgency: ProductItem['urgency'], days: number) =
 
 const getUrgencyLabel = (urgency: ProductItem['urgency'], days: number) => {
     if (urgency === 'expired' || days < 0) {
-        return `Expired (${Math.abs(days)}d ago)`;
+        return `Kedaluwarsa ${Math.abs(days)} hari lalu`;
     }
     if (urgency === 'critical' || days <= 2) {
-        return days === 0 ? 'Expires Today' : `${days}d left (Critical)`;
+        return days === 0 ? 'Kedaluwarsa hari ini' : `${days} hari lagi (Kritis)`;
     }
     if (urgency === 'warning' || (days >= 3 && days <= 5)) {
-        return `${days}d left (Warning)`;
+        return `${days} hari lagi (Peringatan)`;
     }
-    return `${days}d left (Safe)`;
+    return `${days} hari lagi (Aman)`;
 };
 
 const getStatusBadgeClasses = (status: ProductItem['status']) => {
@@ -413,17 +413,17 @@ const getStatusBadgeClasses = (status: ProductItem['status']) => {
 const formatStatusLabel = (status: ProductItem['status']) => {
     switch (status) {
         case 'active':
-            return 'Active';
+            return 'Aktif';
         case 'discounted':
-            return 'Discounted';
+            return 'Diskon';
         case 'reserved_donation':
-            return 'Reserved Donation';
+            return 'Disiapkan untuk Donasi';
         case 'donated':
-            return 'Donated';
+            return 'Didonasikan';
         case 'disposed':
-            return 'Disposed';
+            return 'Dibuang';
         case 'sold_out':
-            return 'Sold Out';
+            return 'Habis Terjual';
         default:
             return status;
     }
@@ -438,18 +438,18 @@ const toggleProductBatches = (productId: number) => {
 const isProductExpanded = (productId: number) => expandedProductIds.value.includes(productId);
 
 const getBatchStatusLabel = (batch: ProductBatchItem) => {
-    if (batch.status === 'donated') return 'Donated';
+    if (batch.status === 'donated') return 'Didonasikan';
     if (batch.discount_approval?.status === 'pending') {
-        return `Awaiting discount approval · ${batch.discount_approval.recommended_percentage}%`;
+        return `Menunggu persetujuan diskon · ${batch.discount_approval.recommended_percentage}%`;
     }
-    if (batch.discount_approval?.status === 'rejected') return 'Discount rejected · regular price';
+    if (batch.discount_approval?.status === 'rejected') return 'Diskon ditolak · harga normal';
     if (batch.status === 'discounted') {
-        return `Discounted${batch.discount_approval?.approved_percentage ? ` · ${batch.discount_approval.approved_percentage}%` : ''}`;
+        return `Diskon${batch.discount_approval?.approved_percentage ? ` · ${batch.discount_approval.approved_percentage}%` : ''}`;
     }
-    if (batch.status === 'sold_out') return 'Sold out';
-    if (batch.status === 'disposed') return 'Disposed';
+    if (batch.status === 'sold_out') return 'Habis terjual';
+    if (batch.status === 'disposed') return 'Dibuang';
 
-    return 'Active stock';
+    return 'Stok aktif';
 };
 
 const getBatchStatusClasses = (batch: ProductBatchItem) => {
@@ -461,15 +461,27 @@ const getBatchStatusClasses = (batch: ProductBatchItem) => {
     return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300';
 };
 
-const formatReceivedAt = (date: string | null) => (date ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(date)) : 'Unknown date');
+const formatReceivedAt = (date: string | null) => (date ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(date)) : 'Tanggal tidak diketahui');
+const batchSourceLabel = (source: string) => ({ manual: 'Input manual', central_sync: 'Sinkronisasi pusat', pos: 'Transaksi kasir', legacy: 'Data lama' }[source] ?? source.replaceAll('_', ' '));
+const categoryLabel = (category: Pick<CategoryItem, 'name' | 'slug'> | null | undefined) => {
+    const bySlug: Record<string, string> = {
+        'fresh-produce': 'Buah dan Sayur', bakery: 'Roti dan Kue', 'dairy-eggs': 'Susu dan Telur',
+        'packaged-goods': 'Bahan Pangan Kemasan', 'meat-seafood': 'Daging dan Hasil Laut',
+    };
+    const byName: Record<string, string> = {
+        'Fresh Produce': 'Buah dan Sayur', Bakery: 'Roti dan Kue', 'Dairy & Eggs': 'Susu dan Telur',
+        'Packaged Goods': 'Bahan Pangan Kemasan', 'Meat & Seafood': 'Daging dan Hasil Laut', General: 'Umum',
+    };
+    return category ? bySlug[category.slug ?? ''] ?? byName[category.name] ?? category.name : 'Umum';
+};
 const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 </script>
 
 <template>
-    <Head title="Food Inventory - SirkulaFood Agent" />
+    <Head title="Stok Pangan - SirkulaFood" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
+        <div class="flex min-h-full min-w-0 flex-1 flex-col gap-5 p-3 sm:gap-6 sm:p-6">
             <!-- Toast Feedback Notification -->
             <transition
                 enter-active-class="transition duration-300 ease-out"
@@ -496,79 +508,79 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
             </transition>
 
             <!-- Header Section -->
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-                        {{ isBusinessOwner ? 'Inventaris Bisnis' : 'Food Inventory Management' }}
+            <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="min-w-0">
+                    <h1 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                        {{ isBusinessOwner ? 'Inventaris Bisnis' : 'Pengelolaan Stok Pangan' }}
                     </h1>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    <p class="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400 sm:text-sm sm:leading-normal">
                         {{ isBusinessOwner
                             ? 'Kelola inventaris supermarket, penerimaan batch, sinkronisasi, diskon, dan donasi.'
-                            : 'Track stock levels, real-time expiration urgency, and execute manual markdown or donation overrides.' }}
+                            : 'Pantau jumlah stok dan masa kedaluwarsa, lalu ajukan diskon atau donasi secara manual.' }}
                     </p>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex w-full items-center gap-2.5 sm:w-auto">
                     <Link
                         href="/inventory/create"
-                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 active:bg-emerald-700"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 active:bg-emerald-700 sm:w-auto"
                     >
                         <Plus class="size-4" />
-                        <span>Add Product</span>
+                        <span>Tambah produk</span>
                     </Link>
                 </div>
             </div>
 
-            <section class="flex flex-col gap-4 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <section class="flex min-w-0 flex-col gap-4 rounded-xl border border-sky-500/20 bg-sky-500/5 p-3.5 sm:p-4 lg:flex-row lg:items-center lg:justify-between">
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
-                        <h2 class="font-semibold text-neutral-900 dark:text-neutral-100">Supermarket Central Sync</h2>
+                        <h2 class="font-semibold text-neutral-900 dark:text-neutral-100">Sinkronisasi Pusat Supermarket</h2>
                         <span
                             class="rounded-full px-2.5 py-1 text-xs font-semibold"
                             :class="auto_sync.auto_sync_enabled ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-neutral-500/10 text-neutral-500'"
                         >
-                            {{ auto_sync.auto_sync_enabled ? 'Auto Sync On' : 'Paused' }}
+                            {{ auto_sync.auto_sync_enabled ? 'Sinkronisasi Otomatis Aktif' : 'Dijeda' }}
                         </span>
-                        <span class="rounded-full bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">DEMO DATA</span>
+                        <span class="rounded-full bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">DATA DEMO</span>
                     </div>
                     <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                        Auto Sync simulates central product receipts and POS sales every 5 minutes. Sync Now updates demo data immediately and asks the manager to approve urgent donations in Telegram; stock changes only after confirmation. Manual product entry remains available.
+                        Sinkronisasi otomatis menyimulasikan penerimaan produk pusat dan penjualan kasir setiap 5 menit. Sinkronkan sekarang untuk memperbarui data demo dan meminta persetujuan donasi mendesak melalui Telegram. Stok berubah setelah dikonfirmasi. Anda juga dapat memasukkan produk secara manual.
                     </p>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                        Last sync: {{ auto_sync.last_synced_at ? new Date(auto_sync.last_synced_at).toLocaleString() : 'Not synced yet' }}
+                        Sinkronisasi terakhir: {{ auto_sync.last_synced_at ? new Date(auto_sync.last_synced_at).toLocaleString() : 'Belum disinkronkan' }}
                         <template v-if="auto_sync.last_sync_summary">
-                            · {{ auto_sync.last_sync_summary.new_products }} new products
-                            · {{ auto_sync.last_sync_summary.received_units }} units received
-                            · {{ auto_sync.last_sync_summary.sold_units }} units sold
+                            · {{ auto_sync.last_sync_summary.new_products }} produk baru
+                            · {{ auto_sync.last_sync_summary.received_units }} unit diterima
+                            · {{ auto_sync.last_sync_summary.sold_units }} unit terjual
                             <template v-if="auto_sync.last_sync_summary.demo_donated_products !== undefined">
-                                · {{ auto_sync.last_sync_summary.donation_approvals_pending ?? auto_sync.last_sync_summary.demo_donated_products }} urgent products awaiting manager approval
-                                across
-                                {{ auto_sync.last_sync_summary.demo_partner_count ?? 0 }} partners
+                                · {{ auto_sync.last_sync_summary.donation_approvals_pending ?? auto_sync.last_sync_summary.demo_donated_products }} produk mendesak menunggu persetujuan pengelola
+                                dari
+                                {{ auto_sync.last_sync_summary.demo_partner_count ?? 0 }} mitra
                             </template>
-                            · {{ auto_sync.last_sync_summary.changed_products ?? 0 }} products updated
-                            · {{ auto_sync.last_sync_summary.discount_recommendations ?? 0 }} pending discount recommendations
+                            · {{ auto_sync.last_sync_summary.changed_products ?? 0 }} produk diperbarui
+                            · {{ auto_sync.last_sync_summary.discount_recommendations ?? 0 }} rekomendasi diskon menunggu persetujuan
                         </template>
                     </p>
                 </div>
-                <div class="flex shrink-0 flex-wrap gap-2">
-                    <Link href="/inventory/sync-history" class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 px-3.5 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-white dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
-                        <History class="size-4" /> Sync History
+                <div class="grid w-full gap-2 sm:grid-cols-2 lg:flex lg:w-auto lg:flex-wrap">
+                    <Link href="/inventory/sync-history" class="inline-flex min-w-0 items-center justify-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-white sm:text-sm dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                        <History class="size-4" /> Riwayat Sinkronisasi
                     </Link>
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 px-3.5 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                        class="inline-flex min-w-0 items-center justify-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
                         :disabled="isTogglingAutoSync"
                         @click="toggleAutoSync"
                     >
-                        {{ auto_sync.auto_sync_enabled ? 'Pause Auto Sync' : 'Enable Auto Sync' }}
+                        {{ auto_sync.auto_sync_enabled ? 'Jeda Sinkronisasi Otomatis' : 'Aktifkan Sinkronisasi Otomatis' }}
                     </button>
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
                         :disabled="isSyncing"
                         @click="runAutoSyncNow"
                     >
                         <RefreshCw class="size-4" :class="{ 'animate-spin': isSyncing }" />
-                        {{ isSyncing ? 'Syncing…' : 'Sync Now' }}
+                        {{ isSyncing ? 'Menyinkronkan…' : 'Sinkronkan Sekarang' }}
                     </button>
                 </div>
             </section>
@@ -577,57 +589,57 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
                 <div class="rounded-xl border border-neutral-200/80 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Catalog</span>
+                        <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Jumlah Katalog</span>
                         <Package class="size-4 text-neutral-400" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
                         {{ stats.total_items }}
                     </p>
-                    <p class="mt-0.5 text-xs text-neutral-400">Total tracked SKUs</p>
+                    <p class="mt-0.5 text-xs text-neutral-400">Total SKU dipantau</p>
                 </div>
 
                 <div class="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-rose-500">Critical (≤ 2 Days)</span>
+                        <span class="text-xs font-semibold text-rose-500">Kritis (≤ 2 Hari)</span>
                         <ShieldAlert class="size-4 text-rose-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-rose-500">
                         {{ stats.critical_count }}
                     </p>
-                    <p class="mt-0.5 text-xs text-rose-400/80">Requires immediate action</p>
+                    <p class="mt-0.5 text-xs text-rose-400/80">Perlu segera ditangani</p>
                 </div>
 
                 <div class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-amber-500">Warning (3-5 Days)</span>
+                        <span class="text-xs font-semibold text-amber-500">Peringatan (3–5 Hari)</span>
                         <Clock class="size-4 text-amber-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-amber-500">
                         {{ stats.warning_count }}
                     </p>
-                    <p class="mt-0.5 text-xs text-amber-400/80">Discount clearance range</p>
+                    <p class="mt-0.5 text-xs text-amber-400/80">Rentang rekomendasi diskon</p>
                 </div>
 
                 <div class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Discounted</span>
+                        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Diskon</span>
                         <Tag class="size-4 text-amber-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-400">
                         {{ stats.discounted_count }}
                     </p>
-                    <p class="mt-0.5 text-xs text-amber-400/80">Promotions running</p>
+                    <p class="mt-0.5 text-xs text-amber-400/80">Diskon sedang berlaku</p>
                 </div>
 
                 <div class="col-span-2 rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 shadow-sm sm:col-span-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">Reserved Donation</span>
+                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">Disiapkan untuk donasi</span>
                         <Handshake class="size-4 text-purple-500" />
                     </div>
                     <p class="mt-2 text-2xl font-bold tracking-tight text-purple-600 dark:text-purple-400">
                         {{ stats.reserved_donation_count }}
                     </p>
-                    <p class="mt-0.5 text-xs text-purple-400/80">Awaiting pickup</p>
+                    <p class="mt-0.5 text-xs text-purple-400/80">Menunggu dijemput</p>
                 </div>
             </div>
 
@@ -640,7 +652,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="Search by SKU, product name, or description..."
+                            placeholder="Cari SKU, nama produk, atau deskripsi..."
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 py-2 pl-9 pr-8 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @input="handleSearchInput"
                         />
@@ -657,16 +669,16 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                         </button>
                     </div>
 
-                    <!-- Category Filter -->
+                    <!-- Kategori Filter -->
                     <div>
                         <select
                             v-model="selectedCategory"
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @change="applyFilters"
                         >
-                            <option value="">All Categories</option>
+                            <option value="">Semua kategori</option>
                             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                                {{ cat.name }}
+                                {{ categoryLabel(cat) }}
                             </option>
                         </select>
                     </div>
@@ -678,11 +690,11 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @change="applyFilters"
                         >
-                            <option value="">All Urgency Levels</option>
-                            <option value="critical">🔴 Critical (≤ 2 Days)</option>
-                            <option value="warning">🟡 Warning (3 - 5 Days)</option>
-                            <option value="safe">🟢 Safe (&gt; 5 Days)</option>
-                            <option value="expired">⚫ Expired</option>
+                            <option value="">Semua tingkat urgensi</option>
+                            <option value="critical">🔴 Kritis (≤ 2 Hari)</option>
+                            <option value="warning">🟡 Peringatan (3–5 hari)</option>
+                            <option value="safe">🟢 Aman (&gt; 5 hari)</option>
+                            <option value="expired">⚫ Kedaluwarsa</option>
                         </select>
                     </div>
 
@@ -693,24 +705,24 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             class="w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-sm text-neutral-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100 dark:focus:border-emerald-500 dark:focus:bg-neutral-800"
                             @change="applyFilters"
                         >
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="discounted">Discounted</option>
-                            <option value="reserved_donation">Reserved Donation</option>
-                            <option value="donated">Donated</option>
-                            <option value="sold_out">Sold Out</option>
-                            <option value="disposed">Disposed</option>
+                            <option value="">Semua status</option>
+                            <option value="active">Aktif</option>
+                            <option value="discounted">Diskon</option>
+                            <option value="reserved_donation">Disiapkan untuk donasi</option>
+                            <option value="donated">Didonasikan</option>
+                            <option value="sold_out">Habis terjual</option>
+                            <option value="disposed">Dibuang</option>
                         </select>
 
                         <button
                             v-if="hasActiveFilters"
                             type="button"
-                            title="Reset all filters"
+                            title="Hapus semua filter"
                             class="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                             @click="clearFilters"
                         >
                             <RefreshCw class="size-3.5" />
-                            <span>Reset</span>
+                            <span>Atur ulang</span>
                         </button>
                     </div>
                 </div>
@@ -718,25 +730,25 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
 
             <!-- Products Data Table -->
             <div class="overflow-hidden rounded-xl border border-neutral-200/80 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                <div class="min-w-0 overflow-x-auto">
+                    <table class="w-full min-w-[980px] text-left text-sm">
                         <thead
                             class="border-b border-neutral-200 bg-neutral-50/75 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:border-neutral-800 dark:bg-neutral-800/50 dark:text-neutral-400"
                         >
                             <tr>
-                                <th scope="col" class="px-4 py-3.5 sm:px-6">SKU & Item</th>
-                                <th scope="col" class="px-4 py-3.5">Category</th>
-                                <th scope="col" class="px-4 py-3.5">Stock</th>
-                                <th scope="col" class="px-4 py-3.5">Price</th>
-                                <th scope="col" class="px-4 py-3.5">Shelf Life & Urgency</th>
+                                <th scope="col" class="px-4 py-3.5 sm:px-6">SKU & Produk</th>
+                                <th scope="col" class="px-4 py-3.5">Kategori</th>
+                                <th scope="col" class="px-4 py-3.5">Stok</th>
+                                <th scope="col" class="px-4 py-3.5">Harga</th>
+                                <th scope="col" class="px-4 py-3.5">Masa Simpan & Urgensi</th>
                                 <th scope="col" class="px-4 py-3.5">Status</th>
-                                <th scope="col" class="px-4 py-3.5 text-right sm:pr-6">Actions</th>
+                                <th scope="col" class="px-4 py-3.5 text-right sm:pr-6">Tindakan</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-200/80 dark:divide-neutral-800/80">
                             <template v-for="product in products.data" :key="product.id">
                                 <tr class="transition-colors hover:bg-neutral-50/60 dark:hover:bg-neutral-800/40">
-                                <!-- SKU & Item Name -->
+                                <!-- SKU & Nama Produk -->
                                 <td class="px-4 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2">
@@ -749,7 +761,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                                 type="button"
                                                 class="inline-flex items-center gap-1 text-left font-semibold text-neutral-900 hover:text-emerald-600 dark:text-neutral-100 dark:hover:text-emerald-400"
                                                 :aria-expanded="isProductExpanded(product.id)"
-                                                :aria-label="`${isProductExpanded(product.id) ? 'Hide' : 'Show'} stock batches for ${product.name}`"
+                                                :aria-label="`${isProductExpanded(product.id) ? 'Sembunyikan' : 'Tampilkan'} batch stok untuk ${product.name}`"
                                                 @click="toggleProductBatches(product.id)"
                                             >
                                                 <ChevronDown v-if="isProductExpanded(product.id)" class="size-4 shrink-0" />
@@ -764,28 +776,28 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                             {{ product.description }}
                                         </p>
                                         <p class="mt-1 text-[11px] text-neutral-400">
-                                            {{ product.source_system === 'supermarket_central' ? 'Central DB · ' + product.external_id : 'Manual entry' }}
+                                            {{ product.source_system === 'supermarket_central' ? 'Basis data pusat · ' + product.external_id : 'Input manual' }}
                                         </p>
                                     </div>
                                 </td>
 
-                                <!-- Category -->
+                                <!-- Kategori -->
                                 <td class="whitespace-nowrap px-4 py-4 text-xs font-medium text-neutral-600 dark:text-neutral-300">
                                     <span class="inline-flex items-center rounded-md bg-neutral-100 px-2 py-0.5 dark:bg-neutral-800">
-                                        {{ product.category?.name ?? 'General' }}
+                                        {{ categoryLabel(product.category) }}
                                     </span>
                                 </td>
 
-                                <!-- Stock / Quantity -->
+                                <!-- Stok / Quantity -->
                                 <td class="whitespace-nowrap px-4 py-4">
                                     <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ product.quantity }}</span>
                                     <span class="ml-1 text-xs text-neutral-500 dark:text-neutral-400">{{ product.unit }}</span>
                                     <p class="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
-                                        {{ product.received_quantity }} {{ product.unit }} received · {{ product.donated_quantity }} {{ product.unit }} donated
+                                        {{ product.received_quantity }} {{ product.unit }} diterima · {{ product.donated_quantity }} {{ product.unit }} didonasikan
                                     </p>
                                 </td>
 
-                                <!-- Price (with discount tag if active) -->
+                                <!-- Harga (with discount tag if active) -->
                                 <td class="whitespace-nowrap px-4 py-4">
                                     <div
                                         v-if="product.discount_price !== null && product.discount_price < product.original_price"
@@ -805,11 +817,11 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                     </div>
                                 </td>
 
-                                <!-- Shelf Life & Urgency Badges -->
+                                <!-- Masa Simpan & Urgensi Badges -->
                                 <td class="whitespace-nowrap px-4 py-4">
                                     <div class="flex flex-col gap-1">
                                         <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                                            Exp: {{ product.expiration_date_formatted }}
+                                            Kedaluwarsa: {{ product.expiration_date_formatted }}
                                         </span>
                                         <div class="inline-flex">
                                             <span
@@ -850,29 +862,29 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                         <button
                                             v-if="isBusinessOwner"
                                             type="button"
-                                            title="Add a separate stock batch"
+                                            title="Tambah batch stok terpisah"
                                             class="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-500/20 dark:text-emerald-300"
                                             @click="openAddBatchModal(product)"
                                         >
                                             <Plus class="size-3.5" />
-                                            <span>Add Batch</span>
+                                            <span>Tambah batch</span>
                                         </button>
                                         <!-- Apply Discount Modal Trigger -->
                                         <button
                                             type="button"
-                                            title="Apply Markdown Discount"
+                                            title="Terapkan Diskon"
                                             :disabled="product.status === 'donated' || product.status === 'disposed' || product.status === 'sold_out'"
                                             class="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-500 transition hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
                                             @click="openDiscountModal(product)"
                                         >
                                             <Tag class="size-3.5" />
-                                            <span class="hidden xl:inline">Discount</span>
+                                            <span class="hidden xl:inline">Diskon</span>
                                         </button>
 
                                         <!-- Reserve Donation Modal Trigger -->
                                         <button
                                             type="button"
-                                            title="Reserve for Donation"
+                                            title="Siapkan Donasi"
                                             :disabled="
                                                 product.status === 'donated' ||
                                                 product.status === 'disposed' ||
@@ -883,22 +895,22 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                             @click="openDonationModal(product)"
                                         >
                                             <Handshake class="size-3.5" />
-                                            <span class="hidden xl:inline">Donate</span>
+                                            <span class="hidden xl:inline">Donasikan</span>
                                         </button>
 
                                         <!-- Edit Item -->
                                         <Link
                                             :href="`/inventory/${product.id}/edit`"
-                                            title="Edit Item"
+                                            title="Ubah Produk"
                                             class="inline-flex items-center rounded-md border border-neutral-200 bg-white p-1 text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white"
                                         >
                                             <Edit3 class="size-3.5" />
                                         </Link>
 
-                                        <!-- Delete Item -->
+                                        <!-- Hapus Produk -->
                                         <button
                                             type="button"
-                                            title="Delete Item"
+                                            title="Hapus Produk"
                                             class="inline-flex items-center rounded-md border border-neutral-200 bg-white p-1 text-neutral-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-red-500/20"
                                             @click="openDeleteModal(product)"
                                         >
@@ -912,11 +924,11 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                 <td colspan="7" class="px-4 py-4 sm:px-6">
                                     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
                                         <div>
-                                            <h3 class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Stock batches · {{ product.name }}</h3>
+                                            <h3 class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Batch stok · {{ product.name }}</h3>
                                             <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                                {{ product.batches.length }} receipts · {{ product.received_quantity }} {{ product.unit }} received ·
-                                                {{ product.quantity }} {{ product.unit }} currently available ·
-                                                {{ product.donated_quantity }} {{ product.unit }} donated · {{ product.sold_quantity }} {{ product.unit }} sold
+                                                {{ product.batches.length }} penerimaan · {{ product.received_quantity }} {{ product.unit }} diterima ·
+                                                {{ product.quantity }} {{ product.unit }} tersedia saat ini ·
+                                                {{ product.donated_quantity }} {{ product.unit }} didonasikan · {{ product.sold_quantity }} {{ product.unit }} terjual
                                             </p>
                                         </div>
                                         <button
@@ -932,19 +944,19 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                             :href="`/inventory/${product.id}/edit`"
                                             class="text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-400"
                                         >
-                                            Edit product
+                                            Ubah produk
                                         </Link>
                                     </div>
                                     <div class="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-700">
                                         <table class="w-full min-w-[760px] text-left text-xs">
                                             <thead class="bg-white text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
                                                 <tr>
-                                                    <th class="px-3 py-2.5">Batch / received</th>
-                                                    <th class="px-3 py-2.5">Received</th>
-                                                    <th class="px-3 py-2.5">Available</th>
-                                                    <th class="px-3 py-2.5">Donated / sold</th>
-                                                    <th class="px-3 py-2.5">Expires</th>
-                                                    <th class="px-3 py-2.5">Batch status</th>
+                                                    <th class="px-3 py-2.5">Batch / diterima</th>
+                                                    <th class="px-3 py-2.5">Diterima</th>
+                                                    <th class="px-3 py-2.5">Tersedia</th>
+                                                    <th class="px-3 py-2.5">Didonasikan / terjual</th>
+                                                    <th class="px-3 py-2.5">Kedaluwarsa</th>
+                                                    <th class="px-3 py-2.5">Status batch</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -952,7 +964,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                                     <td class="px-3 py-3">
                                                         <p class="font-mono font-medium text-neutral-800 dark:text-neutral-200">{{ batch.batch_code }}</p>
                                                         <p class="mt-1 text-neutral-500 dark:text-neutral-400">
-                                                            Received {{ formatReceivedAt(batch.received_at) }} · {{ batch.source.replaceAll('_', ' ') }}
+                                                            Diterima {{ formatReceivedAt(batch.received_at) }} · {{ batchSourceLabel(batch.source) }}
                                                         </p>
                                                     </td>
                                                     <td class="px-3 py-3 font-medium text-neutral-800 dark:text-neutral-200">
@@ -967,7 +979,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                                     <td class="px-3 py-3">
                                                         <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ batch.expiration_date }}</p>
                                                         <p :class="batch.days_remaining <= 2 ? 'mt-1 font-semibold text-rose-600' : 'mt-1 text-neutral-500 dark:text-neutral-400'">
-                                                            {{ batch.days_remaining < 0 ? `Expired ${Math.abs(batch.days_remaining)}d ago` : `${batch.days_remaining}d remaining` }}
+                                                            {{ batch.days_remaining < 0 ? `Kedaluwarsa ${Math.abs(batch.days_remaining)} hari lalu` : `Sisa ${batch.days_remaining} hari` }}
                                                         </p>
                                                     </td>
                                                     <td class="px-3 py-3">
@@ -975,18 +987,18 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                                             {{ getBatchStatusLabel(batch) }}
                                                         </span>
                                                         <p v-if="batch.discount_price !== null" class="mt-1 text-neutral-500 dark:text-neutral-400">
-                                                            {{ formatCurrency(batch.discount_price) }} per unit
+                                                            {{ formatCurrency(batch.discount_price) }} per satuan
                                                         </p>
                                                     </td>
                                                 </tr>
                                                 <tr v-if="product.batches.length === 0">
-                                                    <td colspan="6" class="px-3 py-6 text-center text-neutral-500">No receipt batches recorded for this product.</td>
+                                                    <td colspan="6" class="px-3 py-6 text-center text-neutral-500">Belum ada penerimaan batch untuk produk ini.</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                     <p class="mt-2 text-[11px] text-neutral-500 dark:text-neutral-400">
-                                        Batches with 0–2 days remaining trigger a manager donation approval in Telegram; batches with 3–7 days remaining may appear here as awaiting discount approval.
+                                        Batch dengan sisa 0–2 hari memerlukan persetujuan donasi dari pengelola melalui Telegram. Batch dengan sisa 3–7 hari dapat muncul sebagai menunggu persetujuan diskon.
                                     </p>
                                 </td>
                             </tr>
@@ -999,28 +1011,28 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                         <div class="rounded-full bg-neutral-100 p-3 text-neutral-400 dark:bg-neutral-800">
                                             <Package class="size-8" />
                                         </div>
-                                        <h3 class="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No food products found</h3>
+                                        <h3 class="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">Produk pangan tidak ditemukan</h3>
                                         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                                             {{
                                                 hasActiveFilters
-                                                    ? 'Try adjusting your search query or urgency filters.'
-                                                    : 'Get started by adding your first inventory item.'
+                                                    ? 'Coba ubah kata kunci pencarian atau filter urgensi.'
+                                                    : 'Mulai dengan menambahkan produk pertama ke stok.'
                                             }}
                                         </p>
                                         <div class="mt-4 flex gap-2">
                                             <button
-                                                v-if="hasActiveFilters"
+                                v-if="hasActiveFilters"
                                                 type="button"
                                                 class="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                                                 @click="clearFilters"
                                             >
-                                                Clear filters
+                                                Hapus filter
                                             </button>
                                             <Link
                                                 href="/inventory/create"
                                                 class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500"
                                             >
-                                                Add Product
+                                                Tambah Produk
                                             </Link>
                                         </div>
                                     </div>
@@ -1036,7 +1048,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                     class="flex flex-col items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3 dark:border-neutral-800 sm:flex-row sm:px-6"
                 >
                     <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                        Showing
+                        Menampilkan
                         <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ products.from ?? 0 }}</span>
                         to
                         <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ products.to ?? 0 }}</span>
@@ -1076,7 +1088,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                 <div class="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900">
                     <div class="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
                         <div>
-                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Add stock batch</h3>
+                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Tambah batch stok</h3>
                             <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{{ addBatchTarget.name }} · {{ addBatchTarget.sku }}</p>
                         </div>
                         <button type="button" class="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="closeAddBatchModal">
@@ -1104,15 +1116,15 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             <span v-if="addBatchForm.errors.batch_code" class="font-normal text-red-600">{{ addBatchForm.errors.batch_code }}</span>
                         </label>
                         <div class="flex items-center justify-end gap-2 border-t border-neutral-200 pt-4 dark:border-neutral-800">
-                            <button type="button" class="rounded-lg px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" @click="closeAddBatchModal">Cancel</button>
+                            <button type="button" class="rounded-lg px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" @click="closeAddBatchModal">Batal</button>
                             <button
                                 type="button"
                                 :disabled="addBatchForm.processing || !addBatchForm.quantity || addBatchForm.quantity < 1 || !addBatchForm.expiration_date"
                                 class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
                                 @click="submitAddBatch"
                             >
-                                <span v-if="addBatchForm.processing">Saving…</span>
-                                <span v-else>Add separate batch</span>
+                                <span v-if="addBatchForm.processing">Menyimpan…</span>
+                                <span v-else>Tambah batch terpisah</span>
                             </button>
                         </div>
                     </div>
@@ -1131,7 +1143,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                     <div class="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
                         <div class="flex items-center gap-2 text-amber-500">
                             <Tag class="size-5" />
-                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Apply Clearance Markdown</h3>
+                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Terapkan Diskon</h3>
                         </div>
                         <button
                             type="button"
@@ -1151,14 +1163,14 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             <div class="mt-1 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
                                 <span>SKU: {{ discountTargetProduct.sku }}</span>
                                 <span>•</span>
-                                <span>Current: {{ discountTargetProduct.original_price_formatted }}</span>
+                                <span>Saat ini: {{ discountTargetProduct.original_price_formatted }}</span>
                             </div>
                         </div>
 
-                        <!-- Discount Percentage Picker -->
+                        <!-- Persentase Diskon Picker -->
                         <div>
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-300"> Discount Percentage </label>
+                                <label class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-300"> Persentase Diskon </label>
                                 <span class="font-mono text-base font-bold text-amber-500"> {{ discountPercentage }}% </span>
                             </div>
                             <input
@@ -1189,38 +1201,38 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             </div>
                         </div>
 
-                        <!-- Live Price Preview -->
+                        <!-- Live Harga Preview -->
                         <div class="flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5">
                             <div>
-                                <p class="text-xs font-medium text-amber-500">New Clearance Price</p>
-                                <p class="mt-0.5 text-lg font-bold text-amber-500">IDR {{ calculatedDiscountPrice.toLocaleString('id-ID') }}</p>
+                                <p class="text-xs font-medium text-amber-500">Harga Baru Setelah Diskon</p>
+                                <p class="mt-0.5 text-lg font-bold text-amber-500">Rp {{ calculatedDiscountHarga.toLocaleString('id-ID') }}</p>
                             </div>
                             <span class="rounded-full bg-amber-500/20 px-2.5 py-1 text-xs font-semibold text-amber-500">
-                                Save {{ discountPercentage }}%
+                                Hemat {{ discountPercentage }}%
                             </span>
                         </div>
 
                         <!-- Rationale Field -->
                         <div>
                             <label class="block text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-300">
-                                Markdown Justification
+                                Alasan pemberian diskon
                             </label>
                             <textarea
                                 v-model="discountReason"
                                 rows="2"
-                                placeholder="Why is this markdown applied..."
+                                placeholder="Jelaskan alasan pemberian diskon..."
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 p-2.5 text-xs text-neutral-900 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                             ></textarea>
                         </div>
 
-                        <!-- Modal Actions -->
+                        <!-- Modal Tindakan -->
                         <div class="flex items-center justify-end gap-2.5 pt-2">
                             <button
                                 type="button"
                                 class="rounded-lg px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                                 @click="closeDiscountModal"
                             >
-                                Cancel
+                                Batal
                             </button>
                             <button
                                 type="button"
@@ -1228,8 +1240,8 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                 class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-amber-600 disabled:opacity-50"
                                 @click="submitDiscount"
                             >
-                                <span v-if="isSubmittingDiscount">Applying...</span>
-                                <span v-else>Confirm Markdown</span>
+                                <span v-if="isSubmittingDiscount">Menerapkan…</span>
+                                <span v-else>Konfirmasi Diskon</span>
                             </button>
                         </div>
                     </div>
@@ -1248,7 +1260,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                     <div class="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
                         <div class="flex items-center gap-2 text-purple-500">
                             <Handshake class="size-5" />
-                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Reserve for Charity Donation</h3>
+                            <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Siapkan Donasi untuk Yayasan</h3>
                         </div>
                         <button
                             type="button"
@@ -1268,21 +1280,21 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             <div class="mt-1 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
                                 <span>SKU: {{ donationTargetProduct.sku }}</span>
                                 <span>•</span>
-                                <span>Stock: {{ donationTargetProduct.quantity }} {{ donationTargetProduct.unit }}</span>
+                                <span>Stok: {{ donationTargetProduct.quantity }} {{ donationTargetProduct.unit }}</span>
                             </div>
                         </div>
 
                         <!-- Select Donation Partner -->
                         <div>
                             <label class="block text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-300">
-                                Select Registered Partner
+                                Pilih Mitra Terdaftar
                             </label>
                             <select
                                 v-model="selectedPartnerId"
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-xs text-neutral-900 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                             >
                                 <option v-for="partner in donation_partners" :key="partner.id" :value="partner.id">
-                                    {{ partner.name }} (Contact: {{ partner.contact_person }})
+                                    {{ partner.name }} (Kontak: {{ partner.contact_person }})
                                 </option>
                             </select>
                         </div>
@@ -1290,24 +1302,24 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                         <!-- Rationale Field -->
                         <div>
                             <label class="block text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-300">
-                                Donation Purpose & Instructions
+                                Tujuan dan Petunjuk Donasi
                             </label>
                             <textarea
                                 v-model="donationReason"
                                 rows="2"
-                                placeholder="E.g., Allocated for emergency community meals..."
+                                placeholder="Contoh: dialokasikan untuk dapur umum darurat..."
                                 class="mt-1.5 w-full rounded-lg border border-neutral-200 bg-neutral-50/50 p-2.5 text-xs text-neutral-900 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-100"
                             ></textarea>
                         </div>
 
-                        <!-- Modal Actions -->
+                        <!-- Modal Tindakan -->
                         <div class="flex items-center justify-end gap-2.5 pt-2">
                             <button
                                 type="button"
                                 class="rounded-lg px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                                 @click="closeDonationModal"
                             >
-                                Cancel
+                                Batal
                             </button>
                             <button
                                 type="button"
@@ -1315,8 +1327,8 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                                 class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-purple-700 disabled:opacity-50"
                                 @click="submitDonation"
                             >
-                                <span v-if="isSubmittingDonation">Reserving...</span>
-                                <span v-else>Confirm Allocation</span>
+                                <span v-if="isSubmittingDonation">Menyiapkan…</span>
+                                <span v-else>Konfirmasi Alokasi</span>
                             </button>
                         </div>
                     </div>
@@ -1334,12 +1346,12 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                 >
                     <div class="flex items-center gap-3 text-red-500">
                         <AlertTriangle class="size-6 shrink-0" />
-                        <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Delete Product?</h3>
+                        <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">Hapus Produk?</h3>
                     </div>
 
                     <p class="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
-                        Are you sure you want to permanently delete
-                        <span class="font-semibold text-neutral-900 dark:text-neutral-100"> {{ deleteTargetProduct?.name }} </span>? This will remove
+                        Yakin ingin menghapus
+                        <span class="font-semibold text-neutral-900 dark:text-neutral-100"> {{ deleteTargetProduct?.name }} </span>? Produk ini akan dihapus
                         its stock tracking and related logs.
                     </p>
 
@@ -1349,7 +1361,7 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             class="rounded-lg px-3.5 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                             @click="closeDeleteModal"
                         >
-                            Cancel
+                            Batal
                         </button>
                         <button
                             type="button"
@@ -1357,8 +1369,8 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('id-ID', { style
                             class="rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
                             @click="confirmDelete"
                         >
-                            <span v-if="isDeleting">Deleting...</span>
-                            <span v-else>Delete Permanently</span>
+                            <span v-if="isDeleting">Menghapus…</span>
+                            <span v-else>Hapus Permanen</span>
                         </button>
                     </div>
                 </div>

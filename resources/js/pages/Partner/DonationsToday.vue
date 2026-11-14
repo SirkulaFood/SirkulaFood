@@ -33,7 +33,7 @@ const dateTime = (value: string | null) => value
         <main class="space-y-6 p-6 lg:p-10">
             <header class="flex flex-wrap items-start justify-between gap-4">
                 <div class="space-y-2">
-                    <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Portal Donation Partner</p>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Portal Mitra Donasi</p>
                     <h1 class="text-3xl font-bold">Produk donasi hari ini</h1>
                     <p class="max-w-3xl text-sm text-muted-foreground">Aktivitas donasi yang tercatat hari ini. Gunakan informasi batch dan jumlah untuk koordinasi pengambilan dengan supermarket.</p>
                 </div>

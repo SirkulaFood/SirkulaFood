@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ManagerAccountSeeder::class,
             DonationPartnerSeeder::class,
             ProductSeeder::class,
+            DemoAdminSeeder::class,
         ]);
 
         // General System Agent Log

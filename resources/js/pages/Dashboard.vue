@@ -79,7 +79,7 @@ defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Dasbor',
         href: '/dashboard',
     },
 ];
@@ -109,13 +109,43 @@ function refreshDashboard() {
         },
     });
 }
+
+function formatCurrency(value: number): string {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
+}
+
+function categoryLabel(name: string): string {
+    return ({
+        'Fresh Produce': 'Buah dan Sayur', Bakery: 'Roti dan Kue', 'Dairy & Eggs': 'Susu dan Telur',
+        'Packaged Goods': 'Bahan Pangan Kemasan', 'Meat & Seafood': 'Daging dan Hasil Laut', General: 'Umum',
+    } as Record<string, string>)[name] ?? name;
+}
+
+function statusLabel(status: ProductSummary['status']): string {
+    return {
+        active: 'Aktif',
+        discounted: 'Diskon',
+        reserved_donation: 'Disiapkan untuk donasi',
+        donated: 'Didonasikan',
+        disposed: 'Dibuang',
+    }[status];
+}
+
+function actionLabel(action: AgentLogItem['action_type']): string {
+    return {
+        discount_applied: 'Diskon diterapkan',
+        donation_requested: 'Donasi diminta',
+        alert_sent: 'Peringatan dikirim',
+        manual_override: 'Perubahan manual',
+    }[action];
+}
 </script>
 
 <template>
-    <Head title="SirkulaFood Agent - Circular Economy Dashboard" />
+    <Head title="Dasbor SirkulaFood" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
+        <div class="flex min-h-full min-w-0 flex-1 flex-col gap-5 p-3 sm:gap-6 sm:p-6">
             <!-- Flash notification -->
             <Transition name="flash">
                 <div
@@ -131,68 +161,68 @@ function refreshDashboard() {
             </Transition>
 
             <!-- Quick Action Bar & Agent Status Banner -->
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Circular Economy Dashboard</h1>
-                    <p class="mt-1 text-sm text-muted-foreground">
-                        AI-driven shelf-life forecasting, dynamic markdown clearing, and food waste reduction metrics.
+            <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="min-w-0">
+                    <h1 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Dasbor Ekonomi Sirkular</h1>
+                    <p class="mt-1 max-w-2xl text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-normal">
+                        Prediksi masa simpan berbasis AI, pengelolaan diskon dinamis, dan metrik pengurangan limbah pangan.
                     </p>
                 </div>
 
                 <!-- Quick Action Buttons -->
-                <div class="flex flex-wrap items-center gap-2.5">
+                <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-2.5">
                     <button
                         type="button"
                         :disabled="isRefreshing"
                         @click="refreshDashboard"
-                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
+                        class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50 sm:col-span-1 sm:px-4 sm:text-sm"
                     >
                         <RefreshCw class="size-4" :class="{ 'animate-spin': isRefreshing }" />
-                        <span>{{ isRefreshing ? 'Refreshing…' : 'Refresh data' }}</span>
+                        <span>{{ isRefreshing ? 'Memuat ulang…' : 'Muat ulang data' }}</span>
                     </button>
 
                     <Link
                         href="/inventory"
                         prefetch
-                        class="inline-flex items-center gap-2 rounded-lg border border-sidebar-border bg-card px-3.5 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-accent"
+                        class="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card px-2.5 py-2.5 text-xs font-medium text-foreground shadow-sm transition hover:bg-accent sm:justify-start sm:gap-2 sm:px-3.5 sm:text-sm"
                     >
                         <Package class="size-4 text-muted-foreground" />
-                        <span>View Expiring Products</span>
+                        <span class="sm:hidden">Lihat stok</span><span class="hidden sm:inline">Lihat produk mendekati kedaluwarsa</span>
                     </Link>
 
                     <Link
                         href="/inventory"
-                        class="inline-flex items-center gap-1.5 rounded-lg border border-sidebar-border bg-card px-3.5 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-accent"
+                        class="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card px-2.5 py-2.5 text-xs font-medium text-foreground shadow-sm transition hover:bg-accent sm:justify-start sm:px-3.5 sm:text-sm"
                     >
                         <Plus class="size-4 text-muted-foreground" />
-                        <span>Add New Inventory</span>
+                        <span>Tambah stok</span>
                     </Link>
                 </div>
             </div>
 
             <!-- KPI Metric Summary Cards -->
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                 <!-- 1. Expiring Soon -->
                 <div
-                    class="group relative overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md dark:border-sidebar-border"
+                    class="group relative min-w-0 overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-3.5 shadow-sm transition-all duration-200 hover:shadow-md sm:p-5 dark:border-sidebar-border"
                 >
                     <div class="flex items-start justify-between">
                         <div class="space-y-1.5">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Expiring Soon</p>
-                            <p class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                            <p class="text-[10px] font-semibold uppercase leading-4 tracking-wide text-muted-foreground sm:text-xs sm:tracking-wider">Segera Kedaluwarsa</p>
+                            <p class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-3xl">
                                 {{ metrics.total_expiring_soon }}
                             </p>
                         </div>
-                        <div class="rounded-xl bg-amber-500/10 p-3 text-amber-600 dark:text-amber-400">
-                            <Clock class="size-5" />
+                        <div class="rounded-xl bg-amber-500/10 p-2 text-amber-600 sm:p-3 dark:text-amber-400">
+                            <Clock class="size-4 sm:size-5" />
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-xs">
+                    <div class="mt-3 flex flex-col items-start gap-2 text-[10px] leading-4 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
                         <span class="inline-flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
                             <AlertTriangle class="size-3.5" />
-                            <span>&le; 7 Days Critical Window</span>
+                            <span>Perlu ditangani dalam ≤ 7 hari</span>
                         </span>
-                        <Link href="/inventory" class="text-muted-foreground hover:text-foreground">View all &rarr;</Link>
+                        <Link href="/inventory" class="text-muted-foreground hover:text-foreground">Lihat semua &rarr;</Link>
                     </div>
                     <div
                         class="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-amber-500/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
@@ -201,25 +231,25 @@ function refreshDashboard() {
 
                 <!-- 2. Food Waste Prevented -->
                 <div
-                    class="group relative overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md dark:border-sidebar-border"
+                    class="group relative min-w-0 overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-3.5 shadow-sm transition-all duration-200 hover:shadow-md sm:p-5 dark:border-sidebar-border"
                 >
                     <div class="flex items-start justify-between">
                         <div class="space-y-1.5">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Food Waste Diverted</p>
-                            <p class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                            <p class="text-[10px] font-semibold uppercase leading-4 tracking-wide text-muted-foreground sm:text-xs sm:tracking-wider">Pangan Terselamatkan</p>
+                            <p class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-3xl">
                                 {{ metrics.food_saved_kg }} <span class="text-lg font-medium text-muted-foreground">kg</span>
                             </p>
                         </div>
-                        <div class="rounded-xl bg-emerald-500/10 p-3 text-emerald-600 dark:text-emerald-400">
-                            <Leaf class="size-5" />
+                        <div class="rounded-xl bg-emerald-500/10 p-2 text-emerald-600 sm:p-3 dark:text-emerald-400">
+                            <Leaf class="size-4 sm:size-5" />
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-xs">
+                    <div class="mt-3 flex flex-col items-start gap-2 text-[10px] leading-4 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
                         <span class="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
                             <ArrowUpRight class="size-3.5" />
-                            <span>Diverted from Landfills</span>
+                            <span>Dialihkan dari tempat pembuangan</span>
                         </span>
-                        <span class="text-muted-foreground">100% Organics Target</span>
+                        <span class="text-muted-foreground">Sasaran pangan organik</span>
                     </div>
                     <div
                         class="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-emerald-500/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
@@ -228,22 +258,22 @@ function refreshDashboard() {
 
                 <!-- 3. Financial Loss Prevented (in IDR) -->
                 <div
-                    class="group relative overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md dark:border-sidebar-border"
+                    class="group relative min-w-0 overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-3.5 shadow-sm transition-all duration-200 hover:shadow-md sm:p-5 dark:border-sidebar-border"
                 >
                     <div class="flex items-start justify-between">
                         <div class="space-y-1.5">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Revenue Loss Prevented</p>
-                            <p class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-2xl">
+                            <p class="text-[10px] font-semibold uppercase leading-4 tracking-wide text-muted-foreground sm:text-xs sm:tracking-wider">Potensi Kerugian Dicegah</p>
+                            <p class="break-words text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-2xl">
                                 {{ metrics.financial_loss_prevented_formatted }}
                             </p>
                         </div>
-                        <div class="rounded-xl bg-blue-500/10 p-3 text-blue-600 dark:text-blue-400">
-                            <Coins class="size-5" />
+                        <div class="rounded-xl bg-blue-500/10 p-2 text-blue-600 sm:p-3 dark:text-blue-400">
+                            <Coins class="size-4 sm:size-5" />
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-xs">
-                        <span class="font-medium text-blue-600 dark:text-blue-400"> Via Dynamic Markdowns &amp; Rescue </span>
-                        <span class="text-muted-foreground">IDR Equiv.</span>
+                    <div class="mt-3 flex flex-col items-start gap-1 text-[10px] leading-4 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
+                        <span class="font-medium text-blue-600 dark:text-blue-400"> Melalui diskon dan penyelamatan pangan </span>
+                        <span class="text-muted-foreground">Setara rupiah</span>
                     </div>
                     <div
                         class="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-blue-500/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
@@ -252,22 +282,22 @@ function refreshDashboard() {
 
                 <!-- 4. CO2 Emission Reduced -->
                 <div
-                    class="group relative overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md dark:border-sidebar-border"
+                    class="group relative min-w-0 overflow-hidden rounded-2xl border border-sidebar-border/80 bg-card p-3.5 shadow-sm transition-all duration-200 hover:shadow-md sm:p-5 dark:border-sidebar-border"
                 >
                     <div class="flex items-start justify-between">
                         <div class="space-y-1.5">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">CO2e Emissions Reduced</p>
-                            <p class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                            <p class="text-[10px] font-semibold uppercase leading-4 tracking-wide text-muted-foreground sm:text-xs sm:tracking-wider">Emisi CO₂e Dikurangi</p>
+                            <p class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-3xl">
                                 {{ metrics.co2_emission_reduced_kg }} <span class="text-lg font-medium text-muted-foreground">kg</span>
                             </p>
                         </div>
-                        <div class="rounded-xl bg-teal-500/10 p-3 text-teal-600 dark:text-teal-400">
-                            <Sparkles class="size-5" />
+                        <div class="rounded-xl bg-teal-500/10 p-2 text-teal-600 sm:p-3 dark:text-teal-400">
+                            <Sparkles class="size-4 sm:size-5" />
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-xs">
-                        <span class="font-medium text-teal-600 dark:text-teal-400"> 2.5 kg CO2e / kg food factor </span>
-                        <span class="text-muted-foreground">EPA Standard</span>
+                    <div class="mt-3 flex flex-col items-start gap-1 text-[10px] leading-4 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
+                        <span class="font-medium text-teal-600 dark:text-teal-400"> Faktor 2,5 kg CO₂e / kg pangan </span>
+                        <span class="text-muted-foreground">Acuan EPA</span>
                     </div>
                     <div
                         class="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-teal-500/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
@@ -276,39 +306,39 @@ function refreshDashboard() {
             </div>
 
             <!-- Main Content Area: Urgent Items Attention Table & Live Agent Activity Feed -->
-            <div class="grid flex-1 gap-6 lg:grid-cols-3">
+            <div class="grid min-w-0 flex-1 gap-5 sm:gap-6 lg:grid-cols-3">
                 <!-- Urgent Items Attention (2 cols) -->
-                <div class="flex flex-col rounded-2xl border border-sidebar-border/80 bg-card shadow-sm dark:border-sidebar-border lg:col-span-2">
-                    <div class="flex items-center justify-between border-b border-sidebar-border/80 px-6 py-4">
+                <div class="flex min-w-0 flex-col rounded-2xl border border-sidebar-border/80 bg-card shadow-sm dark:border-sidebar-border lg:col-span-2">
+                    <div class="flex min-w-0 items-start justify-between gap-3 border-b border-sidebar-border/80 px-4 py-4 sm:px-6">
                         <div class="flex items-center gap-2.5">
                             <div class="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
                                 <AlertTriangle class="size-4" />
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold leading-tight text-neutral-900 dark:text-neutral-100">Urgent Clearance Items</h3>
-                                <p class="text-xs text-muted-foreground">Products expiring in 1–3 days requiring AI markdown or donation</p>
+                                <h3 class="text-base font-semibold leading-tight text-neutral-900 dark:text-neutral-100">Produk Prioritas</h3>
+                                <p class="text-[11px] leading-4 text-muted-foreground sm:text-xs">Produk yang kedaluwarsa dalam 1–3 hari dan memerlukan diskon atau donasi</p>
                             </div>
                         </div>
 
                         <Link
                             href="/inventory"
-                            class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                            class="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-emerald-600 hover:text-emerald-700 sm:text-xs dark:text-emerald-400"
                         >
-                            <span>Open Inventory</span>
+                            <span>Buka stok produk</span>
                             <ExternalLink class="size-3" />
                         </Link>
                     </div>
 
                     <!-- Table of Urgent Items -->
-                    <div class="flex-1 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
+                    <div class="min-w-0 flex-1 overflow-x-auto">
+                        <table class="w-full min-w-[780px] text-left text-sm">
                             <thead class="border-b border-sidebar-border/60 bg-muted/40 text-xs font-medium text-muted-foreground">
                                 <tr>
-                                    <th class="px-6 py-3">Product / SKU</th>
-                                    <th class="px-4 py-3">Category</th>
-                                    <th class="px-4 py-3">Quantity</th>
-                                    <th class="px-4 py-3">Price</th>
-                                    <th class="px-4 py-3">Expires In</th>
+                                    <th class="px-6 py-3">Produk / SKU</th>
+                                    <th class="px-4 py-3">Kategori</th>
+                                    <th class="px-4 py-3">Jumlah</th>
+                                    <th class="px-4 py-3">Harga</th>
+                                    <th class="px-4 py-3">Kedaluwarsa dalam</th>
                                     <th class="px-4 py-3">Status</th>
                                 </tr>
                             </thead>
@@ -320,18 +350,18 @@ function refreshDashboard() {
                                     </td>
                                     <td class="px-4 py-3.5">
                                         <span class="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                                            {{ item.category }}
+                                            {{ categoryLabel(item.category) }}
                                         </span>
                                     </td>
                                     <td class="px-4 py-3.5 font-medium">{{ item.quantity }} {{ item.unit }}</td>
                                     <td class="px-4 py-3.5">
                                         <div v-if="item.discount_price" class="flex flex-col">
                                             <span class="font-semibold text-emerald-600 dark:text-emerald-400">
-                                                ${{ item.discount_price.toFixed(2) }}
+                                                {{ formatCurrency(item.discount_price) }}
                                             </span>
-                                            <span class="text-xs text-muted-foreground line-through"> ${{ item.original_price.toFixed(2) }} </span>
+                                            <span class="text-xs text-muted-foreground line-through">{{ formatCurrency(item.original_price) }}</span>
                                         </div>
-                                        <span v-else class="font-medium"> ${{ item.original_price.toFixed(2) }} </span>
+                                        <span v-else class="font-medium">{{ formatCurrency(item.original_price) }}</span>
                                     </td>
                                     <td class="px-4 py-3.5">
                                         <span
@@ -343,7 +373,7 @@ function refreshDashboard() {
                                             }"
                                         >
                                             <Clock class="size-3" />
-                                            <span>{{ item.days_left <= 0 ? 'Today' : `${item.days_left}d left` }}</span>
+                                            <span>{{ item.days_left <= 0 ? 'Hari ini' : `${item.days_left} hari lagi` }}</span>
                                         </span>
                                     </td>
                                     <td class="px-4 py-3.5">
@@ -355,14 +385,14 @@ function refreshDashboard() {
                                                 'bg-blue-500/10 text-blue-700 dark:text-blue-400': item.status === 'active',
                                             }"
                                         >
-                                            {{ item.status.replace('_', ' ') }}
+                                            {{ statusLabel(item.status) }}
                                         </span>
                                     </td>
                                 </tr>
 
                                 <tr v-if="urgent_products.length === 0">
                                     <td colspan="6" class="py-12 text-center text-sm text-muted-foreground">
-                                        No critical expiration items detected. All products have healthy shelf-life buffers.
+                                        Tidak ada produk yang harus segera ditangani. Masa simpan semua produk masih aman.
                                     </td>
                                 </tr>
                             </tbody>
@@ -371,15 +401,15 @@ function refreshDashboard() {
                 </div>
 
                 <!-- Live Agent Activity Feed Widget (1 col) -->
-                <div class="flex flex-col rounded-2xl border border-sidebar-border/80 bg-card shadow-sm dark:border-sidebar-border">
-                    <div class="flex items-center justify-between border-b border-sidebar-border/80 px-6 py-4">
+                <div class="flex min-w-0 flex-col rounded-2xl border border-sidebar-border/80 bg-card shadow-sm dark:border-sidebar-border">
+                    <div class="flex items-center justify-between gap-3 border-b border-sidebar-border/80 px-4 py-4 sm:px-6">
                         <div class="flex items-center gap-2.5">
                             <div class="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
                                 <Bot class="size-4" />
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold leading-tight text-neutral-900 dark:text-neutral-100">Agent Activity Feed</h3>
-                                <p class="text-xs text-muted-foreground">Autonomous decision stream</p>
+                                <h3 class="text-base font-semibold leading-tight text-neutral-900 dark:text-neutral-100">Aktivitas Agen</h3>
+                                <p class="text-xs text-muted-foreground">Catatan keputusan otomatis</p>
                             </div>
                         </div>
 
@@ -410,7 +440,7 @@ function refreshDashboard() {
                                         <Tag v-if="log.action_type === 'discount_applied'" class="size-3" />
                                         <Handshake v-else-if="log.action_type === 'donation_requested'" class="size-3" />
                                         <Zap v-else class="size-3" />
-                                        <span>{{ log.action_type.replace('_', ' ') }}</span>
+                                        <span>{{ actionLabel(log.action_type) }}</span>
                                     </span>
 
                                     <!-- Status Pill -->
@@ -436,7 +466,7 @@ function refreshDashboard() {
 
                             <div v-if="log.partner_name" class="mt-1 flex items-center gap-1.5 text-xs text-violet-700 dark:text-violet-300">
                                 <Handshake class="size-3.5" />
-                                <span>Dispatched to: {{ log.partner_name }}</span>
+                                <span>Disalurkan kepada: {{ log.partner_name }}</span>
                             </div>
 
                             <!-- AI Reasoning text -->
@@ -447,14 +477,14 @@ function refreshDashboard() {
 
                         <div v-if="recent_agent_logs.length === 0" class="py-12 text-center text-sm text-muted-foreground">
                             <Bot class="mx-auto mb-2 size-8 opacity-40" />
-                            <p>No autonomous logs recorded yet.</p>
-                            <p class="text-xs">New inventory is evaluated automatically when it is saved.</p>
+                            <p>Belum ada catatan aktivitas otomatis.</p>
+                            <p class="text-xs">Stok baru akan dievaluasi otomatis setelah disimpan.</p>
                         </div>
                     </div>
 
                     <div class="rounded-b-2xl border-t border-sidebar-border/80 bg-muted/20 p-3 text-center">
                         <Link href="/agent-logs" class="text-xs font-medium text-muted-foreground transition hover:text-foreground">
-                            View full audit log stream &rarr;
+                            Lihat seluruh riwayat aktivitas &rarr;
                         </Link>
                     </div>
                 </div>

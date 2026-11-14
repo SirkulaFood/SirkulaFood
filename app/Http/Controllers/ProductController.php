@@ -118,12 +118,12 @@ class ProductController extends Controller
                     'unit' => $product->unit,
                     'original_price' => (float) $product->original_price,
                     'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
-                    'original_price_formatted' => 'IDR '.number_format((float) $product->original_price, 0, ',', '.'),
+                    'original_price_formatted' => 'Rp '.number_format((float) $product->original_price, 0, ',', '.'),
                     'discount_price_formatted' => $product->discount_price !== null
-                        ? 'IDR '.number_format((float) $product->discount_price, 0, ',', '.')
+                        ? 'Rp '.number_format((float) $product->discount_price, 0, ',', '.')
                         : null,
                     'expiration_date' => $product->expiration_date->toDateString(),
-                    'expiration_date_formatted' => $product->expiration_date->format('M d, Y'),
+                    'expiration_date_formatted' => $product->expiration_date->locale('id')->translatedFormat('d F Y'),
                     'days_remaining' => $daysRemaining,
                     'urgency' => $urgencyLevel,
                     'status' => $product->status,
