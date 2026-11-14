@@ -17,7 +17,7 @@ class ScanInventoryCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'SirkulaFood:scan-inventory 
+    protected $signature = 'sirkulafood:scan-inventory 
                             {--days=7 : Number of days ahead to scan for expiring items}
                             {--dry-run : Evaluate decisions without mutating product statuses}';
 

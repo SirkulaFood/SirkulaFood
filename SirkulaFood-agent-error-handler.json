@@ -23,7 +23,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "http://SirkulaFood.test/api/v1/agent-logs/error",
+        "url": "http://ecoloop.test/api/v1/agent-logs/error",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [

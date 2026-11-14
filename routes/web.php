@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified', 'role:business_owner', 'partner.active'])
     ->get('business-owner/inventory', fn () => to_route('inventory.index'))
     ->name('business-owner.inventory');
 
-Route::middleware(['auth', 'verified', 'role:SirkulaFood_admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:ecoloop_admin,SirkulaFood_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('partners', [AdminPartnerManagementController::class, 'index'])->name('partners.index');
     Route::post('partners/{donationPartner}/approve', [AdminPartnerManagementController::class, 'approve'])->name('partners.approve');
     Route::post('partners/{donationPartner}/toggle-status', [AdminPartnerManagementController::class, 'toggleStatus'])->name('partners.toggle-status');

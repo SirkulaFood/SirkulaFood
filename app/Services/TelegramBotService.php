@@ -53,12 +53,19 @@ class TelegramBotService
             throw new RuntimeException('Telegram bot token is not configured.');
         }
 
+        $payload = [
+            'url' => $url,
+            'secret_token' => $secret,
+            'allowed_updates' => ['message', 'callback_query'],
+        ];
+
+        $ipAddress = config('services.telegram.webhook_ip_address');
+        if (is_string($ipAddress) && filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $payload['ip_address'] = $ipAddress;
+        }
+
         $response = Http::acceptJson()->asJson()->timeout(15)
-            ->post("https://api.telegram.org/bot{$token}/setWebhook", [
-                'url' => $url,
-                'secret_token' => $secret,
-                'allowed_updates' => ['message', 'callback_query'],
-            ]);
+            ->post("https://api.telegram.org/bot{$token}/setWebhook", $payload);
 
         if ($response->failed() || ! $response->json('ok')) {
             throw new RuntimeException('Telegram rejected the webhook registration (HTTP '.$response->status().').');

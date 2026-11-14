@@ -430,7 +430,7 @@ class NotificationService
         foreach (User::query()->notificationRecipients()->get(['id', 'name', 'email', 'telegram_chat_id']) as $user) {
             $managerReference = $reference.':manager:'.$user->id;
             $this->queueDelivery('partner_donation_stock_decision', 'email', $user->email, 'SirkulaFood: konfirmasi stok donasi mitra', [
-                'body' => "Halo {$user->name},\n\n{$managerText}\n\nPilih Kurangi stok atau Stok tetap melalui tombol pada bot Telegram SirkulaFoodPartner_Bot.",
+                'body' => "Halo {$user->name},\n\n{$managerText}\n\nPilih Kurangi stok atau Stok tetap melalui tombol pada bot Telegram SirkulaFood yang terhubung.",
                 'product_id' => $product->id,
             ], $managerReference.':email');
             if (filled($user->telegram_chat_id)) {

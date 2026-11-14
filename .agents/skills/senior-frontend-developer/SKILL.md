@@ -3,7 +3,7 @@ name: senior-frontend-developer
 description: "Apply this skill when acting as a Senior Frontend Developer, or when the user invokes `/skill Senior Frontend Developer`. Use for modern Vue 3 (Composition API, `<script setup lang="ts">`), TypeScript architecture, Inertia.js v2 client-side patterns, reactive state management, component decomposition, accessible primitives (Radix Vue, Headless UI), and frontend performance tuning."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior Frontend Developer

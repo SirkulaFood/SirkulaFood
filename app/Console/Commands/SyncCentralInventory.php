@@ -12,7 +12,7 @@ class SyncCentralInventory extends Command
      *
      * @var string
      */
-    protected $signature = 'SirkulaFood:sync-central-inventory {--force : Run even when Auto Sync is paused}';
+    protected $signature = 'sirkulafood:sync-central-inventory {--force : Run even when Auto Sync is paused}';
 
     /**
      * The console command description.

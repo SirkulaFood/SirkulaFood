@@ -360,7 +360,7 @@ class ExpiringDonationApprovalService
                     'reasoning' => $preAlert
                         ? 'Donasi dijadwalkan otomatis sesuai kebijakan yang dikonfirmasi Business Owner/Manager.'
                         : 'Donasi otomatis sesuai kebijakan yang dikonfirmasi Business Owner/Manager.',
-                    'ai_provider' => 'SirkulaFood_policy',
+                    'ai_provider' => 'sirkulafood_policy',
                 ],
                 'status' => 'scheduled',
                 'expires_at' => $expiry,

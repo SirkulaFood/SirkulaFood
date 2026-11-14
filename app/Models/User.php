@@ -67,7 +67,7 @@ class User extends Authenticatable
     /** Resolve the post-authentication destination for this account role. */
     public function landingRoute(): string
     {
-        if ($this->role === 'SirkulaFood_admin') {
+        if (in_array($this->role, ['ecoloop_admin', 'SirkulaFood_admin'], true)) {
             return 'admin.partners.index';
         }
 

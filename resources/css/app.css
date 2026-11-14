@@ -73,9 +73,47 @@ html {
     }
 }
 
+/* Keep every signed-in role inside the phone viewport while allowing wide tables to scroll. */
+html,
+body,
+#app {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    .group\/sidebar-wrapper,
+    .group\/sidebar-wrapper > main,
+    .group\/sidebar-wrapper > main > *,
+    main {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    main .overflow-x-auto {
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    main :is(h1, h2, h3, p, a, button, label) {
+        overflow-wrap: anywhere;
+    }
+
+    main :is(input, select, textarea) {
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
 /* SirkulaFood visual system: warm editorial surfaces, forest greens and quiet gold. */
 html, body { --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif; }
-.SirkulaFood, .auth-scene { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+.SirkulaFood, .sirkulafood, .auth-scene { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
 .auth-scene { background: radial-gradient(ellipse at 10% 0%, rgba(142,156,117,.23), transparent 36%), radial-gradient(ellipse at 100% 100%, rgba(195,160,91,.16), transparent 34%), #f2eee5; }
 .auth-scene h1, .auth-scene h2, .dashboard-experience h1 { font-family: 'Cormorant Garamond', Georgia, serif; }
 .auth-form-panel .text-muted-foreground { color: #74756b; }
@@ -201,42 +239,3 @@ html, body { --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif; }
         white-space: nowrap;
     }
 }
-
-/* Keep signed-in pages within phone viewports while allowing tables to scroll. */
-html,
-body,
-#app {
-    min-width: 0;
-    max-width: 100%;
-}
-
-@media (max-width: 768px) {
-    html,
-    body {
-        overflow-x: hidden;
-    }
-
-    .group\/sidebar-wrapper,
-    .group\/sidebar-wrapper > main,
-    .group\/sidebar-wrapper > main > *,
-    main {
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    main .overflow-x-auto {
-        max-width: 100%;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-    }
-
-    main :is(h1, h2, h3, p, a, button, label) {
-        overflow-wrap: anywhere;
-    }
-
-    main :is(input, select, textarea) {
-        min-width: 0;
-        max-width: 100%;
-    }
-}
-

@@ -21,6 +21,3 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-
-# Local n8n instance backup may contain account metadata.
-n8n-current-backup.json

@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class ScanDonationApprovalsCommand extends Command
 {
-    protected $signature = 'SirkulaFood:scan-donation-approvals';
+    protected $signature = 'sirkulafood:scan-donation-approvals';
 
     protected $description = 'Notify managers about near-expiry donation batches and run pre-approved donations';
 

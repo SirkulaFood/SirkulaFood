@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Password;
 
 class CreateSirkulaFoodAdmin extends Command
 {
-    protected $signature = 'SirkulaFood:make-admin';
+    protected $signature = 'sirkulafood:make-admin';
 
     protected $description = 'Create a separate SirkulaFood administrator account';
 
@@ -48,7 +48,7 @@ class CreateSirkulaFoodAdmin extends Command
         User::query()->create([
             'name' => $name,
             'email' => $email,
-            'role' => 'SirkulaFood_admin',
+            'role' => 'ecoloop_admin',
             'email_verified_at' => now(),
             'password' => Hash::make($password),
         ]);

@@ -3,7 +3,7 @@ name: senior-backend-developer
 description: "Apply this skill when acting as a Senior Backend Developer, or when the user invokes `/skill Senior Backend Developer`. Use for modern Laravel 12 and PHP 8.4 backend architecture, API design, single action classes, domain services, queue/job pipelines, event-driven architecture, security, and Pest feature testing."
 license: MIT
 metadata:
-  author: SirkulaFood
+  author: ecoloop
 ---
 
 # Senior Backend Developer
