@@ -46,7 +46,7 @@ class TelegramAiChatService
         $asksNoConfirmation = false;
         $asksDirectAutomaticDonation = false;
         if (in_array($actor['role'], ['business_owner', 'manager', 'cashier'], true)) {
-            $asksNoConfirmation = preg_match('/tanpa\s+konfirmasi|tanpa\s+persetujuan|otomatis|auto.?donasi/i', $message) === 1;
+            $asksNoConfirmation = preg_match('/\btanpa\s+(?:perlu\s+|harus\s+)?(?:konfirmasi|persetujuan)\b|\botomatis\b|auto.?donasi/i', $message) === 1;
             $asksDirectAutomaticDonation = in_array($actor['role'], ['business_owner', 'manager'], true)
                 && $asksNoConfirmation
                 && preg_match('/\bdonasikan\b|\bdonasi\s+(?!(?:apa|yang|mana|hari|kemarin|minggu|bulan)\b)\S+/i', $message) === 1
@@ -73,6 +73,10 @@ class TelegramAiChatService
             return $this->response('Pertanyaan SirkulaFood sedang dibatasi agar layanan tetap tersedia. Coba lagi sebentar lagi.');
         }
         RateLimiter::hit($rateLimitKey, 60);
+
+        if ($asksDirectAutomaticDonation) {
+            return $this->handleDirectAutomaticDonationCommand($message, $actor, $chatId, $telegramMessageId);
+        }
 
         if (! filled(config('services.ninerouter.api_key'))) {
             return $this->response('Layanan AI SirkulaFood belum tersambung ke 9Router. Admin perlu memeriksa NINEROUTER_API_KEY di konfigurasi server.');
@@ -136,24 +140,6 @@ class TelegramAiChatService
                 return $this->response('Saya belum bisa memproses jawaban dengan aman. Coba tulis ulang pertanyaan dengan lebih singkat. Tidak ada perubahan stok atau harga yang dilakukan.');
             }
 
-            if ($asksDirectAutomaticDonation) {
-                if (in_array(($structuredAnswer['type'] ?? null), ['donation_proposal', 'direct_automatic_donation'], true)) {
-                    return $this->executeDirectAutomaticDonation($structuredAnswer, $actor, $chatId, $telegramMessageId);
-                }
-
-                if (($structuredAnswer['type'] ?? null) === 'automation_policy_proposal') {
-                    $productChange = collect($structuredAnswer['product_changes'] ?? [])
-                        ->first(fn ($change): bool => is_array($change)
-                            && ($change['enabled'] ?? false) === true
-                            && in_array('donation', (array) ($change['scopes'] ?? []), true));
-                    if (is_array($productChange)) {
-                        return $this->executeDirectAutomaticDonation($productChange, $actor, $chatId, $telegramMessageId);
-                    }
-                }
-
-                return $this->response('Saya memahami Anda ingin donasi produk tersebut langsung berjalan tanpa konfirmasi per item, tetapi belum dapat mencocokkan satu produk dengan yakin. Sebutkan nama produk sesuai Inventory. Tidak ada kebijakan atau stok yang berubah.');
-            }
-
             if (($structuredAnswer['type'] ?? null) === 'automation_policy_proposal') {
                 return $this->createAutomationPolicyProposal($structuredAnswer, $actor, $chatId, $context, $message);
             }
@@ -192,30 +178,70 @@ class TelegramAiChatService
         return ['text' => $text, 'reply_markup' => $replyMarkup];
     }
 
-    /** @param array<string, mixed> $decision
-     * @param array{role: string, user: ?User, partner: ?DonationPartner} $actor
-     * @return array{text: string, reply_markup: array<string, mixed>|null}
-     */
-    private function executeDirectAutomaticDonation(array $decision, array $actor, string $chatId, ?string $telegramMessageId): array
+    /** Resolve an explicit owner/manager command against active inventory before allowing it to change policy or stock. */
+    private function handleDirectAutomaticDonationCommand(string $message, array $actor, string $chatId, ?string $telegramMessageId): array
     {
-        $user = $actor['user'];
-        if (! $user instanceof User || ! in_array($user->role, ['business_owner', 'manager'], true)) {
-            return $this->response('Hanya Business Owner atau Manager yang dapat mengaktifkan donasi otomatis langsung. Tidak ada perubahan yang dilakukan.');
+        if (! preg_match('/\b(?:donasikan|donasi)\s+(.+?)(?=\s+(?:tanpa|dengan|dan|sebanyak|sejumlah|untuk|karena)\b|[,.!?]|$)/iu', $message, $matches)) {
+            return $this->response('Saya belum dapat mengenali produk yang dimaksud. Sebutkan nama produk atau SKU yang tampil di Inventory. Kebijakan dan stok tidak berubah.');
         }
 
-        $productId = filter_var($decision['product_id'] ?? null, FILTER_VALIDATE_INT) ?: null;
-        $productName = trim((string) ($decision['product_name'] ?? $decision['name'] ?? ''));
-        $quantity = $decision['quantity'] ?? null;
-        if ($quantity !== null && (! is_numeric($quantity) || (float) $quantity < 1 || floor((float) $quantity) !== (float) $quantity)) {
-            return $this->response('Jumlah donasi belum jelas. Kirim jumlah bilangan bulat dan satuan, atau minta seluruh batch yang saat ini memenuhi syarat. Tidak ada perubahan stok atau kebijakan.');
+        $requestedProduct = trim((string) $matches[1]);
+        $requestedProduct = preg_replace('/^produk\s+/iu', '', $requestedProduct) ?? $requestedProduct;
+        $requestedProduct = preg_replace('/^(?:(?:sebanyak|sejumlah)\s+)?\d+\s*(?:kg|kilogram|kilo|g|gram|pcs?|unit|liter|l|ml)\s+/iu', '', $requestedProduct) ?? $requestedProduct;
+        $products = Product::query()->whereIn('status', ['active', 'discounted'])->get(['id', 'name', 'sku']);
+        $normalizedRequest = mb_strtolower($requestedProduct);
+        $exactMatches = $products->filter(fn (Product $product): bool => mb_strtolower((string) $product->name) === $normalizedRequest
+            || mb_strtolower((string) $product->sku) === $normalizedRequest);
+
+        if ($exactMatches->isEmpty()) {
+            $stopWords = ['produk', 'stok', 'saya', 'kami', 'itu', 'yang', 'semua', 'seluruh', 'segera', 'tolong', 'dong', 'nya'];
+            $tokens = collect(preg_split('/[^\pL\pN]+/u', $normalizedRequest, -1, PREG_SPLIT_NO_EMPTY) ?: [])
+                ->reject(fn (string $token): bool => in_array($token, $stopWords, true) || preg_match('/^\d+$/', $token) === 1)
+                ->values();
+            $unitWords = ['kg', 'kilo', 'kilogram', 'g', 'gram', 'pcs', 'pc', 'unit', 'liter', 'l', 'ml'];
+            $tokens = $tokens->reject(fn (string $token): bool => in_array($token, $unitWords, true))->values();
+            if ($tokens->isEmpty()) {
+                return $this->response('Sebutkan nama produk atau SKU yang jelas agar donasi otomatis hanya berlaku pada produk yang Anda maksud. Kebijakan dan stok tidak berubah.');
+            }
+
+            $exactMatches = $products->filter(function (Product $product) use ($tokens): bool {
+                $productText = mb_strtolower((string) $product->name.' '.(string) $product->sku);
+                foreach ($tokens as $token) {
+                    if (! preg_match('/(^|[^\pL\pN])'.preg_quote($token, '/').'([^\pL\pN]|$)/u', $productText)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        }
+
+        if ($exactMatches->count() !== 1) {
+            $names = $exactMatches->take(5)->pluck('name')->implode(', ');
+            if ($names !== '') {
+                return $this->response('Nama produk cocok dengan beberapa stok: '.$names.'. Kirim nama lengkap atau SKU agar kebijakan dan stok hanya berubah pada produk yang tepat.');
+            }
+
+            return $this->response('Produk itu belum cocok dengan stok aktif. Sebutkan nama produk atau SKU seperti yang tampil di Inventory. Kebijakan dan stok tidak berubah.');
+        }
+
+        $product = $exactMatches->first();
+        if (! $actor['user'] instanceof User) {
+            return $this->response('Akun Telegram belum terhubung ke akun Business Owner/Manager yang dapat mengubah kebijakan. Tidak ada perubahan yang dilakukan.');
+        }
+        $quantity = null;
+        $unit = null;
+        if (preg_match('/\b(?:sebanyak\s+)?(\d+)\s*(kg|kilogram|kilo|g|gram|pcs?|unit|liter|l|ml)\b/iu', $message, $quantityMatch)) {
+            $quantity = (int) $quantityMatch[1];
+            $unit = (string) $quantityMatch[2];
         }
 
         $reply = app(TelegramAiActionService::class)->executeDirectAutomaticDonation(
-            $productId,
-            $productName,
-            $quantity === null ? null : (int) $quantity,
-            isset($decision['unit']) ? (string) $decision['unit'] : null,
-            $user,
+            (int) $product->id,
+            (string) $product->name,
+            $quantity,
+            $unit,
+            $actor['user'],
             $chatId,
             $telegramMessageId
         );
